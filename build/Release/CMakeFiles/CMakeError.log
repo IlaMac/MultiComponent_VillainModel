@@ -1,0 +1,16 @@
+The MPI test test_mpi for CXX in mode normal failed to compile with the following output:
+Change Dir: /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_86f6f/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_86f6f.dir/build.make CMakeFiles/cmTC_86f6f.dir/build
+Building CXX object CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/c++   -isystem /usr/local/include  -march=native -mtune=native  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -fPIE   -std=c++17 -o CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o -c /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp
+In file included from /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp:1:
+/usr/local/include/mpi.h:1886:10: fatal error: 'openmpi/ompi/mpi/cxx/mpicxx.h' file not found
+#include "openmpi/ompi/mpi/cxx/mpicxx.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o] Error 1
+make: *** [cmTC_86f6f/fast] Error 2
+
+
+
