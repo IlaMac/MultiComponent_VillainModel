@@ -173,9 +173,9 @@ int main(int argc, char *argv[]){
 
     t_tot.toc();
 
-    //std::cout << "Proccess current resident ram usage: " << process_memory_in_mb("VmRSS") << " MB" << std::endl;
-    //std::cout << "Proccess maximum resident ram usage: " << process_memory_in_mb("VmHWM") << " MB" << std::endl;
-    //std::cout << "Proccess maximum virtual  ram usage: " << process_memory_in_mb("VmPeak") << " MB" << std::endl;
+    std::cout << "Proccess current resident ram usage: " << process_memory_in_mb("VmRSS") << " MB" << std::endl;
+    std::cout << "Proccess maximum resident ram usage: " << process_memory_in_mb("VmHWM") << " MB" << std::endl;
+    std::cout << "Proccess maximum virtual  ram usage: " << process_memory_in_mb("VmPeak") << " MB" << std::endl;
     MPI_Barrier(MPI_COMM_WORLD);
 
     t_tot.print_measured_time();
@@ -185,7 +185,8 @@ int main(int argc, char *argv[]){
 
 void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
 
-    int n, t = 0;
+    int n, t;
+    double inv_n_save= 1./2;//Inverse number of spin configurations I want to save
     class_tic_toc t_h5pp(true,5,"Benchmark h5pp");
     class_tic_toc t_metropolis(true,5,"Benchmark metropolis");
     class_tic_toc t_measures(true,5,"Benchmark measures");
@@ -214,15 +215,15 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     std::vector<hsize_t> rho_dims = {NC};	
     h5pp::hid::h5t HDF5_RHO_TYPE = H5Tarray_create(H5T_NATIVE_DOUBLE,rho_dims.size(),rho_dims.data());
     h5pp::hid::h5t MY_HDF5_MEASURES_TYPE = H5Tcreate(H5T_COMPOUND, sizeof(Measures));
+
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E", HOFFSET(Measures, E), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_pot", HOFFSET(Measures, E_pot), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_kin", HOFFSET(Measures, E_kin), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_Josephson", HOFFSET(Measures, E_Josephson), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_B", HOFFSET(Measures, E_B), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_AB", HOFFSET(Measures, E_AB), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m", HOFFSET(Measures, m), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "m_phase", HOFFSET(Measures, m_phase),  HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "ds", HOFFSET(Measures, d_rhoz), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "rho", HOFFSET(Measures, density_psi), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "DH_Ddi", HOFFSET(Measures, DH_Ddi), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2i", HOFFSET(Measures, D2H_Dd2i), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2ij", HOFFSET(Measures, D2H_Dd2ij), HDF5_RHO_TYPE);
@@ -233,7 +234,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     //std::vector<double> testvec (1000000,3.14);
     //file.writeDataset(testvec,"testgroup/hugevector", H5D_layout_t::H5D_CHUNKED);
     for (n = NSTART; n<MCp.nmisu; n++) {
-
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
             metropolis(Site, MCp, Hp,  my_beta);
@@ -242,18 +242,21 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         //Measures
         t_measures.tic();
         mis.reset();
-    	energy(mis, Hp, my_beta, Site);
-        dual_stiffness(mis, Hp, Site);
+        all_measures(mis, Hp, my_beta, Site);
+
+        /*energy(mis, Hp, my_beta, Site);
+    	if(Hp.e!=0) {
+            dual_stiffness(mis, Hp, Site);
+        }
         helicity_modulus(mis, Hp, Site);
         magnetization(mis, Site);
-        if(Hp.e !=0) {
-            density_psi(mis, Site);
-        }
+        magnetization_singlephase(mis, Site);*/
+
         mis.my_rank=PTp.rank;
         t_measures.toc();
 
         t_h5pp.tic();
-        file.appendTableEntries(mis, "Measurements");
+        file.appendTableRecords(mis, "Measurements");
         t_h5pp.toc();
         MPI_Barrier(MPI_COMM_WORLD);
 
@@ -263,7 +266,10 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
         //Save a configuration for the restarting
         save_lattice(Site, directory_write_temp, std::string("restart"));
-        //Parallel Tempering swap
+	if((n%((int)(MCp.nmisu*inv_n_save)))==0){
+	save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
+	}
+	//Parallel Tempering swap
         parallel_temp(mis.E, my_beta, my_ind, PTp, PTroot);
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
@@ -281,9 +287,9 @@ void parallel_temp(double &my_E , double &my_beta, int &my_ind, struct PT_parame
     double coin;
     double n_rand, delta_E, delta_beta;
     double oldbeta_i, oldbeta_nn;
-    int i=0, nn=0, ind_nn=0;
-    int oldrank_i=0, oldrank_nn=0;
-    int newrank_i=0, newrank_nn=0;
+    int i=0, nn=0, ind_nn;
+    int oldrank_i, oldrank_nn;
+    int newrank_i, newrank_nn;
 
 
     MPI_Gather(&my_E, 1, MPI_DOUBLE, PTroot.All_Energies.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
@@ -328,6 +334,7 @@ void parallel_temp(double &my_E , double &my_beta, int &my_ind, struct PT_parame
     MPI_Scatter(PTroot.rank_to_ind.data(), 1, MPI_INT, &my_ind, 1, MPI_INT, PTp.root, MPI_COMM_WORLD);
 
 }
+
 
 
 unsigned int nn(unsigned int i, unsigned int coord, int dir){
@@ -379,5 +386,4 @@ void myhelp(int argd, char** argu) {
     fprintf(stderr,"\n");
     fprintf(stderr,"%s <DIRECTORY_PARAMETERS> <SEED> \n",argu[0]);
     exit (EXIT_FAILURE);
-    return;
 }

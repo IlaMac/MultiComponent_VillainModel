@@ -30,15 +30,14 @@ struct Node{
 
 struct H_parameters{
     /*These values are externally given by an input file*/
-    int a;
-    int b;
+    int rho;
     int eta;
     double e;
     double h;
     double nu;
     double b_low; //lowest beta for the parallel tempering procedure
     double b_high; // highest beta for the parallel tempering procedure
-    int init; //Initial conditions
+    int init;
 };
 
 struct PT_parameters{
@@ -61,8 +60,6 @@ struct MC_parameters{
     int tau; // estimate of the auto-correlation time
     int nmisu; //total number of independent measures
     int n_autosave; //frequency at which intermediate configuration are saved
-    double lbox_l; //length of the box for the uniform distribution of l (cartesian transformation of Psi)
-    double lbox_rho; //length of the box for the uniform distribution of rho (polar transformation of Psi --> modulus)
     double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
     double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
 };
