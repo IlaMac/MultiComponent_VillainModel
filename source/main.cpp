@@ -56,6 +56,19 @@ void signal_callback_handler(int signum) {
 
 unsigned int Lx, Ly, Lz, N;
 
+/*! \brief MatLab-style modulo operator
+ *   \param x first number
+ *   \param y second number
+ *   \return modulo of x and y.
+ *   Example,
+ *     mod(7,2)  = 1 but  7%2=1
+ *     mod(-0.5,10)  = 9.5 instead of -0.5%10=-0.5 as given by x%y.
+ */
+template<typename T>
+inline auto mod(const T x, const T y) {
+    return (x % y + y) % y;
+}
+
 int main(int argc, char *argv[]){
     //std::vector<Node> Lattice;
     struct Node* Lattice;
@@ -217,22 +230,16 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     h5pp::hid::h5t MY_HDF5_MEASURES_TYPE = H5Tcreate(H5T_COMPOUND, sizeof(Measures));
 
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E", HOFFSET(Measures, E), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_kin", HOFFSET(Measures, E_kin), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_Josephson", HOFFSET(Measures, E_Josephson), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_B", HOFFSET(Measures, E_B), H5T_NATIVE_DOUBLE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_AB", HOFFSET(Measures, E_AB), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m", HOFFSET(Measures, m), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m_phase", HOFFSET(Measures, m_phase),  HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "ds", HOFFSET(Measures, d_rhoz), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "DH_Ddi", HOFFSET(Measures, DH_Ddi), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2i", HOFFSET(Measures, D2H_Dd2i), HDF5_RHO_TYPE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2ij", HOFFSET(Measures, D2H_Dd2ij), HDF5_RHO_TYPE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd12", HOFFSET(Measures, D2H_Dd2ij), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "rank", HOFFSET(Measures, my_rank), H5T_NATIVE_INT);
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
 
-    //std::vector<double> testvec (1000000,3.14);
-    //file.writeDataset(testvec,"testgroup/hugevector", H5D_layout_t::H5D_CHUNKED);
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
@@ -242,15 +249,11 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         //Measures
         t_measures.tic();
         mis.reset();
-        all_measures(mis, Hp, my_beta, Site);
-
-        /*energy(mis, Hp, my_beta, Site);
-    	if(Hp.e!=0) {
-            dual_stiffness(mis, Hp, Site);
-        }
-        helicity_modulus(mis, Hp, Site);
-        magnetization(mis, Site);
-        magnetization_singlephase(mis, Site);*/
+        helicity_modulus(mis, Hp, my_beta, Site);
+        energy(mis, Hp, my_beta, Site);
+        magnetization(mis, Hp, my_beta, Site);
+        magnetization_singlephase(mis, Hp, my_beta, Site);
+        dual_stiffness(mis, Hp, my_beta, Site);
 
         mis.my_rank=PTp.rank;
         t_measures.toc();
@@ -266,10 +269,10 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
         //Save a configuration for the restarting
         save_lattice(Site, directory_write_temp, std::string("restart"));
-	if((n%((int)(MCp.nmisu*inv_n_save)))==0){
-	save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
-	}
-	//Parallel Tempering swap
+	    if((n%(MCp.n_autosave))==0){
+	        save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
+	    }
+	    //Parallel Tempering swap
         parallel_temp(mis.E, my_beta, my_ind, PTp, PTroot);
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);

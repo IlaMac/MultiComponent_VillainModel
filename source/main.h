@@ -15,7 +15,7 @@
 #include "rng.h"
 
 /*Number of components*/
-static constexpr int NC = 3;
+static constexpr int NC = 2;
 
 extern unsigned int Lx, Ly, Lz, N;
 
