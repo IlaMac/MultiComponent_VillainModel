@@ -56,18 +56,7 @@ void signal_callback_handler(int signum) {
 
 unsigned int Lx, Ly, Lz, N;
 
-/*! \brief MatLab-style modulo operator
- *   \param x first number
- *   \param y second number
- *   \return modulo of x and y.
- *   Example,
- *     mod(7,2)  = 1 but  7%2=1
- *     mod(-0.5,10)  = 9.5 instead of -0.5%10=-0.5 as given by x%y.
- */
-template<typename T>
-inline auto mod(const T x, const T y) {
-    return (x % y + y) % y;
-}
+
 
 int main(int argc, char *argv[]){
     //std::vector<Node> Lattice;
@@ -235,7 +224,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "ds", HOFFSET(Measures, d_rhoz), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "DH_Ddi", HOFFSET(Measures, DH_Ddi), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2i", HOFFSET(Measures, D2H_Dd2i), HDF5_RHO_TYPE);
-    H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd12", HOFFSET(Measures, D2H_Dd2ij), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd12", HOFFSET(Measures, D2H_Dd12), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "rank", HOFFSET(Measures, my_rank), H5T_NATIVE_INT);
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
@@ -249,11 +238,11 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         //Measures
         t_measures.tic();
         mis.reset();
-        helicity_modulus(mis, Hp, my_beta, Site);
-        energy(mis, Hp, my_beta, Site);
-        magnetization(mis, Hp, my_beta, Site);
-        magnetization_singlephase(mis, Hp, my_beta, Site);
-        dual_stiffness(mis, Hp, my_beta, Site);
+        helicity_modulus(mis, Hp, MCp, my_beta, Site);
+        energy(mis, Hp, MCp, my_beta, Site);
+        magnetization(mis, Site);
+        magnetization_singlephase(mis,  Site);
+        dual_stiffness(mis, Hp, Site);
 
         mis.my_rank=PTp.rank;
         t_measures.toc();

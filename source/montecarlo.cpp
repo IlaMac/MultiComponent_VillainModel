@@ -32,7 +32,7 @@ void metropolis( struct Node* Site, struct MC_parameters &MCp, struct H_paramete
                     NewPsi.t = fmod(OldPsi.t + d_theta, C_TWO_PI);
                     NewPsi.r=1;
                     //t_localHtheta.tic();
-                    newE = HVillan_new(newPsi, i, alpha, my_beta, Hp, MCp, Site)
+                    newE = HVillan_new(NewPsi, i, alpha, my_beta, Hp, MCp, Site);
                     //t_localHtheta.toc();
                     minus_deltaE =  (oldE - newE);
                     // h3 * (oldE - newE); when I will include properly the lattice spacing which in this case is taken to be just 1
@@ -118,8 +118,8 @@ double HVillan_old(double my_beta, struct H_parameters &Hp, struct MC_parameters
                     for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
                         for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
 
-                            u1-= C_TWO_PI*n_1;
-                            u2-= C_TWO_PI*n_2;
+                            u_1-= C_TWO_PI*n_1;
+                            u_2-= C_TWO_PI*n_2;
 
                             local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
                             sum_n1n2+= exp(-local_S);
@@ -190,8 +190,8 @@ double HVillan_new(struct O2 Psi, unsigned int position, unsigned int alpha,  do
                     for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
                         for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
 
-                            u1-= C_TWO_PI*n_1;
-                            u2-= C_TWO_PI*n_2;
+                            u_1-= C_TWO_PI*n_1;
+                            u_2-= C_TWO_PI*n_2;
 
                             local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
                             sum_n1n2+= exp(-local_S);

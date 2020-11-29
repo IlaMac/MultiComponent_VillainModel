@@ -4,7 +4,7 @@
 
 #include "measures.h"
 
-void energy(struct Measures &mis, struct H_parameters &Hp, double my_beta, struct Node* Site){
+void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
 
     unsigned int vec;
     unsigned int n_1, n_2;
@@ -34,8 +34,8 @@ void energy(struct Measures &mis, struct H_parameters &Hp, double my_beta, struc
                     for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
                         for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
 
-                            u1-= C_TWO_PI*n_1;
-                            u2-= C_TWO_PI*n_2;
+                            u_1-= C_TWO_PI*n_1;
+                            u_2-= C_TWO_PI*n_2;
 
                             local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
                             sum_n1n2+= exp(-local_S);
@@ -52,7 +52,7 @@ void energy(struct Measures &mis, struct H_parameters &Hp, double my_beta, struc
 }
 
 
-void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, double my_beta, struct Node* Site){
+void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
     unsigned int n_1, n_2;
@@ -75,8 +75,8 @@ void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, double my_b
 
                 for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
                     for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
-                        u1 -= C_TWO_PI * n_1;
-                        u2 -= C_TWO_PI * n_2;
+                        u_1 -= C_TWO_PI * n_1;
+                        u_2 -= C_TWO_PI * n_2;
 
                         j1=Hp.rho*u_1 + Hp.nu*u_2;
                         j2=Hp.rho*u_2 + Hp.nu*u_1;

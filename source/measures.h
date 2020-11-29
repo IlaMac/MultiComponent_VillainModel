@@ -29,8 +29,8 @@ struct Measures{
 };
 
 
-void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, double my_beta, struct Node* Site);
-void energy(struct Measures &mis, struct H_parameters &Hp, double my_beta, struct Node* Site);
+void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site);
+void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site);
 
 void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site);
 void magnetization(struct Measures &mis, struct Node* Site);
