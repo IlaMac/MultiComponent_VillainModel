@@ -229,6 +229,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
 
+
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
@@ -240,10 +241,11 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         mis.reset();
         helicity_modulus(mis, Hp, MCp, my_beta, Site);
         energy(mis, Hp, MCp, my_beta, Site);
-        magnetization(mis, Site);
+        //magnetization(mis, Site);
         magnetization_singlephase(mis,  Site);
-        dual_stiffness(mis, Hp, Site);
-
+        if(Hp.e!=0) {
+            dual_stiffness(mis, Hp, Site);
+        }
         mis.my_rank=PTp.rank;
         t_measures.toc();
 

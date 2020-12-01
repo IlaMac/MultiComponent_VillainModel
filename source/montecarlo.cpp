@@ -23,10 +23,10 @@ void metropolis( struct Node* Site, struct MC_parameters &MCp, struct H_paramete
                 i = ix + Lx * (iy + iz * Ly);
 
                 /*******PHASE ONLY UPDATE**************/
-                for (alpha = 0; alpha < 3; alpha++) {
+                for (alpha = 0; alpha < NC; alpha++) {
                     OldPsi = Site[i].Psi[alpha];
                     //t_localHtheta.tic();
-                    oldE = HVillan_old(my_beta, Hp, MCp, Site);
+                    oldE = HVillan_old(i, alpha, my_beta, Hp, MCp, Site);
                     //t_localHtheta.toc();
                     d_theta = rn::uniform_real_box(-MCp.lbox_theta, MCp.lbox_theta);
                     NewPsi.t = fmod(OldPsi.t + d_theta, C_TWO_PI);
@@ -88,48 +88,59 @@ void metropolis( struct Node* Site, struct MC_parameters &MCp, struct H_paramete
     MCp.lbox_A= MCp.lbox_A*(0.5*(acc_A/acc_rate)+0.5);
 }
 
-double HVillan_old(double my_beta, struct H_parameters &Hp, struct MC_parameters &MCp, struct Node* Site){
+double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, struct H_parameters &Hp, struct MC_parameters &MCp, struct Node* Site){
 
     unsigned int vec;
-    unsigned int n_1, n_2;
-    unsigned int i, ix, iy, iz, nn_i;
-    double u_1, u_2;
-    double local_S=0., sum_n1n2=0., boltz_h=0.;
+    int n_1, n_2;
+    unsigned int ix, iy, iz, nn_ip, nn_im;
+    double u0_1p, u0_2p, u0_1m, u0_2m, u_1, u_2;
+    double local_S=0., sum_n1n2_plus=0., sum_n1n2_minus=0., boltz_h=0.;
     double inv_beta=1./my_beta;
 
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++){
-                i = ix + Lx * (iy + iz * Ly);
-                for(vec=0; vec<3; vec++) {
-                    if(vec==0){
-                        nn_i= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
-                    }
-                    if(vec==1){
-                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
-                    }
-                    if(vec==2){
-                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
-                    }
+    ix=position%Lx;
+    iy=(position/Lx)%Ly;
+    iz=(position/(Lx*Ly));
 
-                    u_1= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
-                    u_2= Site[nn_i].Psi[2].t - Site[i].Psi[2].t;
+    for(vec=0; vec<3; vec++) {
+        if(vec==0){
+            nn_ip= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
+            nn_im= mod(ix-1,Lx) + Lx * (iy + iz * Ly);
+        }
+        if(vec==1){
+            nn_ip= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+            nn_im= ix + Lx * (mod(iy-1,Ly) + iz * Ly);
+        }
+        if(vec==2){
+            nn_ip= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+            nn_im= ix + Lx * (iy + mod(iz-1,Lz) * Ly);
+        }
 
-                    for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
-                        for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
+        u0_1p= Site[nn_ip].Psi[0].t - Site[position].Psi[0].t;
+        u0_2p= Site[nn_ip].Psi[1].t - Site[position].Psi[1].t;
 
-                            u_1-= C_TWO_PI*n_1;
-                            u_2-= C_TWO_PI*n_2;
+        u0_1m= -Site[nn_im].Psi[0].t + Site[position].Psi[0].t;
+        u0_2m= -Site[nn_im].Psi[1].t + Site[position].Psi[1].t;
 
-                            local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
-                            sum_n1n2+= exp(-local_S);
-                        }
-                    }
+        for (n_1 = (-MCp.nMAX); n_1 < (MCp.nMAX); n_1++) {
+            for (n_2 = (-MCp.nMAX); n_2 < (MCp.nMAX); n_2++) {
 
-                    boltz_h-=inv_beta*log(sum_n1n2);
-                }
+                u_1= u0_1p - C_TWO_PI*n_1;
+                u_2= u0_2p - C_TWO_PI*n_2;
+
+                local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                sum_n1n2_plus+= exp(-local_S);
+
+                u_1= u0_1m - C_TWO_PI*n_1;
+                u_2= u0_2m - C_TWO_PI*n_2;
+
+                local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                sum_n1n2_minus+= exp(-local_S);
             }
         }
+
+        boltz_h-=inv_beta*log(sum_n1n2_minus);
+        boltz_h-=inv_beta*log(sum_n1n2_plus);
+
     }
 
 
@@ -140,68 +151,66 @@ double HVillan_old(double my_beta, struct H_parameters &Hp, struct MC_parameters
 double HVillan_new(struct O2 Psi, unsigned int position, unsigned int alpha,  double my_beta, struct H_parameters &Hp, struct MC_parameters &MCp, struct Node* Site){
 
     unsigned int vec;
-    unsigned int n_1, n_2;
-    unsigned int i, ix, iy, iz, nn_i;
+    int n_1, n_2;
+    unsigned int ix, iy, iz, nn_ip, nn_im;
     double theta_1=0., theta_2=0.;
-    double theta_nn_1=0., theta_nn_2=0.;
-    double u_1, u_2;
-    double local_S=0., sum_n1n2=0., boltz_h=0.;
+    double u0_1p, u0_2p, u0_1m, u0_2m, u_1, u_2;
+    double local_S=0., sum_n1n2_plus=0., sum_n1n2_minus=0., boltz_h=0.;
     double inv_beta=1./my_beta;
 
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++){
-                i = ix + Lx * (iy + iz * Ly);
-                if(i == position){
-                    if(alpha==0){
-                        theta_1=Psi.t;
-                        theta_1=Site[i].Psi[1].t;
-                    }
-                    else if(alpha==1){
-                        theta_2=Psi.t;
-                        theta_2=Site[i].Psi[2].t;
-                    }
-                }
-                for(vec=0; vec<3; vec++) {
-                    if(vec==0){
-                        nn_i= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
-                    }
-                    if(vec==1){
-                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
-                    }
-                    if(vec==2){
-                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
-                    }
+    ix=position%Lx;
+    iy=(position/Lx)%Ly;
+    iz=(position/(Lx*Ly));
 
-                    if(nn_i == position){
-                        if(alpha==0){
-                            theta_nn_1=Psi.t;
-                            theta_nn_1=Site[nn_i].Psi[1].t;
-                        }
-                        else if(alpha==1){
-                            theta_nn_2=Psi.t;
-                            theta_nn_2=Site[nn_i].Psi[2].t;
-                        }
-                    }
+    if(alpha==0){
+        theta_1=Psi.t;
+        theta_2=Site[position].Psi[1].t;
+    }
+    else if(alpha==1){
+        theta_1=Site[position].Psi[0].t;
+        theta_2=Psi.t;
+    }
 
-                    u_1= theta_nn_1 - theta_1;
-                    u_2= theta_nn_2 - theta_2;
+    for(vec=0; vec<3; vec++) {
+        if(vec==0){
+            nn_ip= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
+            nn_im= mod(ix-1,Lx) + Lx * (iy + iz * Ly);
+        }
+        if(vec==1){
+            nn_ip= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+            nn_im= ix + Lx * (mod(iy-1,Ly) + iz * Ly);
+        }
+        if(vec==2){
+            nn_ip= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+            nn_im= ix + Lx * (iy + mod(iz-1,Lz) * Ly);
+        }
 
-                    for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
-                        for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
+        u0_1p= Site[nn_ip].Psi[0].t - theta_1;
+        u0_2p= Site[nn_ip].Psi[1].t - theta_2;
 
-                            u_1-= C_TWO_PI*n_1;
-                            u_2-= C_TWO_PI*n_2;
+        u0_1m= -Site[nn_im].Psi[0].t + theta_1;
+        u0_2m= -Site[nn_im].Psi[1].t + theta_2;
 
-                            local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
-                            sum_n1n2+= exp(-local_S);
-                        }
-                    }
+        for (n_1 = (-MCp.nMAX); n_1 < (MCp.nMAX); n_1++) {
+            for (n_2 = (-MCp.nMAX); n_2 < (MCp.nMAX); n_2++) {
 
-                    boltz_h-=inv_beta*log(sum_n1n2);
-                }
+                u_1= u0_1p - C_TWO_PI*n_1;
+                u_2= u0_2p - C_TWO_PI*n_2;
+
+                local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                sum_n1n2_plus+= exp(-local_S);
+
+                u_1= u0_1m - C_TWO_PI*n_1;
+                u_2= u0_2m - C_TWO_PI*n_2;
+
+                local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                sum_n1n2_minus+= exp(-local_S);
             }
         }
+
+        boltz_h-=inv_beta*log(sum_n1n2_plus);
+        boltz_h-=inv_beta*log(sum_n1n2_minus);
+
     }
 
     return boltz_h;
@@ -245,7 +254,7 @@ double local_HA(double A, unsigned int ix, unsigned int iy, unsigned int iz,  un
         nn_im = imz;
     }
 
-    for(alpha=0; alpha<3; alpha++) {
+    for(alpha=0; alpha<NC; alpha++) {
         gauge_phase1=Site[nn_ip].Psi[alpha].t - Site[i].Psi[alpha].t + Hp.h*Hp.e*A;
         h_Kinetic -= inv_h2*cos(gauge_phase1);
     }
@@ -254,7 +263,7 @@ double local_HA(double A, unsigned int ix, unsigned int iy, unsigned int iz,  un
     //We need to compute just the part of the Hamiltonian involving A
 
     //Kinetic= -(1/h²)*\sum_k=1,2,3 |Psi_{alpha}(r)||Psi_{alpha}(r+k)|* cos(theta_{alpha}(r+k) - theta_{alpha}(r) +h*e*A_k(r))
-    for(alpha=0; alpha<3; alpha++) {
+    for(alpha=0; alpha<NC; alpha++) {
         gauge_phase1=Site[nn_ip].Psi[alpha].t - Site[i].Psi[alpha].t + Hp.h*Hp.e*A;
         h_Kinetic -= inv_h2*cos(gauge_phase1);
     }

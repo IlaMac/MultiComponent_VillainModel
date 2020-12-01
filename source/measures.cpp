@@ -7,9 +7,9 @@
 void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
 
     unsigned int vec;
-    unsigned int n_1, n_2;
+    int n_1, n_2;
     unsigned int i, ix, iy, iz, nn_i;
-    double u_1, u_2;
+    double u0_1, u0_2, u_1, u_2;
     double local_S=0., sum_n1n2=0., boltz_h=0.;
     double inv_beta=1./my_beta;
 
@@ -28,16 +28,17 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    u_1= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
-                    u_2= Site[nn_i].Psi[2].t - Site[i].Psi[2].t;
+                    u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
+                    u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
 
-                    for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
-                        for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
+                    for (n_1 = -(MCp.nMAX); n_1 < (MCp.nMAX); n_1++) {
+                        for (n_2 = -(MCp.nMAX); n_2 < (MCp.nMAX); n_2++) {
 
-                            u_1-= C_TWO_PI*n_1;
-                            u_2-= C_TWO_PI*n_2;
+                            u_1= u0_1 - C_TWO_PI*n_1;
+                            u_2= u0_2 - C_TWO_PI*n_2;
 
                             local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+
                             sum_n1n2+= exp(-local_S);
                         }
                     }
@@ -55,9 +56,9 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
 void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
-    unsigned int n_1, n_2;
+    int n_1, n_2;
     unsigned int i, ix, iy, iz, nn_i;
-    double u_1, u_2;
+    double u_1, u_2, u0_1, u0_2;
     double j1, j2;
     double d1=0., d2=0., d11=0., d12=0., d22=0.;
     double norm=0., boltz=0.;
@@ -70,13 +71,13 @@ void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_p
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                u_1= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
-                u_2= Site[nn_i].Psi[2].t - Site[i].Psi[2].t;
+                u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
+                u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
 
-                for (n_1 = -MCp.INT_NMAX; n_1 < MCp.INT_NMAX; n_1++) {
-                    for (n_2 = -MCp.INT_NMAX; n_2 < MCp.INT_NMAX; n_2++) {
-                        u_1 -= C_TWO_PI * n_1;
-                        u_2 -= C_TWO_PI * n_2;
+                for (n_1 = -MCp.nMAX; n_1 < MCp.nMAX; n_1++) {
+                    for (n_2 = -MCp.nMAX; n_2 < MCp.nMAX; n_2++) {
+                        u_1 = u0_1 - C_TWO_PI * n_1;
+                        u_2 = u0_2 - C_TWO_PI * n_2;
 
                         j1=Hp.rho*u_1 + Hp.nu*u_2;
                         j2=Hp.rho*u_2 + Hp.nu*u_1;
@@ -135,6 +136,7 @@ void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* 
     mis.d_rhoz=invNorm*((Re_rhoz*Re_rhoz) +(Im_rhoz*Im_rhoz));
 }
 
+//DESIGNED FOR 3 COMPONENTs
 void magnetization(struct Measures &mis, struct Node* Site){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i;

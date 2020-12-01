@@ -62,7 +62,7 @@ struct MC_parameters{
     int n_autosave; //frequency at which intermediate configuration are saved
     double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
     double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
-    int INT_NMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
+    int nMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
 };
 
 void initialize_lattice(struct Node* Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp);
