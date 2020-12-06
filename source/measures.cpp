@@ -31,8 +31,8 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
                     u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
                     u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
 
-                    for (n_1 = -(MCp.nMAX); n_1 < (MCp.nMAX); n_1++) {
-                        for (n_2 = -(MCp.nMAX); n_2 < (MCp.nMAX); n_2++) {
+                    for (n_1 = -(MCp.nMAX); n_1 < (MCp.nMAX+1); n_1++) {
+                        for (n_2 = -(MCp.nMAX); n_2 < (MCp.nMAX+1); n_2++) {
 
                             u_1= u0_1 - C_TWO_PI*n_1;
                             u_2= u0_2 - C_TWO_PI*n_2;
@@ -74,8 +74,8 @@ void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_p
                 u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
                 u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
 
-                for (n_1 = -MCp.nMAX; n_1 < MCp.nMAX; n_1++) {
-                    for (n_2 = -MCp.nMAX; n_2 < MCp.nMAX; n_2++) {
+                for (n_1 = -MCp.nMAX; n_1 < (MCp.nMAX +1); n_1++) {
+                    for (n_2 = -MCp.nMAX; n_2 < (MCp.nMAX+1); n_2++) {
                         u_1 = u0_1 - C_TWO_PI * n_1;
                         u_2 = u0_2 - C_TWO_PI * n_2;
 
