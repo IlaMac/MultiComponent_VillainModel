@@ -6,7 +6,7 @@
 
 void U_internal_energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site) {
     unsigned int vec;
-    double U_energy=0.;`z
+    double U_energy=0.;
     int n_1, n_2;
     unsigned int i, ix, iy, iz, nn_i;
     double u_1, u_2, u0_1, u0_2;
