@@ -64,7 +64,6 @@ double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, st
     unsigned int ix, iy, iz, nn_ip, nn_im;
     double u0_1p, u0_2p, u0_1m, u0_2m, u_1, u_2;
     double local_S=0., sum_n1n2_plus=0., sum_n1n2_minus=0., boltz_h=0.;
-    double inv_beta=1./my_beta;
 
     ix=position%Lx;
     iy=(position/Lx)%Ly;
@@ -84,11 +83,12 @@ double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, st
             nn_im= ix + Lx * (iy + mod(iz-1,Lz) * Ly);
         }
 
-        u0_1p= Site[nn_ip].Psi[0].t - Site[position].Psi[0].t;
-        u0_2p= Site[nn_ip].Psi[1].t - Site[position].Psi[1].t;
+        u0_1p= fmod(Site[nn_ip].Psi[0].t - Site[position].Psi[0].t, C_PI);
+        u0_2p= fmod(Site[nn_ip].Psi[1].t - Site[position].Psi[1].t, C_PI);
 
-        u0_1m= -Site[nn_im].Psi[0].t + Site[position].Psi[0].t;
-        u0_2m= -Site[nn_im].Psi[1].t + Site[position].Psi[1].t;
+        u0_1m= fmod(-Site[nn_im].Psi[0].t + Site[position].Psi[0].t, C_PI);
+        u0_2m= fmod(-Site[nn_im].Psi[1].t + Site[position].Psi[1].t, C_PI);
+
 
         for (n_1 = (-MCp.nMAX); n_1 < (MCp.nMAX +1); n_1++) {
             for (n_2 = (-MCp.nMAX); n_2 < (MCp.nMAX +1); n_2++) {
@@ -109,7 +109,6 @@ double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, st
 
         boltz_h-=log(sum_n1n2_minus);
         boltz_h-=log(sum_n1n2_plus);
-
     }
 
 
@@ -154,11 +153,11 @@ double HVillan_new(struct O2 Psi, unsigned int position, unsigned int alpha,  do
             nn_im= ix + Lx * (iy + mod(iz-1,Lz) * Ly);
         }
 
-        u0_1p= Site[nn_ip].Psi[0].t - theta_1;
-        u0_2p= Site[nn_ip].Psi[1].t - theta_2;
+        u0_1p= fmod(Site[nn_ip].Psi[0].t - theta_1, C_PI);
+        u0_2p= fmod(Site[nn_ip].Psi[1].t - theta_2, C_PI);
 
-        u0_1m= -Site[nn_im].Psi[0].t + theta_1;
-        u0_2m= -Site[nn_im].Psi[1].t + theta_2;
+        u0_1m= fmod(-Site[nn_im].Psi[0].t + theta_1, C_PI);
+        u0_2m= fmod(-Site[nn_im].Psi[1].t + theta_2, C_PI);
 
         for (n_1 = (-MCp.nMAX); n_1 < (MCp.nMAX+1); n_1++) {
             for (n_2 = (-MCp.nMAX); n_2 < (MCp.nMAX+1); n_2++) {

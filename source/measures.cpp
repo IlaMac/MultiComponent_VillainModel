@@ -4,6 +4,58 @@
 
 #include "measures.h"
 
+void U_internal_energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site) {
+    unsigned int vec;
+    double U_energy=0.;`z
+    int n_1, n_2;
+    unsigned int i, ix, iy, iz, nn_i;
+    double u_1, u_2, u0_1, u0_2;
+    double du=0., local_Sb;
+    double norm=0., boltz=0.;
+    double inv_beta=1./my_beta;
+    double inv_V=1./N;
+
+    for(iz=0;iz<Lz;iz++){
+        for(iy=0;iy<Ly;iy++){
+            for(ix=0; ix<Lx; ix++) {
+                i = ix + Lx * (iy + iz * Ly);
+                for(vec=0; vec<3; vec++) {
+                    if (vec == 0) {
+                        nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+                    }
+                    if (vec == 1) {
+                        nn_i = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+                    }
+                    if (vec == 2) {
+                        nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+                    }
+
+                    u0_1 = fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
+                    u0_2 = fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
+
+                    for (n_1 = -MCp.nMAX; n_1 < (MCp.nMAX + 1); n_1++) {
+                        for (n_2 = -MCp.nMAX; n_2 < (MCp.nMAX + 1); n_2++) {
+                            u_1 = u0_1 - C_TWO_PI * n_1;
+                            u_2 = u0_2 - C_TWO_PI * n_2;
+
+                            local_Sb= 0.5 * (Hp.rho * (u_1 * u_1 + u_2 * u_2) + Hp.nu * (u_1 * u_2));
+                            boltz = exp(-( my_beta * local_Sb));
+                            norm += boltz;
+                            du+= local_Sb*boltz;
+
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    U_energy= du/norm;
+
+}
+
+
 void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
 
     unsigned int vec;
@@ -28,8 +80,8 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
-                    u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
+                    u0_1= fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
+                    u0_2= fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
 
                     for (n_1 = -(MCp.nMAX); n_1 < (MCp.nMAX+1); n_1++) {
                         for (n_2 = -(MCp.nMAX); n_2 < (MCp.nMAX+1); n_2++) {
@@ -71,8 +123,8 @@ void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_p
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                u0_1= Site[nn_i].Psi[0].t - Site[i].Psi[0].t;
-                u0_2= Site[nn_i].Psi[1].t - Site[i].Psi[1].t;
+                u0_1= fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
+                u0_2= fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
 
                 for (n_1 = -MCp.nMAX; n_1 < (MCp.nMAX +1); n_1++) {
                     for (n_2 = -MCp.nMAX; n_2 < (MCp.nMAX+1); n_2++) {
