@@ -40,20 +40,6 @@ struct H_parameters{
     int init;
 };
 
-struct PT_parameters{
-    /*Parallel Tempering parameters*/
-    int np;
-    int rank;
-    int root=0;
-};
-
-struct PTroot_parameters{
-    /*Arrays root needs to handle the swaps*/
-    std::vector <double> beta;
-    std::vector <double> All_Energies;
-    std::vector <int> ind_to_rank;
-    std::vector <int> rank_to_ind;
-};
 
 struct MC_parameters{
     /*These values are externally given by an input file*/
@@ -68,6 +54,5 @@ struct MC_parameters{
 void initialize_lattice(struct Node* Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp);
 void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_parameters);
 void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directory_parameters);
-void initialize_PTarrays(struct PT_parameters &PTp, struct PTroot_parameters &PTroot, struct H_parameters &Hp);
 
 #endif //INITIALIZATION_H

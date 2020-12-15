@@ -13,6 +13,7 @@
 #include "robust_filesystem.h"
 #include <mpi.h>
 #include "rng.h"
+#include "pt.h"
 
 /*Number of components*/
 static constexpr int NC = 2;
@@ -37,8 +38,6 @@ inline auto mod(const T x, const T y) {
     return (x % y + y) % y;
 }
 void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters, int NSTART);
-void parallel_temp(double &my_E , double &my_beta,  int &my_ind, struct PT_parameters &PTp, struct PTroot_parameters &PTroot);
-unsigned int nn(unsigned int i, unsigned int coord, int dir);
 void myhelp(int argd, char** argu);
 
 

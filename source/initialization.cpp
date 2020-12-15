@@ -27,8 +27,8 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.e=0;
         Hp.h= 1.0;
         Hp.nu=0.1;
-        Hp.b_low=0.35;
-        Hp.b_high=0.5;
+        Hp.b_low=0.1;
+        Hp.b_high=20.;
         Hp.init=0;
     }
 
@@ -49,8 +49,8 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
             fclose(fin);
         }
     }else{
-        MCp.nmisu=2;
-        MCp.tau=32;
+        MCp.nmisu=100;
+        MCp.tau=2;
         MCp.n_autosave=20000; //not used now
         MCp.lbox_theta=C_PI;
         MCp.lbox_A=0.1;
@@ -112,25 +112,4 @@ void initialize_lattice(struct Node* Site, const fs::path & directory_read, int 
 
 
 
-void initialize_PTarrays(struct PT_parameters &PTp, struct PTroot_parameters &PTroot, struct H_parameters &Hp){
-    int p;
-    double  beta_low, beta_high, delta_beta;
 
-    if(Hp.b_high>Hp.b_low){ //Paranoic check
-        beta_low=Hp.b_low;
-        beta_high=Hp.b_high;
-    }else{
-        beta_low=Hp.b_high;
-        beta_high=Hp.b_low;
-    }
-    PTroot.beta.resize(PTp.np, 0.0);
-    PTroot.All_Energies.resize(PTp.np, 0.0);
-    PTroot.ind_to_rank.resize(PTp.np, 0);
-    PTroot.rank_to_ind.resize(PTp.np, 0);
-    delta_beta=(beta_high-beta_low)/(PTp.np-1);
-    for(p=0; p<PTp.np; p++){
-        PTroot.rank_to_ind[p]=p;
-        PTroot.ind_to_rank[p]=p;
-        PTroot.beta[p]=beta_low + p*delta_beta;
-    }
-};

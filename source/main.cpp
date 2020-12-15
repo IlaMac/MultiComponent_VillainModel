@@ -188,6 +188,9 @@ int main(int argc, char *argv[]){
 void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
 
     int n, t;
+    std::vector <double> all_beta;
+    double E_betanp=0., E_betanm=0.;
+    double beta_np=0., beta_nm=0.;
     double inv_n_save= 1./2;//Inverse number of spin configurations I want to save
     class_tic_toc t_h5pp(true,5,"Benchmark h5pp");
     class_tic_toc t_metropolis(true,5,"Benchmark metropolis");
@@ -239,13 +242,18 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         //Measures
         t_measures.tic();
         mis.reset();
-        helicity_modulus(mis, Hp, MCp, my_beta, Site);
-        energy(mis, Hp, MCp, my_beta, Site);
+        //helicity_modulus(mis, Hp, MCp, my_beta, Site);
+        MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+        MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+
+        energy(mis, Hp, MCp, my_beta, beta_np, beta_nm, E_betanp, E_betanm, Site);
         //magnetization(mis, Site);
-        magnetization_singlephase(mis,  Site);
+        magnetization_singlephase(mis,  Site, my_beta);
         if(Hp.e!=0) {
             dual_stiffness(mis, Hp, Site);
         }
+        MPI_Barrier(MPI_COMM_WORLD);
+
         mis.my_rank=PTp.rank;
         t_measures.toc();
 
@@ -263,8 +271,10 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 	    if((n%(MCp.n_autosave))==0){
 	        save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
 	    }
-	    //Parallel Tempering swap
-        parallel_temp(mis.E, my_beta, my_ind, PTp, PTroot);
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        //Parallel Tempering swap
+        parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
         file = h5pp::File(directory_write_temp+"/Output.h5", h5pp::FilePermission::READWRITE);
@@ -276,102 +286,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     t_metropolis.print_measured_time_w_percent();
 }
 
-void parallel_temp(double &my_E , double &my_beta, int &my_ind, struct PT_parameters &PTp, struct PTroot_parameters &PTroot){
-
-    double coin;
-    double n_rand, delta_E, delta_beta;
-    double oldbeta_i, oldbeta_nn;
-    int i=0, nn=0, ind_nn;
-    int oldrank_i, oldrank_nn;
-    int newrank_i, newrank_nn;
-
-
-    MPI_Gather(&my_E, 1, MPI_DOUBLE, PTroot.All_Energies.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-    if (PTp.rank == PTp.root) { //Root forms the pairs and decides (given the energies and the betas) which pairs will swap
-        //Pair Formation
-        coin = rn::uniform_real_box(0,1);
-        if(coin < 0.5) { //each even rank wil be paired with its right neighbour
-            nn= +1;
-        }else if(coin >= 0.5){ //each even rank wil be paired with its left neighbour
-            nn=-1;
-        }
-        while (i < PTp.np) {
-            n_rand=rn::uniform_real_box(0,1);
-            ind_nn=(PTp.np + i + nn) % PTp.np;
-            oldrank_i=PTroot.ind_to_rank[i];
-            oldrank_nn=PTroot.ind_to_rank[ind_nn];
-            delta_E = PTroot.All_Energies[oldrank_i] - PTroot.All_Energies[oldrank_nn];
-            delta_beta = PTroot.beta[oldrank_i] - PTroot.beta[oldrank_nn];
-            //swapping condition
-            //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-            if (n_rand < exp(delta_beta * delta_E)) {
-
-                //swap indices in the rank_to_ind array
-                PTroot.rank_to_ind[oldrank_i] = ind_nn;
-                PTroot.rank_to_ind[oldrank_nn] = i;
-
-                //swap indices in the ind_to_rank array
-                newrank_i= oldrank_nn;
-                PTroot.ind_to_rank[i]= newrank_i;
-                newrank_nn=oldrank_i;
-                PTroot.ind_to_rank[ind_nn] =newrank_nn;
-                //swap beta
-                oldbeta_i= PTroot.beta[oldrank_i];
-                oldbeta_nn= PTroot.beta[oldrank_nn];
-                PTroot.beta[oldrank_i] = oldbeta_nn;
-                PTroot.beta[oldrank_nn] = oldbeta_i;
-            }
-                i+= 2;
-        }
-    }
-    MPI_Scatter(PTroot.beta.data(), 1, MPI_DOUBLE, &my_beta, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-    MPI_Scatter(PTroot.rank_to_ind.data(), 1, MPI_INT, &my_ind, 1, MPI_INT, PTp.root, MPI_COMM_WORLD);
-
-}
-
-
-
-unsigned int nn(unsigned int i, unsigned int coord, int dir){
-
-    unsigned int ix, iy, iz;
-    int ix_new=0, iy_new=0, iz_new=0;
-
-    ix=i%Lx;
-    iy=(i/Lx)%Ly;
-    iz=(i/(Lx*Ly));
-
-    if(dir!=0){
-
-        if(coord==0){
-            ix_new= ix + dir/sqrt(dir*dir);
-            if(ix_new==Lx){ ix_new=0;}
-            if(ix_new < 0){ ix_new=(Lx-1);}
-            iy_new=iy;
-            iz_new=iz;
-        }
-        if(coord==1){
-            iy_new= iy + dir/sqrt(dir*dir);
-            if(iy_new==Ly){ iy_new=0;}
-            if(iy_new<0){ iy_new=(Ly-1);}
-            ix_new=ix;
-            iz_new=iz;
-        }
-        if(coord==2){
-            iz_new= iz + dir/sqrt(dir*dir);
-            if(iz_new==Lz){ iz_new=0;}
-            if(iz_new<0){ iz_new=(Lz-1);}
-            ix_new=ix;
-            iy_new=iy;
-        }
-
-    }
-    else{
-        ix_new=ix;
-        iy_new=iy;
-        iz_new=iz;
-    }
-    return (ix_new+ Lx*(iy_new+ iz_new*Ly));
-}
 
 void myhelp(int argd, char** argu) {
     int i;

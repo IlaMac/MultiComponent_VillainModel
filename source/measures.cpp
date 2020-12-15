@@ -56,13 +56,15 @@ void U_internal_energy(struct Measures &mis, struct H_parameters &Hp, struct MC_
 }
 
 
-void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
+void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, double beta_np, double beta_nm, double &E_betanp, double &E_betanm, struct Node* Site){
 
     unsigned int vec;
     int n_1, n_2;
     unsigned int i, ix, iy, iz, nn_i;
     double u0_1, u0_2, u_1, u_2;
     double local_S=0., sum_n1n2=0., boltz_h=0.;
+    double inv_betap=1./beta_np, sum_n1n2_p=0., boltz_hp=0.;
+    double inv_betam=1./beta_nm, sum_n1n2_m=0., boltz_hm=0.;
     double inv_beta=1./my_beta;
 
     for(iz=0;iz<Lz;iz++){
@@ -89,19 +91,27 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
                             u_1= u0_1 - C_TWO_PI*n_1;
                             u_2= u0_2 - C_TWO_PI*n_2;
 
-                            local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                            local_S = 0.5 * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
 
-                            sum_n1n2+= exp(-local_S);
+                            sum_n1n2+= exp(-my_beta *local_S);
+                            sum_n1n2_p+= exp(-beta_np *local_S);
+                            sum_n1n2_m+= exp(-beta_nm *local_S);
+
                         }
                     }
 
-                    boltz_h-=inv_beta*log(sum_n1n2);
+                    boltz_h-= inv_beta*log(sum_n1n2);
+                    boltz_hp-= inv_betap*log(sum_n1n2_p);
+                    boltz_h-= inv_betam*log(sum_n1n2_m);
+
                 }
             }
         }
     }
 
     mis.E=boltz_h; // As soon as I will include the lattice spacing h --> h3*boltz_h
+    E_betanp=boltz_hp;
+    E_betanm=boltz_hm;
 }
 
 
@@ -177,8 +187,8 @@ void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* 
         for(iy=0; iy<Ly;iy++){
             for(iz=0; iz<Lz;iz++){
                 i=ix +Lx*(iy+Ly*iz);
-                Dx_Ay=(Site[nn(i, 0, 1)].A[1]- Site[i].A[1])/Hp.h;
-                Dy_Ax=(Site[nn(i, 1, 1)].A[0]- Site[i].A[0])/Hp.h;
+                Dx_Ay=(Site[mod(ix + 1, Lx) +Lx*(iy+Ly*iz)].A[1]- Site[i].A[1])/Hp.h;
+                Dy_Ax=(Site[ix +Lx*(mod(iy + 1, Ly) +Ly*iz) ].A[0]- Site[i].A[0])/Hp.h;
 
                 Re_rhoz+=(cos((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
                 Im_rhoz+=(sin((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
@@ -224,7 +234,7 @@ void magnetization(struct Measures &mis, struct Node* Site){
     mis.m=mis.m/N;
 }
 
-void magnetization_singlephase(struct Measures &mis, struct Node* Site){
+void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i, alpha;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
@@ -246,6 +256,8 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site){
         sin_phi[alpha]*=inv_N;
         mis.m_phase[alpha] = (cos_phi[alpha]*cos_phi[alpha]) + (sin_phi[alpha]*sin_phi[alpha]);
     }
+
+
 }
 
 void save_lattice(struct Node* Site, const fs::path & directory_write, std::string configuration){
