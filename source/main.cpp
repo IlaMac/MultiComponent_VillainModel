@@ -242,7 +242,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         //Measures
         t_measures.tic();
         mis.reset();
-        //helicity_modulus(mis, Hp, MCp, my_beta, Site);
+        helicity_modulus(mis, Hp, MCp, my_beta, Site);
         MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
         MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
 

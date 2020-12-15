@@ -1,32 +1,59 @@
-The MPI test test_mpi for CXX in mode normal failed to compile with the following output:
-Change Dir: /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+Performing C++ SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_86f6f/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_86f6f.dir/build.make CMakeFiles/cmTC_86f6f.dir/build
-Building CXX object CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/c++   -isystem /usr/local/include  -march=native -mtune=native  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -fPIE   -std=c++17 -o CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o -c /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp
-In file included from /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp:1:
-/usr/local/include/mpi.h:1886:10: fatal error: 'openmpi/ompi/mpi/cxx/mpicxx.h' file not found
-#include "openmpi/ompi/mpi/cxx/mpicxx.h"
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 error generated.
-make[1]: *** [CMakeFiles/cmTC_86f6f.dir/test_mpi.cpp.o] Error 1
-make: *** [cmTC_86f6f/fast] Error 2
+Run Build Command(s):/usr/bin/gmake cmTC_87687/fast && /usr/bin/gmake -f CMakeFiles/cmTC_87687.dir/build.make CMakeFiles/cmTC_87687.dir/build
+gmake[1]: Entering directory `/home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_87687.dir/src.cxx.o
+/software/sse/manual/mpprun/4.1.3/nsc-wrappers/c++    -march=native -mtune=native -DCMAKE_HAVE_LIBC_PTHREAD -fPIE   -std=c++17 -o CMakeFiles/cmTC_87687.dir/src.cxx.o -c /home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_87687
+/software/sse/manual/CMake/3.16.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87687.dir/link.txt --verbose=1
+/software/sse/manual/mpprun/4.1.3/nsc-wrappers/c++  -march=native -mtune=native -DCMAKE_HAVE_LIBC_PTHREAD    CMakeFiles/cmTC_87687.dir/src.cxx.o  -o cmTC_87687 
+ld: CMakeFiles/cmTC_87687.dir/src.cxx.o: in function `main':
+src.cxx:(.text+0x2f): undefined reference to `pthread_create'
+ld: src.cxx:(.text+0x3b): undefined reference to `pthread_detach'
+ld: src.cxx:(.text+0x4c): undefined reference to `pthread_join'
+ld: src.cxx:(.text+0x60): undefined reference to `pthread_atfork'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [cmTC_87687] Error 1
+gmake[1]: Leaving directory `/home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+gmake: *** [cmTC_87687/fast] Error 2
 
 
+Source file was:
+#include <pthread.h>
 
-The MPI test test_mpi for CXX in mode normal failed to compile with the following output:
-Change Dir: /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+void* test_func(void* data)
+{
+  return data;
+}
 
-Run Build Command(s):/usr/bin/make cmTC_7e360/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_7e360.dir/build.make CMakeFiles/cmTC_7e360.dir/build
-Building CXX object CMakeFiles/cmTC_7e360.dir/test_mpi.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/c++   -isystem /usr/local/include  -march=native -mtune=native  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -fPIE   -std=c++17 -o CMakeFiles/cmTC_7e360.dir/test_mpi.cpp.o -c /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp
-In file included from /Users/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/FindMPI/test_mpi.cpp:1:
-/usr/local/include/mpi.h:1886:10: fatal error: 'openmpi/ompi/mpi/cxx/mpicxx.h' file not found
-#include "openmpi/ompi/mpi/cxx/mpicxx.h"
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 error generated.
-make[1]: *** [CMakeFiles/cmTC_7e360.dir/test_mpi.cpp.o] Error 1
-make: *** [cmTC_7e360/fast] Error 2
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_6064d/fast && /usr/bin/gmake -f CMakeFiles/cmTC_6064d.dir/build.make CMakeFiles/cmTC_6064d.dir/build
+gmake[1]: Entering directory `/home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6064d.dir/CheckFunctionExists.cxx.o
+/software/sse/manual/mpprun/4.1.3/nsc-wrappers/c++    -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE   -std=c++17 -o CMakeFiles/cmTC_6064d.dir/CheckFunctionExists.cxx.o -c /home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_6064d
+/software/sse/manual/CMake/3.16.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6064d.dir/link.txt --verbose=1
+/software/sse/manual/mpprun/4.1.3/nsc-wrappers/c++  -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_6064d.dir/CheckFunctionExists.cxx.o  -o cmTC_6064d  -lpthreads 
+ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [cmTC_6064d] Error 1
+gmake[1]: Leaving directory `/home/x_ilama/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+gmake: *** [cmTC_6064d/fast] Error 2
 
 
 
