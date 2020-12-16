@@ -102,7 +102,7 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
 
                     boltz_h-= inv_beta*log(sum_n1n2);
                     boltz_hp-= inv_betap*log(sum_n1n2_p);
-                    boltz_h-= inv_betam*log(sum_n1n2_m);
+                    boltz_hm-= inv_betam*log(sum_n1n2_m);
 
                 }
             }
@@ -256,6 +256,8 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
         sin_phi[alpha]*=inv_N;
         mis.m_phase[alpha] = (cos_phi[alpha]*cos_phi[alpha]) + (sin_phi[alpha]*sin_phi[alpha]);
     }
+
+    std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
 
 
 }

@@ -26,10 +26,10 @@ void metropolis( struct Node* Site, struct MC_parameters &MCp, struct H_paramete
                 for (alpha = 0; alpha < NC; alpha++) {
                     OldPsi = Site[i].Psi[alpha];
                     //t_localHtheta.tic();
-                    oldE = HVillan_old(i, alpha, my_beta, Hp, MCp, Site);
+                    oldE = HVillan_old(i, my_beta, Hp, MCp, Site);
                     //t_localHtheta.toc();
                     d_theta = rn::uniform_real_box(-MCp.lbox_theta, MCp.lbox_theta);
-                    NewPsi.t = fmod(OldPsi.t + d_theta, C_TWO_PI);
+                    NewPsi.t = fmod(OldPsi.t + d_theta, C_TWO_PI) ;
                     NewPsi.r=1;
                     //t_localHtheta.tic();
                     newE = HVillan_new(NewPsi, i, alpha, my_beta, Hp, MCp, Site);
@@ -57,7 +57,7 @@ void metropolis( struct Node* Site, struct MC_parameters &MCp, struct H_paramete
     //MCp.lbox_A= MCp.lbox_A*(0.5*(acc_A/acc_rate)+0.5);
 }
 
-double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, struct H_parameters &Hp, struct MC_parameters &MCp, struct Node* Site){
+double HVillan_old(unsigned int position, double my_beta, struct H_parameters &Hp, struct MC_parameters &MCp, struct Node* Site){
 
     unsigned int vec;
     int n_1, n_2;
@@ -83,15 +83,21 @@ double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, st
             nn_im= ix + Lx * (iy + mod(iz-1,Lz) * Ly);
         }
 
-        u0_1p= fmod(Site[nn_ip].Psi[0].t - Site[position].Psi[0].t, C_PI);
-        u0_2p= fmod(Site[nn_ip].Psi[1].t - Site[position].Psi[1].t, C_PI);
+//        u0_1p= fmod(Site[nn_ip].Psi[0].t - Site[position].Psi[0].t, C_PI);
+//        u0_2p= fmod(Site[nn_ip].Psi[1].t - Site[position].Psi[1].t, C_PI);
+//
+//        u0_1m= fmod(-Site[nn_im].Psi[0].t + Site[position].Psi[0].t, C_PI);
+//        u0_2m= fmod(-Site[nn_im].Psi[1].t + Site[position].Psi[1].t, C_PI);
 
-        u0_1m= fmod(-Site[nn_im].Psi[0].t + Site[position].Psi[0].t, C_PI);
-        u0_2m= fmod(-Site[nn_im].Psi[1].t + Site[position].Psi[1].t, C_PI);
+        u0_1p= Site[nn_ip].Psi[0].t - Site[position].Psi[0].t;
+        u0_2p= Site[nn_ip].Psi[1].t - Site[position].Psi[1].t;
 
+        u0_1m= -Site[nn_im].Psi[0].t + Site[position].Psi[0].t;
+        u0_2m= -Site[nn_im].Psi[1].t + Site[position].Psi[1].t;
 
         for (n_1 = (-MCp.nMAX); n_1 < (MCp.nMAX +1); n_1++) {
             for (n_2 = (-MCp.nMAX); n_2 < (MCp.nMAX +1); n_2++) {
+
 
                 u_1= u0_1p - C_TWO_PI*n_1;
                 u_2= u0_2p - C_TWO_PI*n_2;
@@ -102,7 +108,7 @@ double HVillan_old(unsigned int position, unsigned int alpha, double my_beta, st
                 u_1= u0_1m - C_TWO_PI*n_1;
                 u_2= u0_2m - C_TWO_PI*n_2;
 
-                local_S = 0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
+                local_S = 0.5* my_beta* (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
                 sum_n1n2_minus+= exp(-local_S);
             }
         }
