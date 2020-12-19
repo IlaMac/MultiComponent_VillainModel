@@ -14,6 +14,9 @@
 #include <iostream>
 #define C_TWO_PI (6.2831853071795864769252867665590058L)
 #define C_PI (3.1415926535897932384626433832795029L)
+/*MaxP corresponds to the number of q states of the theta field. Division of phase values in <-pi, pi>. Must have MaxP uneven to have a symmetric interval around zero.*/
+//static constexpr int MaxP=129;
+#define MaxP (129)
 #define Annealing (0) //To be implemented
 
 //static constexpr double C_TWO_PI = 6.2831853071795864769252867665590058;
@@ -47,7 +50,8 @@ struct MC_parameters{
     int nmisu; //total number of independent measures
     int n_autosave; //frequency at which intermediate configuration are saved
     double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
-    double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
+    //double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
+    int lbox; //length of the box of integer for the extraction of the new phase
     int nMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
 };
 

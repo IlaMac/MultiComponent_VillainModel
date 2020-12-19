@@ -192,6 +192,8 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     double E_betanp=0., E_betanm=0.;
     double beta_np=0., beta_nm=0.;
     double inv_n_save= 1./2;//Inverse number of spin configurations I want to save
+    struct Villain vil;
+
     class_tic_toc t_h5pp(true,5,"Benchmark h5pp");
     class_tic_toc t_metropolis(true,5,"Benchmark metropolis");
     class_tic_toc t_measures(true,5,"Benchmark measures");
@@ -222,6 +224,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     h5pp::hid::h5t MY_HDF5_MEASURES_TYPE = H5Tcreate(H5T_COMPOUND, sizeof(Measures));
 
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E", HOFFSET(Measures, E), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "U", HOFFSET(Measures, U), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m", HOFFSET(Measures, m), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m_phase", HOFFSET(Measures, m_phase),  HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "ds", HOFFSET(Measures, d_rhoz), H5T_NATIVE_DOUBLE);
@@ -232,26 +235,33 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
 
+    /*Initialization Villain potentials*/
+    init_villain_potentials(my_beta, vil, Hp, MCp);
+    MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+    MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp);
 
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
-            metropolis(Site, MCp, Hp,  my_beta);
+            //metropolis(Site, MCp, Hp,  my_beta);
+            metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
         //Measures
         t_measures.tic();
         mis.reset();
-        helicity_modulus(mis, Hp, MCp, my_beta, Site);
-        MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-        MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+        helicity_modulus(my_beta, mis, vil, Site);
 
-        energy(mis, Hp, MCp, my_beta, beta_np, beta_nm, E_betanp, E_betanm, Site);
-        //magnetization(mis, Site);
+        energy(mis, vil, E_betanp, E_betanm, Site);
+        MPI_Barrier(MPI_COMM_WORLD);
+        u_internal_energy(mis, vil, Site);
         magnetization_singlephase(mis,  Site, my_beta);
-        if(Hp.e!=0) {
-            dual_stiffness(mis, Hp, Site);
-        }
+
+        //magnetization(mis, Site);
+//        if(Hp.e!=0) {
+//            dual_stiffness(mis, Hp, Site);
+//        }
         MPI_Barrier(MPI_COMM_WORLD);
 
         mis.my_rank=PTp.rank;

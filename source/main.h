@@ -15,6 +15,7 @@
 #include "rng.h"
 #include "pt.h"
 
+
 /*Number of components*/
 static constexpr int NC = 2;
 

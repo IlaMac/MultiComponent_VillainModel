@@ -4,21 +4,19 @@
 
 #include "measures.h"
 
-void U_internal_energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site) {
+void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* Site) {
+
     unsigned int vec;
-    double U_energy=0.;
-    int n_1, n_2;
+    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    double  inv_dp=MaxP/C_TWO_PI;
     unsigned int i, ix, iy, iz, nn_i;
-    double u_1, u_2, u0_1, u0_2;
-    double du=0., local_Sb;
-    double norm=0., boltz=0.;
-    double inv_beta=1./my_beta;
     double inv_V=1./N;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
             for(ix=0; ix<Lx; ix++) {
                 i = ix + Lx * (iy + iz * Ly);
+
                 for(vec=0; vec<3; vec++) {
                     if (vec == 0) {
                         nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
@@ -30,42 +28,26 @@ void U_internal_energy(struct Measures &mis, struct H_parameters &Hp, struct MC_
                         nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                     }
 
-                    u0_1 = fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
-                    u0_2 = fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
-
-                    for (n_1 = -MCp.nMAX; n_1 < (MCp.nMAX + 1); n_1++) {
-                        for (n_2 = -MCp.nMAX; n_2 < (MCp.nMAX + 1); n_2++) {
-                            u_1 = u0_1 - C_TWO_PI * n_1;
-                            u_2 = u0_2 - C_TWO_PI * n_2;
-
-                            local_Sb= 0.5 * (Hp.rho * (u_1 * u_1 + u_2 * u_2) + Hp.nu * (u_1 * u_2));
-                            boltz = exp(-( my_beta * local_Sb));
-                            norm += boltz;
-                            du+= local_Sb*boltz;
-
-                        }
-                    }
+                    arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                    arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                    mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
             }
         }
     }
 
-    U_energy= du/norm;
 
 }
 
 
-void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, double beta_np, double beta_nm, double &E_betanp, double &E_betanm, struct Node* Site){
+void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site){
 
     unsigned int vec;
-    int n_1, n_2;
+    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    double  inv_dp=MaxP/C_TWO_PI;
     unsigned int i, ix, iy, iz, nn_i;
-    double u0_1, u0_2, u_1, u_2;
-    double local_S=0., sum_n1n2=0., boltz_h=0.;
-    double inv_betap=1./beta_np, sum_n1n2_p=0., boltz_hp=0.;
-    double inv_betam=1./beta_nm, sum_n1n2_m=0., boltz_hm=0.;
-    double inv_beta=1./my_beta;
+    double E_betanp_temp=0., E_betanm_temp=0.;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
@@ -82,49 +64,27 @@ void energy(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters 
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    u0_1= fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
-                    u0_2= fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
-
-                    for (n_1 = -(MCp.nMAX); n_1 < (MCp.nMAX+1); n_1++) {
-                        for (n_2 = -(MCp.nMAX); n_2 < (MCp.nMAX+1); n_2++) {
-
-                            u_1= u0_1 - C_TWO_PI*n_1;
-                            u_2= u0_2 - C_TWO_PI*n_2;
-
-                            local_S = 0.5 * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) );
-
-                            sum_n1n2+= exp(-my_beta *local_S);
-                            sum_n1n2_p+= exp(-beta_np *local_S);
-                            sum_n1n2_m+= exp(-beta_nm *local_S);
-
-                        }
-                    }
-
-                    boltz_h-= inv_beta*log(sum_n1n2);
-                    boltz_hp-= inv_betap*log(sum_n1n2_p);
-                    boltz_hm-= inv_betam*log(sum_n1n2_m);
-
+                    arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                    arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2];
+                    E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
+                    E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
                 }
             }
         }
     }
-
-    mis.E=boltz_h; // As soon as I will include the lattice spacing h --> h3*boltz_h
-    E_betanp=boltz_hp;
-    E_betanm=boltz_hm;
+    E_betanp=E_betanp_temp;
+    E_betanm=E_betanp_temp;
 }
 
 
-void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_parameters &MCp, double my_beta, struct Node* Site){
+void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, struct Node* Site){
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
-    int n_1, n_2;
+    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    double  inv_dp=MaxP/C_TWO_PI;
+    double d1=0., d2=0., d11=0., d22=0., d12=0.;
     unsigned int i, ix, iy, iz, nn_i;
-    double u_1, u_2, u0_1, u0_2;
-    double j1, j2;
-    double d1=0., d2=0., d11=0., d12=0., d22=0.;
-    double norm=0., boltz=0.;
-    double inv_beta=1./my_beta;
     double inv_V=1./N;
 
     for(iz=0;iz<Lz;iz++){
@@ -133,70 +93,51 @@ void helicity_modulus(struct Measures &mis, struct H_parameters &Hp, struct MC_p
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                u0_1= fmod(Site[nn_i].Psi[0].t - Site[i].Psi[0].t, C_PI);
-                u0_2= fmod(Site[nn_i].Psi[1].t - Site[i].Psi[1].t, C_PI);
+                arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
 
-                for (n_1 = -MCp.nMAX; n_1 < (MCp.nMAX +1); n_1++) {
-                    for (n_2 = -MCp.nMAX; n_2 < (MCp.nMAX+1); n_2++) {
-                        u_1 = u0_1 - C_TWO_PI * n_1;
-                        u_2 = u0_2 - C_TWO_PI * n_2;
-
-                        j1=Hp.rho*u_1 + Hp.nu*u_2;
-                        j2=Hp.rho*u_2 + Hp.nu*u_1;
-                        boltz=exp(-(0.5 * my_beta * (Hp.rho * (u_1*u_1 + u_2*u_2) + Hp.nu*(u_1*u_2) )));
-
-                        norm+=boltz;
-                        d1+= j1*boltz;
-                        d2+= j2*boltz;
-                        d11+= (Hp.rho - my_beta*j1*j1)*boltz;
-                        d22+= (Hp.rho - my_beta*j2*j2)*boltz;
-                        d12+= (Hp.nu - my_beta*j1*j2)*boltz;
-
-                    }
-                }
-
-                mis.DH_Ddi[0]+= d1/norm;
-                mis.DH_Ddi[1]+= d2/norm;
-                mis.D2H_Dd2i[0]+=d11/norm + my_beta*(d1/norm)*(d1/norm);
-                mis.D2H_Dd2i[1]+=d22/norm + my_beta*(d2/norm)*(d2/norm);
-                mis.D2H_Dd12+= d12/norm + my_beta*(d1*d2)/(norm*norm);
+                d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
+                d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
+                d11+= vil.d11_potential[start + arg_1 +MaxP*arg_2];
+                d22+= vil.d22_potential[start + arg_1 +MaxP*arg_2];
+                d12+= vil.d12_potential[start + arg_1 +MaxP*arg_2];
 
             }
         }
     }
 
-    mis.DH_Ddi[0]*=inv_V;
-    mis.DH_Ddi[1]*=inv_V;
-    mis.D2H_Dd2i[0]*=inv_V;
-    mis.D2H_Dd2i[1]*=inv_V;
-    mis.D2H_Dd12*=inv_V;
+    mis.DH_Ddi[0]=d1*inv_V;
+    mis.DH_Ddi[1]=d2*inv_V;
+    mis.D2H_Dd2i[0]=d11*inv_V;
+    mis.D2H_Dd2i[1]=d22*inv_V;
+    mis.D2H_Dd12=d12*inv_V;
 
 }
 
 //TO CHANGE!!!!!!!
-void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site){
-
-    double qx_min=C_TWO_PI/(Lx);
-    double invNorm= 1./((C_TWO_PI)*(C_TWO_PI)*N);
-    unsigned int i, ix, iy, iz;
-    double Re_rhoz=0.;
-    double Im_rhoz=0.;
-    double Dx_Ay, Dy_Ax;
-
-    for(ix=0; ix<Lx;ix++){
-        for(iy=0; iy<Ly;iy++){
-            for(iz=0; iz<Lz;iz++){
-                i=ix +Lx*(iy+Ly*iz);
-                Dx_Ay=(Site[mod(ix + 1, Lx) +Lx*(iy+Ly*iz)].A[1]- Site[i].A[1])/Hp.h;
-                Dy_Ax=(Site[ix +Lx*(mod(iy + 1, Ly) +Ly*iz) ].A[0]- Site[i].A[0])/Hp.h;
-
-                Re_rhoz+=(cos((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
-                Im_rhoz+=(sin((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
-            }
-        }
-    }
-    mis.d_rhoz=invNorm*((Re_rhoz*Re_rhoz) +(Im_rhoz*Im_rhoz));
-}
+//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site){
+//
+//    double qx_min=C_TWO_PI/(Lx);
+//    double invNorm= 1./((C_TWO_PI)*(C_TWO_PI)*N);
+//    unsigned int i, ix, iy, iz;
+//    double Re_rhoz=0.;
+//    double Im_rhoz=0.;
+//    double Dx_Ay, Dy_Ax;
+//
+//    for(ix=0; ix<Lx;ix++){
+//        for(iy=0; iy<Ly;iy++){
+//            for(iz=0; iz<Lz;iz++){
+//                i=ix +Lx*(iy+Ly*iz);
+//                Dx_Ay=(Site[mod(ix + 1, Lx) +Lx*(iy+Ly*iz)].A[1]- Site[i].A[1])/Hp.h;
+//                Dy_Ax=(Site[ix +Lx*(mod(iy + 1, Ly) +Ly*iz) ].A[0]- Site[i].A[0])/Hp.h;
+//
+//                Re_rhoz+=(cos((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
+//                Im_rhoz+=(sin((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
+//            }
+//        }
+//    }
+//    mis.d_rhoz=invNorm*((Re_rhoz*Re_rhoz) +(Im_rhoz*Im_rhoz));
+//}
 
 //DESIGNED FOR 3 COMPONENTs
 void magnetization(struct Measures &mis, struct Node* Site){
@@ -256,6 +197,9 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
         sin_phi[alpha]*=inv_N;
         mis.m_phase[alpha] = (cos_phi[alpha]*cos_phi[alpha]) + (sin_phi[alpha]*sin_phi[alpha]);
     }
+
+// std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
+
 
 }
 

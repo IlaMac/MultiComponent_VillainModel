@@ -113,7 +113,7 @@ endif ()
 ### Add all source files recursively
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 file(GLOB_RECURSE HEADERS "source/*.h")
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h)
 
 
 
