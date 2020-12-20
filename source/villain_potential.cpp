@@ -18,6 +18,11 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             sum = 0;
             norm = 0;
             sum_1 =  0;
+            d1=0;
+            d2=0;
+            d11=0;
+            d22=0;
+            d12=0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
                     u1=dp*arg1 - C_TWO_PI*n1;
