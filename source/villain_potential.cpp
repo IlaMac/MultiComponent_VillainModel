@@ -56,7 +56,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             vil.d22_potential[start + arg1 + MaxP*arg2]+=d22/norm + my_beta*(d2/norm)*(d2/norm);
             vil.d12_potential[start + arg1 + MaxP*arg2]+= d12/norm + my_beta*(d1*d2)/(norm*norm);
             /*Calculating beta-derivative of the Villain potential needed for calculating the internal energy (which differs from the energy mean due to the temperature dependence of the Villain model).*/
-            vil.upotential[start + (arg1 + MaxP*arg2)] = sum_1/norm;
+            vil.upotential[start + (arg1 + MaxP*arg2)] = -sum_1/norm;
         }
     }
 }
