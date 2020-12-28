@@ -92,8 +92,10 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
-                arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                arg_1 = ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
+                        //arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                arg_2 = ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
+                        //arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
