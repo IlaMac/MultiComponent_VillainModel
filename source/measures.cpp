@@ -85,7 +85,6 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
     double  inv_dp=MaxP/C_TWO_PI;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
     unsigned int i, ix, iy, iz, nn_i;
-    double inv_V=1./N;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
@@ -106,11 +105,11 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
         }
     }
 
-    mis.DH_Ddi[0]=d1*inv_V;
-    mis.DH_Ddi[1]=d2*inv_V;
-    mis.D2H_Dd2i[0]=d11*inv_V;
-    mis.D2H_Dd2i[1]=d22*inv_V;
-    mis.D2H_Dd12=d12*inv_V;
+    mis.DH_Ddi[0]=d1;
+    mis.DH_Ddi[1]=d2;
+    mis.D2H_Dd2i[0]=d11;
+    mis.D2H_Dd2i[1]=d22;
+    mis.D2H_Dd12=d12;
 
 }
 

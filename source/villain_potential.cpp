@@ -9,7 +9,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double u1, u2, sum_1, sum, norm, boltz, boltz_H;
     double j1, j2;
-    double d1=0., d2=0., d11=0., d12=0., d22=0.;
+    double d1, d2, d11, d12, d22;
     double dp=C_TWO_PI/MaxP;
     double inv_beta=1./my_beta;
 
@@ -35,14 +35,14 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                     norm += boltz;
                     sum_1 += boltz_H*boltz;
 
-                    j1=Hp.rho*u1 + Hp.nu*u2;
-                    j2=Hp.rho*u2 + Hp.nu*u1;
+                    j1=Hp.rho*u1 + 0.5*Hp.nu*u2;
+                    j2=Hp.rho*u2 + 0.5*Hp.nu*u1;
 
                     d1+= j1*boltz;
                     d2+= j2*boltz;
                     d11+= (Hp.rho - my_beta*j1*j1)*boltz;
                     d22+= (Hp.rho - my_beta*j2*j2)*boltz;
-                    d12+= (Hp.nu - my_beta*j1*j2)*boltz;
+                    d12+= (0.5*Hp.nu - my_beta*j1*j2)*boltz;
 
                 }
             }
@@ -56,7 +56,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             vil.d22_potential[start + arg1 + MaxP*arg2]+=d22/norm + my_beta*(d2/norm)*(d2/norm);
             vil.d12_potential[start + arg1 + MaxP*arg2]+= d12/norm + my_beta*(d1*d2)/(norm*norm);
             /*Calculating beta-derivative of the Villain potential needed for calculating the internal energy (which differs from the energy mean due to the temperature dependence of the Villain model).*/
-            vil.upotential[start + (arg1 + MaxP*arg2)] = -sum_1/norm;
+            vil.upotential[start + (arg1 + MaxP*arg2)] = sum_1/norm;
         }
     }
 }
