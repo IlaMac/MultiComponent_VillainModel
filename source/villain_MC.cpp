@@ -68,16 +68,16 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                                 //new_phase[beta]=Site[i].Psi[beta].t;
                                 new_int_phase[beta]= Site[i].Psi[beta].t*inv_dp;
                             }
-                            arg_F_new[beta][vec] = ARG( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]), MaxP);
-                                    //arg( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]));
+                            arg_F_new[beta][vec] = //ARG( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]), MaxP);
+                                    arg( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]));
                             //std::cout<< arg_F_new[beta][vec] << " other way: "<< (arg(Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta])) <<
                             //" before ARG: " << (Site[ip].Psi[beta].t - new_phase[beta])*inv_dp << " new: "<< Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta] << std::endl;
-                            arg_B_new[beta][vec] = ARG( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp), MaxP);
-                                    //arg( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp));
-                            arg_F_old[beta][vec] = ARG( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp, MaxP);
-                                    //arg( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp);
-                            arg_B_old[beta][vec] = ARG( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp, MaxP);
-                                    //arg( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp);
+                            arg_B_new[beta][vec] = //ARG( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp), MaxP);
+                                    arg( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp));
+                            arg_F_old[beta][vec] = //ARG( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp, MaxP);
+                                    arg( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp);
+                            arg_B_old[beta][vec] = //ARG( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp, MaxP);
+                                    arg( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp);
                             }
                     }
 
