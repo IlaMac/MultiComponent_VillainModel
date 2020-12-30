@@ -13,14 +13,14 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
     int new_int_phase[NC]={0};
     int old_int_phase;
     double new_phase[NC]={0};
-    struct Node* New_Site;
-    struct Node* Old_Site;
+    //struct Node* New_Site;
+    //struct Node* Old_Site;
     int arg_F_new[NC][3]={0};
     int arg_B_new[NC][3]={0}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={0};
     int arg_B_old[NC][3]={0}; /*Forward and Backward updated phases*/
     double acc_rate=0.5, acc_theta=0., rand;
-    double newE, oldE, minus_deltaE, dE;
+    double newE, oldE, dE;
 
     class_tic_toc t_localHtheta(true,5,"local_Htheta");
 
@@ -36,6 +36,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                 for (alpha = 0; alpha < NC; alpha++) {
                     newE=0.;
                     oldE=0.;
+                    memset(new_phase, 0, sizeof(new_phase));
                     n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
                     old_int_phase= Site[i].Psi[alpha].t*inv_dp;
                     new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);

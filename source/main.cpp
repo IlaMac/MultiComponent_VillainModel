@@ -244,7 +244,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
-            //metropolis(Site, MCp, Hp,  my_beta);
+            ////metropolis(Site, MCp, Hp,  my_beta);
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
@@ -252,6 +252,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         t_measures.tic();
         mis.reset();
         helicity_modulus(my_beta, mis, vil, Site);
+        MPI_Barrier(MPI_COMM_WORLD);
         energy(mis, vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
@@ -284,7 +285,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         MPI_Barrier(MPI_COMM_WORLD);
 
         //Parallel Tempering swap
-        parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
+        //parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
         file = h5pp::File(directory_write_temp+"/Output.h5", h5pp::FilePermission::READWRITE);
