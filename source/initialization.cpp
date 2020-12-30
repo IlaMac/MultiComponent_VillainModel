@@ -10,8 +10,8 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
     if(fs::exists(hp_init_file)){
         FILE *fin= nullptr;
         if((fin=fopen(hp_init_file.c_str(), "r"))) {
-            fscanf(fin, "%d" , &Hp.rho);
-            fscanf(fin, "%d" , &Hp.eta);
+            fscanf(fin, "%lf" , &Hp.rho);
+            fscanf(fin, "%lf" , &Hp.eta);
             fscanf(fin, "%lf" , &Hp.e);
             fscanf(fin, "%lf" , &Hp.h);
             fscanf(fin, "%lf" , &Hp.nu);

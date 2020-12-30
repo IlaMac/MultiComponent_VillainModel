@@ -33,8 +33,8 @@ struct Node{
 
 struct H_parameters{
     /*These values are externally given by an input file*/
-    int rho;
-    int eta;
+    double rho;
+    double eta;
     double e;
     double h;
     double nu;
