@@ -28,8 +28,10 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                         nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                     }
 
-                    arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
-                    arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                    arg_1 = ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
+                            //arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                    arg_2 = ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
+                            //arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -64,8 +66,10 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
-                    arg_2 = arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                    arg_1 = ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
+                            //arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                    arg_2 = ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
+                            //arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
                     mis.E+= vil.potential[start + arg_1 +MaxP*arg_2];
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
@@ -219,7 +223,7 @@ void save_lattice(struct Node* Site, const fs::path & directory_write, std::stri
 
     if((fPsi=fopen(psi_init_file.c_str(), "w"))) {
         for (i = 0; i < N; i++) {
-            fwrite(Site[i].Psi, sizeof(struct O2), 3, fPsi);
+            fwrite(Site[i].Psi, sizeof(struct O2), NC, fPsi);
         }
         fclose(fPsi);
     }

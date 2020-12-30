@@ -34,6 +34,8 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                 /*******PHASE ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
+                    newE=0.;
+                    oldE=0.;
                     n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
                     old_int_phase= Site[i].Psi[alpha].t*inv_dp;
                     new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);
@@ -90,13 +92,12 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                     }
                     dE = newE - oldE;
-                    oldE = 0;
-                    newE = 0;
-//                    if (dE < 0) {
-//                        Site[i].Psi[alpha].t = new_phase[alpha];
-//                        acc_theta++;
+
+                    if (dE < 0) {
+                        Site[i].Psi[alpha].t = new_phase[alpha];
+                        acc_theta++;
 //                        //mis.E+=dE;
-//                    } else {
+                    } else {
                         rand = rn::uniform_real_box(0, 1);
                         //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
                         if ((rand) < exp(-my_beta*dE)) {
@@ -104,7 +105,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                             acc_theta++;
                             //mis.E+=dE;
                         }
-                    //}
+                    }
                 }
             }
         }

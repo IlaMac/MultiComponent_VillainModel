@@ -46,9 +46,8 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
 
                 }
             }
-
+            /*Table Villain potential*/
             vil.potential[start + arg1 + MaxP*arg2]= -inv_beta*log(sum);
-
             /*Table for the helicity modulus*/
             vil.d1_potential[start + arg1 + MaxP*arg2]+= d1/norm;
             vil.d2_potential[start + arg1 + MaxP*arg2]+= d2/norm;
@@ -59,6 +58,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             vil.upotential[start + (arg1 + MaxP*arg2)] = sum_1/norm;
         }
     }
+
 }
 
 void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp) {

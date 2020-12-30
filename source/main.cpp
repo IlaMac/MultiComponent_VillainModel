@@ -252,7 +252,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         t_measures.tic();
         mis.reset();
         helicity_modulus(my_beta, mis, vil, Site);
-
         energy(mis, vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
@@ -266,6 +265,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
         mis.my_rank=PTp.rank;
         t_measures.toc();
+        //std::cout << "nu: "<< Hp.nu << " d11: "<< mis.D2H_Dd2i[0]<< " d22: "<< mis.D2H_Dd2i[1] << " d12: "<<  mis.D2H_Dd12 << std::endl;
 
         t_h5pp.tic();
         file.appendTableRecords(mis, "Measurements");
