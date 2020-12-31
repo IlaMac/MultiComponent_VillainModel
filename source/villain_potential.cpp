@@ -10,7 +10,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
     double u1, u2, sum_1, sum, norm, boltz, boltz_H;
     double j1, j2;
     double d1, d2, d11, d12, d22;
-    double dp=C_TWO_PI/MaxP;
+    double dp=2*M_PI/MaxP;
     double inv_beta=1./my_beta;
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
@@ -65,7 +65,7 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double sum_np, sum_nm, u1, u2;
-    double dp=C_TWO_PI/MaxP;
+    double dp=2*M_PI/MaxP;
     double inv_betanp=1./beta_np;
     double inv_betanm=1./beta_nm;
 

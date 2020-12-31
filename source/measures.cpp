@@ -8,7 +8,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double  inv_dp=MaxP/C_TWO_PI;
+    double dp=2*M_PI/MaxP;
     unsigned int i, ix, iy, iz, nn_i;
     double inv_V=1./N;
 
@@ -29,9 +29,9 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                     }
 
                     arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
                     arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -47,7 +47,7 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double  inv_dp=MaxP/C_TWO_PI;
+    double dp=2*M_PI/MaxP;
     unsigned int i, ix, iy, iz, nn_i;
     double E_betanp_temp=0., E_betanm_temp=0.;
 
@@ -67,9 +67,9 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
                     }
 
                     arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
                     arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
                     mis.E+= vil.potential[start + arg_1 +MaxP*arg_2];
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
@@ -86,7 +86,7 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double  inv_dp=MaxP/C_TWO_PI;
+    double dp=2*M_PI/MaxP;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
     unsigned int i, ix, iy, iz, nn_i;
 
@@ -97,9 +97,9 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
                 arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp);
+                        arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
                 arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp);
+                        arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];

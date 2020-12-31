@@ -8,11 +8,11 @@
 void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
     unsigned int ix, iy, iz, ip, im, alpha, beta, vec, i;
-    double dp=C_TWO_PI/MaxP, inv_dp=MaxP/C_TWO_PI;
+    long double dp=2*M_PI/MaxP;
     int n_var, start=0.5*(MaxP*MaxP-1);
     int new_int_phase[NC]={0};
     int old_int_phase;
-    double new_phase[NC]={0};
+    double new_phase;
     //struct Node* New_Site;
     //struct Node* Old_Site;
     int arg_F_new[NC][3]={0};
@@ -36,12 +36,14 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                 for (alpha = 0; alpha < NC; alpha++) {
                     newE=0.;
                     oldE=0.;
-                    memset(new_phase, 0, sizeof(new_phase));
+                    memset(new_int_phase, 0, sizeof(new_int_phase));
                     n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
-                    old_int_phase= Site[i].Psi[alpha].t*inv_dp;
+                    old_int_phase= Site[i].Psi[alpha].t/dp;
                     new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);
+
                     //new_phase[alpha] = Site[i].Psi[alpha].t + (double) n_var * dp;
-                    new_phase[alpha]=dp*new_int_phase[alpha];
+                    new_phase=dp*new_int_phase[alpha];
+
                     /*Phases defined in the interval [0, 2pi)*/
                     //new_phase[alpha] = arg_phase(new_phase[alpha]);
 
@@ -66,18 +68,18 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                                 new_int_phase[beta]= new_int_phase[alpha];
                             }else{
                                 //new_phase[beta]=Site[i].Psi[beta].t;
-                                new_int_phase[beta]= Site[i].Psi[beta].t*inv_dp;
+                                new_int_phase[beta]= Site[i].Psi[beta].t/dp;
                             }
                             arg_F_new[beta][vec] = //ARG( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]), MaxP);
-                                    arg( (Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta]));
+                                    arg( (Site[ip].Psi[beta].t/dp - new_int_phase[beta]));
                             //std::cout<< arg_F_new[beta][vec] << " other way: "<< (arg(Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta])) <<
                             //" before ARG: " << (Site[ip].Psi[beta].t - new_phase[beta])*inv_dp << " new: "<< Site[ip].Psi[beta].t*inv_dp - new_int_phase[beta] << std::endl;
                             arg_B_new[beta][vec] = //ARG( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp), MaxP);
-                                    arg( (new_int_phase[beta] - Site[im].Psi[beta].t*inv_dp));
+                                    arg( (new_int_phase[beta] - Site[im].Psi[beta].t/dp));
                             arg_F_old[beta][vec] = //ARG( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp, MaxP);
-                                    arg( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)*inv_dp);
+                                    arg( (Site[ip].Psi[beta].t - Site[i].Psi[beta].t)/dp);
                             arg_B_old[beta][vec] = //ARG( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp, MaxP);
-                                    arg( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)*inv_dp);
+                                    arg( (Site[i].Psi[beta].t - Site[im].Psi[beta].t)/dp);
                             }
                     }
 
@@ -95,14 +97,15 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     dE = newE - oldE;
 
                     if (dE < 0) {
-                        Site[i].Psi[alpha].t = new_phase[alpha];
+                        Site[i].Psi[alpha].t = new_phase;
                         acc_theta++;
+
 //                        //mis.E+=dE;
                     } else {
                         rand = rn::uniform_real_box(0, 1);
                         //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
                         if ((rand) < exp(-my_beta*dE)) {
-                            Site[i].Psi[alpha].t = new_phase[alpha];
+                            Site[i].Psi[alpha].t = new_phase;
                             acc_theta++;
                             //mis.E+=dE;
                         }
