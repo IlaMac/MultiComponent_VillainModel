@@ -8,7 +8,6 @@
 #include <fstream>
 #include <random>
 #include "o2.h"
-#include "montecarlo.h"
 #include "initialization.h"
 #include "robust_filesystem.h"
 #include <mpi.h>

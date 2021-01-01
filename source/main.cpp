@@ -134,7 +134,7 @@ int main(int argc, char *argv[]){
     // Lattice.resize(N);
     for(i=0; i<N; i++) {
         Lattice[i].A = (double *) calloc(3, sizeof(double));
-        Lattice[i].Psi = (struct O2 *) calloc(NC, sizeof(struct O2));
+        Lattice[i].Psi = (double *) calloc(NC, sizeof( double));
     }
 
     //Initialize H_parameters: file "H_init.txt"
@@ -244,7 +244,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
-            ////metropolis(Site, MCp, Hp,  my_beta);
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }

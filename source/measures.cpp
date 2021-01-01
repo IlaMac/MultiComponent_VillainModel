@@ -28,10 +28,10 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                         nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
-                    arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
+                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[1] - Site[i].Psi[1])/dp);
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -66,10 +66,10 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
-                    arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
+                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1])/dp);
                     mis.E+= vil.potential[start + arg_1 +MaxP*arg_2];
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
@@ -96,10 +96,10 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = //ARG( (Site[nn_i].Psi[0].t - Site[i].Psi[0].t)*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[0].t - Site[i].Psi[0].t)/dp);
-                arg_2 = //ARG( (Site[nn_i].Psi[1].t - Site[i].Psi[1].t)*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[1].t - Site[i].Psi[1].t)/dp);
+                arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
+                        arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
+                        arg((Site[nn_i].Psi[1] - Site[i].Psi[1])/dp);
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
@@ -157,13 +157,13 @@ void magnetization(struct Measures &mis, struct Node* Site){
             for (ix = 0; ix < Lx; ix++) {
                 i=ix +Lx*(iy+Ly*iz);
 
-                phi_shifted_1= Site[i].Psi[1].t - Site[i].Psi[0].t;
+                phi_shifted_1= Site[i].Psi[1] - Site[i].Psi[0];
                 while(phi_shifted_1 >= C_TWO_PI){
                         phi_shifted_1-= C_TWO_PI;}
                 while(phi_shifted_1< 0){
                         phi_shifted_1+=C_TWO_PI;}
 
-                phi_shifted_2= Site[i].Psi[2].t - Site[i].Psi[0].t;
+                phi_shifted_2= Site[i].Psi[2] - Site[i].Psi[0];
                 while(phi_shifted_2 >= C_TWO_PI){
                         phi_shifted_2-= C_TWO_PI;}
                 while(phi_shifted_2< 0){
@@ -190,8 +190,8 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
             for (ix = 0; ix < Lx; ix++) {
                 i=ix +Lx*(iy+Ly*iz);
                 for(alpha=0; alpha<NC; alpha++){
-                    cos_phi[alpha]+= cos(Site[i].Psi[alpha].t);
-                    sin_phi[alpha]+= sin(Site[i].Psi[alpha].t);
+                    cos_phi[alpha]+= cos(Site[i].Psi[alpha]);
+                    sin_phi[alpha]+= sin(Site[i].Psi[alpha]);
                 }
             }
         }
@@ -223,7 +223,7 @@ void save_lattice(struct Node* Site, const fs::path & directory_write, std::stri
 
     if((fPsi=fopen(psi_init_file.c_str(), "w"))) {
         for (i = 0; i < N; i++) {
-            fwrite(Site[i].Psi, sizeof(struct O2), NC, fPsi);
+            fwrite(Site[i].Psi, sizeof(double), NC, fPsi);
         }
         fclose(fPsi);
     }

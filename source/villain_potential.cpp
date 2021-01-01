@@ -7,13 +7,14 @@
 void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp) {
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
+    std::cout<< start<< std::endl;
     double u1, u2, sum_1, sum, norm, boltz, boltz_H;
     double j1, j2;
     double d1, d2, d11, d12, d22;
     double dp=2*M_PI/MaxP;
-    double inv_beta=1./my_beta;
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
+        std::cout<< arg2<<std::endl;
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
             sum = 0;
             norm = 0;
@@ -24,9 +25,11 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             d22=0;
             d12=0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
+                u2=dp*arg2 - 2*M_PI*n2;
+                std::cout<< u2<<std::endl;
+
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
-                    u1=dp*arg1 - C_TWO_PI*n1;
-                    u2=dp*arg2 - C_TWO_PI*n2;
+                    u1=dp*arg1 - 2*M_PI*n1;
 
                     sum+=exp(-0.5*my_beta*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
 
@@ -47,7 +50,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                 }
             }
             /*Table Villain potential*/
-            vil.potential[start + arg1 + MaxP*arg2]= -inv_beta*log(sum);
+            vil.potential[start + arg1 + MaxP*arg2]= -log(sum)/my_beta;
             /*Table for the helicity modulus*/
             vil.d1_potential[start + arg1 + MaxP*arg2]+= d1/norm;
             vil.d2_potential[start + arg1 + MaxP*arg2]+= d2/norm;
@@ -56,6 +59,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             vil.d12_potential[start + arg1 + MaxP*arg2]+= d12/norm + my_beta*(d1*d2)/(norm*norm);
             /*Calculating beta-derivative of the Villain potential needed for calculating the internal energy (which differs from the energy mean due to the temperature dependence of the Villain model).*/
             vil.upotential[start + (arg1 + MaxP*arg2)] = sum_1/norm;
+
         }
     }
 
@@ -66,23 +70,21 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double sum_np, sum_nm, u1, u2;
     double dp=2*M_PI/MaxP;
-    double inv_betanp=1./beta_np;
-    double inv_betanm=1./beta_nm;
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
             sum_np = 0;
             sum_nm = 0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
+                u2=dp*arg2 - 2*M_PI*n2;
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
-                    u1=dp*arg1 - C_TWO_PI*n1;
-                    u2=dp*arg2 - C_TWO_PI*n2;
+                    u1=dp*arg1 - 2*M_PI*n1;
                     sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
                     sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
                 }
             }
-            vil.potential_bplus[start + arg1 + MaxP*arg2]= -inv_betanp*log(sum_np);
-            vil.potential_bminus[start + arg1 + MaxP*arg2]= -inv_betanm*log(sum_nm);
+            vil.potential_bplus[start + arg1 + MaxP*arg2]= -log(sum_np)/beta_np;
+            vil.potential_bminus[start + arg1 + MaxP*arg2]= -log(sum_nm)/beta_nm;
         }
     }
 }
