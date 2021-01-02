@@ -9,17 +9,17 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
     unsigned int ix, iy, iz;
     int ip, im, alpha, vec, i;
-    long double dp=2*M_PI/MaxP;
+    //long double dp=2*M_PI/MaxP;
     int n_var, start=0.5*(MaxP*MaxP-1);
     int new_int_phase[NC]={0};
     int old_int_phase;
-    double new_phase[NC]={0};
+    //double new_phase[NC]={0};
     int arg_F_new[NC][3]={0};
     int arg_B_new[NC][3]={0}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={0};
     int arg_B_old[NC][3]={0}; /*Forward and Backward updated phases*/
     double acc_rate=0.5, acc_theta=0., rand;
-    double newE, oldE, dE;
+    double dE;
 
     class_tic_toc t_localHtheta(true,5,"local_Htheta");
 
@@ -33,10 +33,15 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                 for (alpha = 0; alpha < NC; alpha++) {
 
                     memset(new_int_phase, 0, sizeof(new_int_phase));
-                    n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
-                    old_int_phase= Site[i].Psi[alpha]/dp;
-                    new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);
-                    new_phase[alpha]=dp*new_int_phase[alpha];  /*The new phase is automatically defined in the interval [0, 2pi)*/
+                    old_int_phase= Site[i].Psi[alpha];
+                    n_var = rn::uniform_integer_box(1, MCp.lbox);
+                    rand = rn::uniform_real_box(0, 1);
+                    if(rand>=0.5){
+                        new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);
+                    }else{
+                        new_int_phase[alpha]= int_arg_phase(old_int_phase - n_var);
+                    }
+                    //new_phase[alpha]=dp*new_int_phase[alpha];  /*The new phase is automatically defined in the interval [0, 2pi)*/
 
                         for (vec = 0; vec < 3; vec++) {
                             if (vec == 0) {
@@ -52,34 +57,33 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                                 im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                             }
                             arg_F_new[alpha][vec] = //ARG( (Site[ip].Psi[beta]*inv_dp - new_int_phase[beta]), MaxP);
-                                    arg( (Site[ip].Psi[alpha]/dp - new_int_phase[alpha]));
+                                    arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]));
                             arg_B_new[alpha][vec] = //ARG( (new_int_phase[beta] - Site[im].Psi[beta]*inv_dp), MaxP);
-                                    arg( (new_int_phase[alpha] - Site[im].Psi[alpha]/dp));
+                                    arg( (new_int_phase[alpha] - Site[im].Psi[alpha]));
                             arg_F_old[alpha][vec] = //ARG( (Site[ip].Psi[beta] - Site[i].Psi[beta])*inv_dp, MaxP);
-                                    arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha])/dp);
+                                    arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]));
                             arg_B_old[alpha][vec] = //ARG( (Site[i].Psi[beta] - Site[im].Psi[beta])*inv_dp, MaxP);
-                                    arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha])/dp);
+                                    arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]));
                             }
                     }
 
                     /*Specific for the two component case*/
+                //std::cout<< " new:1 "<< new_int_phase[0]  << " new:2 "<< new_int_phase[1] <<std::endl;
 
                     /*Phase updating phase componet 1*/
-                    oldE=0;
-                    newE=0;
+                    dE=0;
                     for (vec = 0; vec < 3; vec++) {
                         //std::cout << start + arg_B_new[0][vec] + MaxP*arg_B_new[1][vec] << " " << start + arg_F_new[0][vec] + MaxP*arg_F_new[1][vec] << " MAX:" << start + (MaxP*(MaxP-1)*0.5 +  (MaxP-1)*0.5) <<std::endl;
-                        oldE += vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec]] +
-                                vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]];
-                        newE += vil.potential[start + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec]] +
-                                vil.potential[start + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec]];
+                        dE += vil.potential[start + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec]]
+                              +vil.potential[start + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec]]
+                              -vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec]]
+                              -vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]];
                     }
-                    dE = newE - oldE;
 
                     rand = rn::uniform_real_box(0, 1);
                     //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                    if ((rand) > exp(my_beta*dE)) {
-                        Site[i].Psi[0] = new_phase[0];
+                    if ((rand) <exp(-dE)) {
+                        Site[i].Psi[0] = new_int_phase[0];
                         acc_theta++;
                         for(vec=0; vec<3;vec++){
                             arg_B_old[0][vec]=arg_B_new[0][vec];
@@ -88,21 +92,19 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                         //mis.E+=dE;
                     }
                 /*Phase updating phase componet 2*/
-                oldE=0;
-                newE=0;
+                dE=0;
                 for (vec = 0; vec < 3; vec++) {
                     //std::cout << start + arg_B_new[0][vec] + MaxP*arg_B_new[1][vec] << " " << start + arg_F_new[0][vec] + MaxP*arg_F_new[1][vec] << " MAX:" << start + (MaxP*(MaxP-1)*0.5 +  (MaxP-1)*0.5) <<std::endl;
-                    oldE += vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec]] +
-                            vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]];
-                    newE += vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec]] +
-                            vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec]];
+                    dE += vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec]]
+                          +vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec]]
+                          -vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec]]
+                          -vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]];
                 }
-                dE = newE - oldE;
-
+                //std::cout<< dE<< " old: "<<Site[i].Psi[1] << " new: "<< new_int_phase[1] <<std::endl;
                 rand = rn::uniform_real_box(0, 1);
                 //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                if ((rand) > exp(my_beta*dE)) {
-                    Site[i].Psi[1] = new_phase[1];
+                if ((rand)< exp(-dE)) {
+                    Site[i].Psi[1] = new_int_phase[1];
                     acc_theta++;
                     for(vec=0; vec<3;vec++){
                         arg_B_old[1][vec]=arg_B_new[1][vec];

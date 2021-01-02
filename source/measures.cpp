@@ -29,9 +29,9 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                     }
 
                     arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
                     arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1] - Site[i].Psi[1])/dp);
+                            arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -43,7 +43,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 }
 
 
-void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site){
+void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site, double my_beta){
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
@@ -67,10 +67,10 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
                     }
 
                     arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
                     arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1])/dp);
-                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2];
+                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
                 }
@@ -97,9 +97,9 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
                 arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[0] - Site[i].Psi[0])/dp);
+                        arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
                 arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[1] - Site[i].Psi[1])/dp);
+                        arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
@@ -183,6 +183,7 @@ void magnetization(struct Measures &mis, struct Node* Site){
 void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i, alpha;
+    double dp=2*M_PI/MaxP;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
     double inv_N=1./N;
     for(iz=0; iz<Lz;iz++) {
@@ -190,8 +191,8 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
             for (ix = 0; ix < Lx; ix++) {
                 i=ix +Lx*(iy+Ly*iz);
                 for(alpha=0; alpha<NC; alpha++){
-                    cos_phi[alpha]+= cos(Site[i].Psi[alpha]);
-                    sin_phi[alpha]+= sin(Site[i].Psi[alpha]);
+                    cos_phi[alpha]+= cos(Site[i].Psi[alpha]*dp);
+                    sin_phi[alpha]+= sin(Site[i].Psi[alpha]*dp);
                 }
             }
         }
@@ -203,7 +204,7 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
         mis.m_phase[alpha] = (cos_phi[alpha]*cos_phi[alpha]) + (sin_phi[alpha]*sin_phi[alpha]);
     }
 
-// std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
+ std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
 
 
 }
@@ -223,7 +224,7 @@ void save_lattice(struct Node* Site, const fs::path & directory_write, std::stri
 
     if((fPsi=fopen(psi_init_file.c_str(), "w"))) {
         for (i = 0; i < N; i++) {
-            fwrite(Site[i].Psi, sizeof(double), NC, fPsi);
+            fwrite(Site[i].Psi, sizeof(int), NC, fPsi);
         }
         fclose(fPsi);
     }

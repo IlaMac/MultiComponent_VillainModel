@@ -7,14 +7,12 @@
 void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp) {
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
-    std::cout<< start<< std::endl;
     double u1, u2, sum_1, sum, norm, boltz, boltz_H;
     double j1, j2;
     double d1, d2, d11, d12, d22;
     double dp=2*M_PI/MaxP;
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
-        std::cout<< arg2<<std::endl;
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
             sum = 0;
             norm = 0;
@@ -26,13 +24,9 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             d12=0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
                 u2=dp*arg2 - 2*M_PI*n2;
-                std::cout<< u2<<std::endl;
-
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
                     u1=dp*arg1 - 2*M_PI*n1;
-
                     sum+=exp(-0.5*my_beta*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
-
                     boltz_H = 0.5*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) );
                     boltz = exp(-my_beta*boltz_H);
                     norm += boltz;
@@ -50,7 +44,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                 }
             }
             /*Table Villain potential*/
-            vil.potential[start + arg1 + MaxP*arg2]= -log(sum)/my_beta;
+            vil.potential[start + arg1 + MaxP*arg2]= -log(sum);
             /*Table for the helicity modulus*/
             vil.d1_potential[start + arg1 + MaxP*arg2]+= d1/norm;
             vil.d2_potential[start + arg1 + MaxP*arg2]+= d2/norm;

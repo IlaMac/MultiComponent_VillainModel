@@ -82,7 +82,7 @@ void initialize_lattice(struct Node* Site, const fs::path & directory_read, int 
         FILE *fA= nullptr;
         if((fPsi=fopen(psi_init_file.c_str(), "r")) and (fA=fopen(a_init_file.c_str(), "r")) ) {
             for (i = 0; i < N; i++) {
-                fread(Site[i].Psi, sizeof(double), NC, fPsi);
+                fread(Site[i].Psi, sizeof(int), NC, fPsi);
                 fread(Site[i].A, sizeof(double), 3, fA);
             }
             fclose(fA);
@@ -93,7 +93,7 @@ void initialize_lattice(struct Node* Site, const fs::path & directory_read, int 
             for (i = 0; i < N; i++) {
                 for (alpha = 0; alpha < NC; alpha++) {
                     //Site[i].Psi[alpha].r =1;
-                    Site[i].Psi[alpha] = 0.;
+                    Site[i].Psi[alpha] = 0;
                     //polar_to_cartesian(Site[i].Psi[alpha]);
                 }
             }

@@ -134,7 +134,7 @@ int main(int argc, char *argv[]){
     // Lattice.resize(N);
     for(i=0; i<N; i++) {
         Lattice[i].A = (double *) calloc(3, sizeof(double));
-        Lattice[i].Psi = (double *) calloc(NC, sizeof( double));
+        Lattice[i].Psi = (int *) calloc(NC, sizeof( int));
     }
 
     //Initialize H_parameters: file "H_init.txt"
@@ -252,7 +252,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         mis.reset();
         helicity_modulus(my_beta, mis, vil, Site);
         MPI_Barrier(MPI_COMM_WORLD);
-        energy(mis, vil, E_betanp, E_betanm, Site);
+        energy(mis, vil, E_betanp, E_betanm, Site, my_beta);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
         magnetization_singlephase(mis,  Site, my_beta);

@@ -16,7 +16,7 @@
 #define C_PI (3.1415926535897932384626433832795029L)
 /*MaxP corresponds to the number of q states of the theta field. Division of phase values in <-pi, pi>. Must have MaxP uneven to have a symmetric interval around zero.*/
 //static constexpr int MaxP=129;
-#define MaxP (11)
+#define MaxP (129)
 #define Annealing (0) //To be implemented
 
 //static constexpr double C_TWO_PI = 6.2831853071795864769252867665590058;
@@ -29,7 +29,7 @@ struct Node{
     /*three SC components*/
     //std::array<O2, NC> Psi; 
     //struct O2* Psi;
-    double *Psi;
+    int *Psi; /*discretized values of the phase. To be multiplied by 2*M_PI/MaxP*/
 };
 
 struct H_parameters{
