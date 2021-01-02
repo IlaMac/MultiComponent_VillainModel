@@ -5,7 +5,7 @@
 #include "villain_MC.h"
 
 
-void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil, struct Measures &mis){
+void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
     unsigned int ix, iy, iz;
     int ip, im, alpha, vec, i;
@@ -86,7 +86,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                             arg_B_old[0][vec]=arg_B_new[0][vec];
                             arg_F_old[0][vec]=arg_F_new[0][vec];
                         }
-                        mis.E+=dE;
+                        //mis.E+=dE;
                     }
 
                 /*Phase updating phase componet 2*/
@@ -106,7 +106,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                         arg_B_old[1][vec]=arg_B_new[1][vec];
                         arg_F_old[1][vec]=arg_F_new[1][vec];
                     }
-                    mis.E+=dE;
+                    //mis.E+=dE;
                 }
             }
         }

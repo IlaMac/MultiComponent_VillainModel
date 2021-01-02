@@ -191,7 +191,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     std::vector <double> all_beta;
     double E_betanp=0., E_betanm=0.;
     double beta_np=0., beta_nm=0.;
-    double inv_n_save= 1./2;//Inverse number of spin configurations I want to save
     struct Villain vil;
     /*Measurements*/
     struct Measures mis;
@@ -242,11 +241,10 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
     mis.reset();
-    energy(mis, vil, Site, my_beta);
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
-            metropolis_villain(Site, MCp, Hp, my_beta, vil, mis);
+            metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
         //Measures
@@ -254,6 +252,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         mis.reset();
         helicity_modulus(my_beta, mis, vil, Site);
         MPI_Barrier(MPI_COMM_WORLD);
+        energy(mis, vil, Site, my_beta);
         energy_nn(vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);

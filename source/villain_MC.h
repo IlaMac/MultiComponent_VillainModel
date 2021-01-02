@@ -20,7 +20,7 @@
 #define ARG(diff,N) ((diff) + (N)*((2*(diff)<(-(N)))*(1-(2*(diff)+(N)+1)/(2*(N))) - (2*(diff)>(N))*(1+(2*(diff)-(N)-1)/(2*(N)))))
 
 
-void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil, struct Measures &mis);
+void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
 double arg_phase(double x);
 int arg(int x);
 int int_arg_phase(int x);
