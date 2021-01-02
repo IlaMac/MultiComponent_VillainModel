@@ -181,7 +181,7 @@ int main(int argc, char *argv[]){
     MPI_Barrier(MPI_COMM_WORLD);
 
     t_tot.print_measured_time();
- 
+
     return 0;
 }
 
@@ -193,13 +193,14 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     double beta_np=0., beta_nm=0.;
     double inv_n_save= 1./2;//Inverse number of spin configurations I want to save
     struct Villain vil;
+    /*Measurements*/
+    struct Measures mis;
 
     class_tic_toc t_h5pp(true,5,"Benchmark h5pp");
     class_tic_toc t_metropolis(true,5,"Benchmark metropolis");
     class_tic_toc t_measures(true,5,"Benchmark measures");
 
-    /*Measurements*/
-    Measures mis;
+
 
     std::string directory_write_temp;
     directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
@@ -236,15 +237,16 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
 
     /*Initialization Villain potentials*/
-    init_villain_potentials(my_beta, vil, Hp, MCp);
+    init_villain_potentials(my_beta, vil, Hp, MCp, directory_write_temp );
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp);
-
+    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
+    mis.reset();
+    energy(mis, vil, Site, my_beta);
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
-            metropolis_villain(Site, MCp, Hp, my_beta, vil);
+            metropolis_villain(Site, MCp, Hp, my_beta, vil, mis);
             t_metropolis.toc();
         }
         //Measures
@@ -252,20 +254,15 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         mis.reset();
         helicity_modulus(my_beta, mis, vil, Site);
         MPI_Barrier(MPI_COMM_WORLD);
-        energy(mis, vil, E_betanp, E_betanm, Site, my_beta);
+        energy_nn(vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
         magnetization_singlephase(mis,  Site, my_beta);
 
-        //magnetization(mis, Site);
-//        if(Hp.e!=0) {
-//            dual_stiffness(mis, Hp, Site);
-//        }
         MPI_Barrier(MPI_COMM_WORLD);
 
         mis.my_rank=PTp.rank;
         t_measures.toc();
-        //std::cout << "nu: "<< Hp.nu << " d11: "<< mis.D2H_Dd2i[0]<< " d22: "<< mis.D2H_Dd2i[1] << " d12: "<<  mis.D2H_Dd12 << std::endl;
 
         t_h5pp.tic();
         file.appendTableRecords(mis, "Measurements");
@@ -284,7 +281,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
         MPI_Barrier(MPI_COMM_WORLD);
 
         //Parallel Tempering swap
-        //parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
+        parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
         file = h5pp::File(directory_write_temp+"/Output.h5", h5pp::FilePermission::READWRITE);

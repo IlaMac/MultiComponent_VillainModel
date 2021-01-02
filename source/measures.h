@@ -32,9 +32,10 @@ struct Measures{
 };
 
 
-void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, struct Node* Site);
-void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site, double my_beta);
+void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double my_beta);
+void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site);
 void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* Site);
+void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, struct Node* Site);
 void magnetization(struct Measures &mis, struct Node* Site);
 void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta);
 void save_lattice(struct Node* Site, const fs::path & directory_write, std::string configuration);

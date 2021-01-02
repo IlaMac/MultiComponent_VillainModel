@@ -4,13 +4,17 @@
 
 #include "villain_potential.h"
 
-void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp) {
+void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write) {
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double u1, u2, sum_1, sum, norm, boltz, boltz_H;
     double j1, j2;
     double d1, d2, d11, d12, d22;
     double dp=2*M_PI/MaxP;
+    fs::path vpotential_file = directory_write / std::string("Villain_potential.txt");
+
+    FILE *fVPotential= nullptr;
+    fVPotential=fopen(vpotential_file.c_str(), "w");
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
@@ -23,9 +27,9 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             d22=0;
             d12=0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
-                u2=dp*arg2 - 2*M_PI*n2;
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
                     u1=dp*arg1 - 2*M_PI*n1;
+                    u2=dp*arg2 - 2*M_PI*n2;
                     sum+=exp(-0.5*my_beta*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
                     boltz_H = 0.5*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) );
                     boltz = exp(-my_beta*boltz_H);
@@ -44,7 +48,8 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                 }
             }
             /*Table Villain potential*/
-            vil.potential[start + arg1 + MaxP*arg2]= -log(sum);
+            vil.potential[start + arg1 + MaxP*arg2]= -log(sum)/my_beta;
+            fprintf(fVPotential, "%d %d %19.12e \n", arg1, arg2, my_beta*vil.potential[start + arg1 + MaxP*arg2]);
             /*Table for the helicity modulus*/
             vil.d1_potential[start + arg1 + MaxP*arg2]+= d1/norm;
             vil.d2_potential[start + arg1 + MaxP*arg2]+= d2/norm;
@@ -56,10 +61,10 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
 
         }
     }
-
+    fclose(fVPotential);
 }
 
-void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp) {
+void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write) {
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double sum_np, sum_nm, u1, u2;
@@ -70,8 +75,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
             sum_np = 0;
             sum_nm = 0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
-                u2=dp*arg2 - 2*M_PI*n2;
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
+                    u2=dp*arg2 - 2*M_PI*n2;
                     u1=dp*arg1 - 2*M_PI*n1;
                     sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
                     sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));

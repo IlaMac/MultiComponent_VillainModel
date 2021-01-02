@@ -42,12 +42,10 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
 }
 
-
-void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site, double my_beta){
+void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site){
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double dp=2*M_PI/MaxP;
     unsigned int i, ix, iy, iz, nn_i;
     double E_betanp_temp=0., E_betanm_temp=0.;
 
@@ -70,7 +68,6 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
                             arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
                     arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
                             arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
-                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
                 }
@@ -79,6 +76,41 @@ void energy(struct Measures &mis, struct Villain &vil, double &E_betanp, double 
     }
     E_betanp=E_betanp_temp;
     E_betanm=E_betanp_temp;
+}
+
+
+void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double my_beta){
+
+    unsigned int vec;
+    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    unsigned int i, ix, iy, iz, nn_i;
+
+    for(iz=0;iz<Lz;iz++){
+        for(iy=0;iy<Ly;iy++){
+            for(ix=0; ix<Lx; ix++){
+                i = ix + Lx * (iy + iz * Ly);
+                for(vec=0; vec<3; vec++) {
+                    if(vec==0){
+                        nn_i= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
+                    }
+                    if(vec==1){
+                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+                    }
+                    if(vec==2){
+                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+                    }
+
+                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
+                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
+
+                }
+            }
+        }
+    }
+
 }
 
 

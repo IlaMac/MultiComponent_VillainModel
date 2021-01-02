@@ -23,6 +23,6 @@ struct Villain{
     double d12_potential[MaxP*MaxP]={0}; /*Useful to compute efficiently the helicity modulus*/
 };
 
-void init_villain_potentials(double my_beta, struct Villain &vil, struct H_parameters &Hp, struct MC_parameters &MCp);
-void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp);
+void init_villain_potentials(double my_beta, struct Villain &vil, struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write);
+void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write);
 #endif //VILLAIN_2COMPONENT_VILLAIN_POTENTIAL_H

@@ -13,14 +13,14 @@
 #include <iostream>
 #include <cstring>
 #include "o2.h"
-
+#include "measures.h"
 
 
 #undef  ARG
 #define ARG(diff,N) ((diff) + (N)*((2*(diff)<(-(N)))*(1-(2*(diff)+(N)+1)/(2*(N))) - (2*(diff)>(N))*(1+(2*(diff)-(N)-1)/(2*(N)))))
 
 
-void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
+void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil, struct Measures &mis);
 double arg_phase(double x);
 int arg(int x);
 int int_arg_phase(int x);
