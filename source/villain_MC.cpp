@@ -11,7 +11,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
     int ip, im, alpha, vec, i;
     int n_var, start=0.5*(MaxP*MaxP-1);
     int new_int_phase[NC]={0};
-    int old_int_phase;
+    //int old_int_phase;
     int arg_F_new[NC][3]={0};
     int arg_B_new[NC][3]={0}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={0};
@@ -29,15 +29,12 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                 /*******PHASE ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
-
-                    memset(new_int_phase, 0, sizeof(new_int_phase));
-                    old_int_phase= Site[i].Psi[alpha];
                     n_var = rn::uniform_integer_box(1, MCp.lbox);
                     rand = rn::uniform_real_box(0, 1);
                     if(rand>=0.5){
-                        new_int_phase[alpha]= int_arg_phase(old_int_phase + n_var);
+                        new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] + n_var);
                     }else{
-                        new_int_phase[alpha]= int_arg_phase(old_int_phase - n_var);
+                        new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] - n_var);
                     }
                     //new_phase[alpha]=dp*new_int_phase[alpha];  /*The new phase is automatically defined in the interval [0, 2pi)*/
 
@@ -78,6 +75,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     }
 
                     rand = rn::uniform_real_box(0, 1);
+                    //std::cout<< rand<< " dE "<< dE<< " new phase: "<< new_int_phase[0]  << " old_phase "<< Site[i].Psi[0] <<std::endl;
                     //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
                     if ((rand) <exp(-my_beta*dE)) {
                         Site[i].Psi[0] = new_int_phase[0];
