@@ -204,7 +204,7 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
         mis.m_phase[alpha] = (cos_phi[alpha]*cos_phi[alpha]) + (sin_phi[alpha]*sin_phi[alpha]);
     }
 
- std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
+ //std::cout << "my beta"<< my_beta<<  " mphase1: "<< mis.m_phase[0] << "mphase1: " << mis.m_phase[1]<< std::endl;
 
 
 }
