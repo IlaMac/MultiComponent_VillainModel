@@ -20,6 +20,10 @@ static constexpr int NC = 2;
 
 extern unsigned int Lx, Ly, Lz, N;
 
+#undef  SQR
+#define SQR(x) ((x)*(x))
+
+
 namespace paths_dir{
     inline std::string TEMP_DIROUT;
     inline std::string DIROUT;

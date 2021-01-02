@@ -8,7 +8,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double dp=2*M_PI/MaxP;
+    double dp=C_TWO_PI/MaxP;
     unsigned int i, ix, iy, iz, nn_i;
     double inv_V=1./N;
 
@@ -28,10 +28,10 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                         nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
+                    arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -64,10 +64,10 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
                 }
@@ -100,10 +100,10 @@ void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    arg_1 =ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
                     mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
 
                 }
@@ -118,7 +118,6 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double dp=2*M_PI/MaxP;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
     unsigned int i, ix, iy, iz, nn_i;
 
@@ -128,10 +127,10 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0])*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1])*inv_dp, MaxP);
-                        arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
+                arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                        //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                        //arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
@@ -215,7 +214,7 @@ void magnetization(struct Measures &mis, struct Node* Site){
 void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i, alpha;
-    double dp=2*M_PI/MaxP;
+    double dp=C_TWO_PI/MaxP;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
     double inv_N=1./N;
     for(iz=0; iz<Lz;iz++) {
