@@ -78,7 +78,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     //
                     //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
                     if ((rand) <exp(-my_beta*dE)) {
-                        std::cout<< rand<< " dE "<< dE<< " exp(-beta dE): "<< exp(-my_beta*dE)<< " beta: "<< my_beta <<" new phase: "<< new_int_phase[0]  << " old_phase "<< Site[i].Psi[0] <<std::endl;
+                        //std::cout<< rand<< " dE "<< dE<< " exp(-beta dE): "<< exp(-my_beta*dE)<< " beta: "<< my_beta <<" new phase: "<< new_int_phase[0]  << " old_phase "<< Site[i].Psi[0] <<std::endl;
                         Site[i].Psi[0] = new_int_phase[0];
                         acc_theta++;
                         for(vec=0; vec<3;vec++){
