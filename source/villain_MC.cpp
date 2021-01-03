@@ -51,19 +51,19 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                                 ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                                 im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                             }
-                            arg_F_new[alpha][vec] = ARG( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
-                                    //arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]));
-                            arg_B_new[alpha][vec] = ARG( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
-                                    //arg( (new_int_phase[alpha] - Site[im].Psi[alpha]));
-                            arg_F_old[alpha][vec] = ARG( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
-                                    //arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]));
-                            arg_B_old[alpha][vec] = ARG( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
-                                    //arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]));
+                            arg_F_new[alpha][vec] = //ARG( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
+                                    arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]));
+                            arg_B_new[alpha][vec] = //ARG( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
+                                    arg( (new_int_phase[alpha] - Site[im].Psi[alpha]));
+                            arg_F_old[alpha][vec] = //ARG( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
+                                    arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]));
+                            arg_B_old[alpha][vec] = //ARG( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
+                                    arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]));
                             }
                     }
 
                     /*Specific for the two component case*/
-                //std::cout<< " new:1 "<< new_int_phase[0]  << " new:2 "<< new_int_phase[1] <<std::endl;
+                    //std::cout<< " new:1 "<< new_int_phase[0]  << " new:2 "<< new_int_phase[1] <<std::endl;
 
                     /*Phase updating phase componet 1*/
                     dE=0;
@@ -75,9 +75,10 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     }
 
                     rand = rn::uniform_real_box(0, 1);
-                    //std::cout<< rand<< " dE "<< dE<< " new phase: "<< new_int_phase[0]  << " old_phase "<< Site[i].Psi[0] <<std::endl;
+                    //
                     //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
                     if ((rand) <exp(-my_beta*dE)) {
+                        std::cout<< rand<< " dE "<< dE<< " exp(-beta dE): "<< exp(-my_beta*dE)<< " beta: "<< my_beta <<" new phase: "<< new_int_phase[0]  << " old_phase "<< Site[i].Psi[0] <<std::endl;
                         Site[i].Psi[0] = new_int_phase[0];
                         acc_theta++;
                         for(vec=0; vec<3;vec++){
