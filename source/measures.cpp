@@ -28,10 +28,10 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
                         nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
-                            arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
+                    arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
                     mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
                 }
 
@@ -64,10 +64,10 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
-                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
                     E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
                 }
@@ -100,10 +100,10 @@ void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                            arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                    arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
-                            arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
+                    arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                            //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                    arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                            //arg((Site[nn_i].Psi[1]- Site[i].Psi[1]));
                     mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
 
                 }
@@ -127,10 +127,10 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = //ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                        arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
-                arg_2 = //ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
-                        arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
+                arg_1 = ARG( (Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
+                        //arg((Site[nn_i].Psi[0] - Site[i].Psi[0]));
+                arg_2 = ARG( (Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                        //arg((Site[nn_i].Psi[1] - Site[i].Psi[1]));
 
                 d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
                 d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
