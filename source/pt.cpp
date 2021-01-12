@@ -67,8 +67,8 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm,  double &m
             oldrank_i = PTroot.ind_to_rank[i];
             oldrank_nn = PTroot.ind_to_rank[ind_nn];
             if (nn == 1) {
-                E_rank_betann = PTroot.E_rank_betap[oldrank_i];
-                E_ranknn_beta = PTroot.E_rank_betam[oldrank_nn];
+                E_rank_betann = PTroot.E_rank_betap[oldrank_i]; /*H[\beta_n=plus, x]*/
+                E_ranknn_beta = PTroot.E_rank_betam[oldrank_nn]; /*H[\beta_plus_minus=, x_n=plus]*/
             } else if (nn == -1) {
                 E_rank_betann = PTroot.E_rank_betam[oldrank_i];
                 E_ranknn_beta = PTroot.E_rank_betap[oldrank_nn];

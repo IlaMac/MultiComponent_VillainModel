@@ -239,7 +239,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     init_villain_potentials(my_beta, vil, Hp, MCp, directory_write_temp );
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
+    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
     mis.reset();
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
@@ -281,6 +281,10 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 
         //Parallel Tempering swap
         parallel_temp(mis.E, E_betanp, E_betanm, my_beta, my_ind, PTp, PTroot);
+        MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+        MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+        init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
+
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
         file = h5pp::File(directory_write_temp+"/Output.h5", h5pp::FilePermission::READWRITE);
