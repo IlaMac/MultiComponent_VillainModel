@@ -22,7 +22,7 @@
 
 void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
 double arg_phase(double x);
-int arg(int x);
-int int_arg_phase(int x);
+int arg(int x, int Max);
+int int_arg_phase(int x,  int Max);
 
 #endif //VILLAIN_2COMPONENT_VILLAIN_MC_H
