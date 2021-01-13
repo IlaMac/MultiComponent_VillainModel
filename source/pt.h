@@ -31,6 +31,6 @@ struct PTroot_parameters{
 };
 
 void initialize_PTarrays(struct PT_parameters &PTp, struct PTroot_parameters &PTroot, struct H_parameters &Hp);
-void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &my_beta,  int &my_ind, struct PT_parameters &PTp, struct PTroot_parameters &PTroot);
+void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &beta_p, double &beta_m, double &my_beta,  int &my_ind, struct PT_parameters &PTp, struct PTroot_parameters &PTroot);
 
 #endif //VILLAIN_2COMPONENT_PT_H
