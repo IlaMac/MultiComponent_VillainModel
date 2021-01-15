@@ -29,13 +29,13 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                 /*******PHASE ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
-                    n_var = rn::uniform_integer_box(1, MCp.lbox);
-                    rand = rn::uniform_real_box(0, 1);
-                    if(rand>=0.5){
+                    n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
+                    //rand = rn::uniform_real_box(0, 1);
+                    //if(rand>=0.5){
                         new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] + n_var, MaxP);
-                    }else{
-                        new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] - n_var, MaxP);
-                    }
+                    //}else{
+                    //      new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] - n_var, MaxP);
+                    //}
                     //new_phase[alpha]=dp*new_int_phase[alpha];  /*The new phase is automatically defined in the interval [0, 2pi)*/
 
                         for (vec = 0; vec < 3; vec++) {
@@ -55,8 +55,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                             arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
                             arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
                             arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
-                            }
-
+                        }
                 }
                     /*Specific for the two component case*/
                     /*Phase updating phase componet 1*/
@@ -119,10 +118,10 @@ double arg_phase(double x){
 }
 int int_arg_phase(int x, int Max){
     while(x < 0 ){
-        x+=Max-1;
+        x+=Max;
     }
     while(x>Max-1){
-        x-=Max-1;
+        x-=Max;
     }
     return x;
 }
