@@ -239,7 +239,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     init_villain_potentials(my_beta, vil, Hp, MCp, directory_write_temp );
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
-
+    std::cout<< "START I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << std::endl;
     init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
     mis.reset();
     for (n = NSTART; n<MCp.nmisu; n++) {
@@ -278,11 +278,11 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 	    if((n%(MCp.n_autosave))==0){
 	        save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
 	    }
+
         MPI_Barrier(MPI_COMM_WORLD);
 
         //Parallel Tempering swap
-        parallel_temp(mis.E, E_betanp, E_betanm, beta_np, beta_nm,  my_beta, my_ind, PTp, PTroot);
-        init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
+        parallel_temp(mis.E, E_betanp, E_betanm, beta_np, beta_nm,  my_beta, my_ind, vil, PTp, PTroot);
 
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);

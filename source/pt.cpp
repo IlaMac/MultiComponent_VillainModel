@@ -23,6 +23,8 @@ void initialize_PTarrays(struct PT_parameters &PTp, struct PTroot_parameters &PT
     PTroot.E_rank_betap.resize(PTp.np, 0.0);
     PTroot.E_rank_betam.resize(PTp.np, 0.0);
 
+    PTroot.Villain_beta.resize(PTp.np);
+
     PTroot.ind_to_rank.resize(PTp.np, 0);
     PTroot.rank_to_ind.resize(PTp.np, 0);
     delta_beta = (beta_high - beta_low) / (PTp.np - 1);
@@ -36,7 +38,7 @@ void initialize_PTarrays(struct PT_parameters &PTp, struct PTroot_parameters &PT
         PTroot.beta_m[p] = PTroot.beta[ (PTp.np+p-1)%PTp.np ];
     }
 }
-void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &beta_p, double &beta_m,  double &my_beta, int &my_ind, struct PT_parameters &PTp, struct PTroot_parameters &PTroot){
+void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &beta_p, double &beta_m,  double &my_beta, int &my_ind, struct Villain &vil, struct PT_parameters &PTp, struct PTroot_parameters &PTroot){
 
     double coin;
     double n_rand;
@@ -44,19 +46,26 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
     double Delta;
     double E_rank_betann, E_ranknn_beta;
     double oldbeta_i, oldbeta_nn;
-    double oldbeta_plus_i, oldbeta_plus_nn;
-    double oldbeta_minus_i, oldbeta_minus_nn;
 
     int i=0,p, nn=0, ind_nn;
     int oldrank_i, oldrank_nn;
     int newrank_i, newrank_nn;
 
+    struct Villain vill_oldbeta;
+    struct Villain vill_oldbeta_nn;
+
+
+    //Create a datatype for the nth worker_results[n] struct
+    MPI_Datatype vill_struct;
+    MPI_Type_contiguous(9*MaxP*MaxP,MPI_DOUBLE,&vill_struct);
+    MPI_Type_commit(&vill_struct);
 
     MPI_Gather(&my_E, 1, MPI_DOUBLE, PTroot.E_rank_beta.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Gather(&E_betanp, 1, MPI_DOUBLE, PTroot.E_rank_betap.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Gather(&E_betanm, 1, MPI_DOUBLE, PTroot.E_rank_betam.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Gather(&beta_m, 1, MPI_DOUBLE, PTroot.beta_m.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Gather(&beta_p, 1, MPI_DOUBLE, PTroot.beta_p.data(), 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+    MPI_Gather(&vil, 1 , vill_struct, PTroot.Villain_beta.data(), 1, vill_struct, PTp.root, MPI_COMM_WORLD);
 
     if (PTp.rank == PTp.root) { //Root forms the pairs and decides (given the energies and the betas) which pairs will swap
         //Pair Formation
@@ -100,34 +109,11 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
                 oldbeta_nn = PTroot.beta[oldrank_nn];
                 PTroot.beta[oldrank_i] = oldbeta_nn;
                 PTroot.beta[oldrank_nn] = oldbeta_i;
-                //swap beta_nn
-//                oldbeta_minus_i=PTroot.beta_m[oldrank_i];
-//                oldbeta_plus_i=PTroot.beta_p[oldrank_i];
-//                oldbeta_minus_nn=PTroot.beta_m[oldrank_nn];
-//                oldbeta_plus_nn=PTroot.beta_p[oldrank_nn];
-//
-//                if(nn == 1){
-//                    PTroot.beta_p[oldrank_i]=oldbeta_plus_nn;
-//                    PTroot.beta_m[oldrank_i]=oldbeta_nn;
-//                    PTroot.beta_p[oldrank_nn]=oldbeta_i;
-//                    PTroot.beta_m[oldrank_nn]=oldbeta_minus_i;
-//                    std::cout<< "oldbeta: "<< oldbeta_i<< " oldbeta_plus: "<< oldbeta_plus_i << " oldbeta_minus: " << oldbeta_minus_i<<std::endl;
-//                    std::cout<< "oldbeta_nn: "<< oldbeta_nn<< " oldbetann_plus: "<< oldbeta_plus_nn << " oldbetann_minus: " << oldbeta_minus_nn<<std::endl;
-//                    std::cout<< "NEWbeta: "<< PTroot.beta[oldrank_i]<< " oldbeta_plus: "<< PTroot.beta_p[oldrank_i] << " oldbeta_minus: " << PTroot.beta_m[oldrank_i]<<std::endl;
-//                    std::cout<< "NEWbeta_nn: "<< PTroot.beta[oldrank_nn]<< " oldbetann_plus: "<< PTroot.beta_p[oldrank_nn] << " oldbetann_minus: " << PTroot.beta_m[oldrank_nn]<<std::endl;
-//
-//                }
-//                else if(nn== -1){
-//                    PTroot.beta_p[oldrank_i]=oldbeta_nn;
-//                    PTroot.beta_m[oldrank_i]=oldbeta_minus_nn;
-//                    PTroot.beta_p[oldrank_nn]=oldbeta_plus_i;
-//                    PTroot.beta_m[oldrank_nn]=oldbeta_i;
-//                    std::cout<< "oldbeta: "<< oldbeta_i<< " oldbeta_plus: "<< oldbeta_plus_i << " oldbeta_minus: " << oldbeta_minus_i<<std::endl;
-//                    std::cout<< "oldbeta_nn: "<< oldbeta_nn<< " oldbetann_plus: "<< oldbeta_plus_nn << " oldbetann_minus: " << oldbeta_minus_nn<<std::endl;
-//                    std::cout<< "NEWbeta: "<< PTroot.beta[oldrank_i]<< " oldbeta_plus: "<< PTroot.beta_p[oldrank_i] << " oldbeta_minus: " << PTroot.beta_m[oldrank_i]<<std::endl;
-//                    std::cout<< "NEWbeta_nn: "<< PTroot.beta[oldrank_nn]<< " oldbetann_plus: "<< PTroot.beta_p[oldrank_nn] << " oldbetann_minus: " << PTroot.beta_m[oldrank_nn]<<std::endl;
-//
-//                }
+                //swap vill struct
+                vill_oldbeta=PTroot.Villain_beta[oldrank_i];
+                vill_oldbeta_nn=PTroot.Villain_beta[oldrank_nn];
+                PTroot.Villain_beta[oldrank_i]=vill_oldbeta_nn;
+                PTroot.Villain_beta[oldrank_nn]=vill_oldbeta;
             }
             i += 2;
         }
@@ -142,5 +128,6 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
     MPI_Scatter(PTroot.rank_to_ind.data(), 1, MPI_INT, &my_ind, 1, MPI_INT, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_m, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_p, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+    MPI_Scatter(PTroot.Villain_beta.data(), 1, vill_struct, &vil, 1, vill_struct, PTp.root, MPI_COMM_WORLD);
 
 }

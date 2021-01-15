@@ -10,6 +10,7 @@
 #include "initialization.h"
 #include <fstream>
 
+#define MaxP (129)
 
 struct Villain{
     double potential[MaxP*MaxP]={0}; /*Table of the Villain potential multiplied by beta for each value of \Delta_mu \theta_1(r),  \Delta_mu \theta_2(r) */

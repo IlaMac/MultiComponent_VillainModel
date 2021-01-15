@@ -20,6 +20,7 @@ static constexpr int NC = 2;
 
 extern unsigned int Lx, Ly, Lz, N;
 
+
 #undef  SQR
 #define SQR(x) ((x)*(x))
 
