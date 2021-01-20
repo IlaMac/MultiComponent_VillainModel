@@ -145,8 +145,8 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
 //TO CHANGE!!!!!!!
 //void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site){
 //
-//    double qx_min=C_TWO_PI/(Lx);
-//    double invNorm= 1./((C_TWO_PI)*(C_TWO_PI)*N);
+//    double qx_min=2*M_PI/(Lx);
+//    double invNorm= 1./((2*M_PI)*(2*M_PI)*N);
 //    unsigned int i, ix, iy, iz;
 //    double Re_rhoz=0.;
 //    double Im_rhoz=0.;
@@ -181,16 +181,16 @@ void magnetization(struct Measures &mis, struct Node* Site){
                 i=ix +Lx*(iy+Ly*iz);
 
                 phi_shifted_1= Site[i].Psi[1] - Site[i].Psi[0];
-                while(phi_shifted_1 >= C_TWO_PI){
-                        phi_shifted_1-= C_TWO_PI;}
+                while(phi_shifted_1 >= 2*M_PI){
+                        phi_shifted_1-= 2*M_PI;}
                 while(phi_shifted_1< 0){
-                        phi_shifted_1+=C_TWO_PI;}
+                        phi_shifted_1+=2*M_PI;}
 
                 phi_shifted_2= Site[i].Psi[2] - Site[i].Psi[0];
-                while(phi_shifted_2 >= C_TWO_PI){
-                        phi_shifted_2-= C_TWO_PI;}
+                while(phi_shifted_2 >= 2*M_PI){
+                        phi_shifted_2-= 2*M_PI;}
                 while(phi_shifted_2< 0){
-                        phi_shifted_2+=C_TWO_PI;}
+                        phi_shifted_2+=2*M_PI;}
 
                 if(phi_shifted_1>phi_shifted_2){
                     mis.m+=1;
@@ -206,7 +206,7 @@ void magnetization(struct Measures &mis, struct Node* Site){
 void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i, alpha;
-    double dp=C_TWO_PI/MaxP;
+    double dp=2*M_PI/MaxP;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
     double inv_N=1./N;
     for(iz=0; iz<Lz;iz++) {

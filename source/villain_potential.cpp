@@ -67,7 +67,7 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
 
     int n1, n2, arg1, arg2, start=0.5*(MaxP*MaxP-1);
     double sum_np, sum_nm, u1, u2;
-    double dp=C_TWO_PI/MaxP;
+    double dp=2*M_PI/MaxP;
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
@@ -75,8 +75,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
             sum_nm = 0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
-                    u2=dp*arg2 - C_TWO_PI*n2;
-                    u1=dp*arg1 - C_TWO_PI*n1;
+                    u2=dp*arg2 - 2*M_PI*n2;
+                    u1=dp*arg1 - 2*M_PI*n1;
                     sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
                     sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
                 }

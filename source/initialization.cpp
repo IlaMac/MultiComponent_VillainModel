@@ -27,8 +27,8 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.e=0;
         Hp.h= 1.0;
         Hp.nu=0.1;
-        Hp.b_low=0.45;
-        Hp.b_high=0.46;
+        Hp.b_low=0.4;
+        Hp.b_high=0.5;
         Hp.init=0;
     }
 
@@ -49,7 +49,7 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
             fclose(fin);
         }
     }else{
-        MCp.nmisu=10;
+        MCp.nmisu=1000;
         MCp.tau=1;
         MCp.n_autosave=2000; //not used now
         MCp.lbox_theta=C_PI;
@@ -92,18 +92,14 @@ void initialize_lattice(struct Node* Site, const fs::path & directory_read, int 
         if(Hp.init==0) {
             for (i = 0; i < N; i++) {
                 for (alpha = 0; alpha < NC; alpha++) {
-                    //Site[i].Psi[alpha].r =1;
                     Site[i].Psi[alpha] = 0;
-                    //polar_to_cartesian(Site[i].Psi[alpha]);
                 }
             }
         }
         else if(Hp.init!=0) {
             for (i = 0; i < N; i++) {
                 for (alpha = 0; alpha < NC; alpha++) {
-                    //Site[i].Psi[alpha].r = 1;
-                    Site[i].Psi[alpha] = rn::uniform_integer_box(0, MaxP-1);
-                    //polar_to_cartesian(Site[i].Psi[alpha]);
+                    Site[i].Psi[alpha] = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
                 }
             }
         }

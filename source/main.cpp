@@ -279,6 +279,7 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
 	        save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
 	    }
 
+        //std::cout<< "I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << " my Vbeta in 0 is: "<< vil.potential[(int)0.5*(MaxP*MaxP-1)] <<  " my Vbetaplus in 0 is: "<< vil.potential_bplus[(int)0.5*(MaxP*MaxP-1)]  <<  " my Vbetaminus in 0 is: "<< vil.potential_bminus[(int)0.5*(MaxP*MaxP-1)]  <<  std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
 
         //Parallel Tempering swap
