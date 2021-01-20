@@ -32,7 +32,7 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
                     //rand = rn::uniform_real_box(0, 1);
                     //if(rand>=0.5){
-                        new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] + n_var, MaxP);
+                        new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);
                     //}else{
                     //      new_int_phase[alpha]= int_arg_phase(Site[i].Psi[alpha] - n_var, MaxP);
                     //}
@@ -127,10 +127,10 @@ int int_arg_phase(int x, int Max){
 }
 int arg(int x, int Max){
 
-    while(2*x < -(Max -1)){
+    while(x < -(Max -1)/2){
         x+=(Max-1);
     }
-    while(2*x > (Max -1)){
+    while(x > (Max -1)/2){
         x-=(Max-1);
     }
     return x;

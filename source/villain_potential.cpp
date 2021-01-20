@@ -30,19 +30,19 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                     u1=dp*arg1 - C_TWO_PI*n1;
                     u2=dp*arg2 - C_TWO_PI*n2;
                     //boltz_H=0.5*Hp.rho*(SQR(dp*arg1-C_TWO_PI*n1) + Hp.alpha*SQR(dp*arg2-C_TWO_PI*n2) - gamma*SQR(dp*(arg1-arg2)-C_TWO_PI*(n1-n2))))
-                    boltz_H = 0.5*(Hp.rho * (SQR(u1) +SQR(u2)) + Hp.nu*(u1*u2) );
+                    boltz_H = 0.5*(Hp.rho * (SQR(u1) +SQR(u2)) - Hp.nu*SQR(u1-u2) );
                     boltz = exp(-my_beta*boltz_H);
                     norm += boltz;
                     sum_1 += boltz_H*boltz;
 
-                    j1=Hp.rho*u1 + 0.5*Hp.nu*u2;
-                    j2=Hp.rho*u2 + 0.5*Hp.nu*u1;
+                    j1=Hp.rho*u1 - Hp.nu*(u1-u2);
+                    j2=Hp.rho*u2 - Hp.nu*(u1-u2);
 
                     d1+= j1*boltz;
                     d2+= j2*boltz;
-                    d11+= (Hp.rho - my_beta*j1*j1)*boltz;
-                    d22+= (Hp.rho - my_beta*j2*j2)*boltz;
-                    d12+= (0.5*Hp.nu - my_beta*j1*j2)*boltz;
+                    d11+= (Hp.rho - Hp.nu - my_beta*j1*j1)*boltz;
+                    d22+= (Hp.rho - Hp.nu - my_beta*j2*j2)*boltz;
+                    d12+= (Hp.nu - my_beta*j1*j2)*boltz;
 
                 }
             }
@@ -77,8 +77,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
                     u2=dp*arg2 - C_TWO_PI*n2;
                     u1=dp*arg1 - C_TWO_PI*n1;
-                    sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
-                    sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) + Hp.nu*(u1*u2) ));
+                    sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
+                    sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
                 }
             }
             vil.potential_bplus[start + arg1 + MaxP*arg2]= -log(sum_np)/beta_np;
