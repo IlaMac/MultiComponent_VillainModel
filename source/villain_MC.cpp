@@ -29,8 +29,9 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                 /*******PHASE ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
-                    n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
-                    new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);
+                    //n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
+                    //new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);
+                    new_int_phase[alpha]= rn::uniform_integer_box(-(MaxP-1)/2, (MaxP-1)/2);
                     // std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
                         for (vec = 0; vec < 3; vec++) {
                             if (vec == 0) {
