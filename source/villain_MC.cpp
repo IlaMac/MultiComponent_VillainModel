@@ -29,9 +29,9 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
 
                 /*******PHASE ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
-                    //n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
-                    //new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);
-                    new_int_phase[alpha]= rn::uniform_integer_box(-(MaxP-1)/2, (MaxP-1)/2);
+                    n_var = rn::uniform_integer_box(-MCp.lbox, MCp.lbox);
+                    new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);
+                    //new_int_phase[alpha]= rn::uniform_integer_box(-(MaxP-1)/2, (MaxP-1)/2);
                     // std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
                         for (vec = 0; vec < 3; vec++) {
                             if (vec == 0) {
@@ -83,12 +83,12 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                           -vil.potential[start + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec]]
                           -vil.potential[start + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]]);
                 }
-                rand = rn::uniform_real_box(0, 1);
-                //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                if (rand < exp(-my_beta*dE)) {
-                    Site[i].Psi[1] = new_int_phase[1];
-                    acc_theta++;
-                }
+//                rand = rn::uniform_real_box(0, 1);
+//                //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
+//                if (rand < exp(-my_beta*dE)) {
+//                    Site[i].Psi[1] = new_int_phase[1];
+//                    acc_theta++;
+//                }
             }
         }
     }
