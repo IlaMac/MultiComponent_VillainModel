@@ -8,7 +8,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    unsigned int i, ix, iy, iz, nn_i;
+    int i, ix, iy, iz, nn_i;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
@@ -17,13 +17,13 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
                 for(vec=0; vec<3; vec++) {
                     if (vec == 0) {
-                        nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+                        nn_i = mod(ix + 1, (int)Lx) + Lx * (iy + iz * Ly);
                     }
                     if (vec == 1) {
-                        nn_i = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+                        nn_i = ix + Lx * (mod(iy + 1, (int)Ly) + iz * Ly);
                     }
                     if (vec == 2) {
-                        nn_i = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+                        nn_i = ix + Lx * (iy + mod(iz + 1, (int)Lz) * Ly);
                     }
 
                     arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
@@ -42,7 +42,7 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    unsigned int i, ix, iy, iz, nn_i;
+    int i, ix, iy, iz, nn_i;
     double E_betanp_temp=0., E_betanm_temp=0.;
 
     for(iz=0;iz<Lz;iz++){
@@ -51,13 +51,13 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
                 i = ix + Lx * (iy + iz * Ly);
                 for(vec=0; vec<3; vec++) {
                     if(vec==0){
-                        nn_i= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
+                        nn_i= mod(ix+1,(int)Lx) + Lx * (iy + iz * Ly);
                     }
                     if(vec==1){
-                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+                        nn_i= ix + Lx * (mod(iy+1,(int)Ly) + iz * Ly);
                     }
                     if(vec==2){
-                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+                        nn_i= ix + Lx * (iy + mod(iz+1,(int)Lz) * Ly);
                     }
                     arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
                     arg_2 = arg((Site[nn_i].Psi[1]- Site[i].Psi[1]), MaxP);
@@ -75,8 +75,8 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
 void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double my_beta){
 
     unsigned int vec;
-    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    unsigned int i, ix, iy, iz, nn_i;
+    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);
+    int i, ix, iy, iz, nn_i;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
@@ -84,13 +84,13 @@ void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double
                 i = ix + Lx * (iy + iz * Ly);
                 for(vec=0; vec<3; vec++) {
                     if(vec==0){
-                        nn_i= mod(ix+1,Lx) + Lx * (iy + iz * Ly);
+                        nn_i= mod(ix+1, (int)Lx) + Lx * (iy + iz * Ly);
                     }
                     if(vec==1){
-                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+                        nn_i= ix + Lx * (mod(iy+1,(int)Ly) + iz * Ly);
                     }
                     if(vec==2){
-                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+                        nn_i= ix + Lx * (iy + mod(iz+1,(int)Lz) * Ly);
                     }
 
                     arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
@@ -110,13 +110,13 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
-    unsigned int i, ix, iy, iz, nn_i;
+    int i, ix, iy, iz, nn_i;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
             for(ix=0; ix<Lx; ix++) {
                 i = ix + Lx * (iy + iz * Ly);
-                nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+                nn_i = mod(ix + 1, (int)Lx) + Lx * (iy + iz * Ly);
 
                 arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
                 arg_2 = arg((Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);

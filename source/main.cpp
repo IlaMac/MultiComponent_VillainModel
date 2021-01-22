@@ -243,12 +243,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
     mis.reset();
 
-    for(i=0;i<N;i++){
-        if(Site[i].Psi[1]!=0 ){
-            printf("Here is non zero! Site %d\n", i);
-        }
-    }
-
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
