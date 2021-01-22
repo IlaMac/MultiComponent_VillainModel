@@ -27,10 +27,11 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
             d12=0;
             for (n2 = -MCp.nMAX; n2 < (MCp.nMAX+1); n2++) {
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
-                    u1=dp*arg1 - 2*M_PI*n1;
-                    u2=dp*arg2 - 2*M_PI*n2;
-                    //boltz_H=0.5*Hp.rho*(SQR(dp*arg1-2*M_PI*n1) + Hp.alpha*SQR(dp*arg2-2*M_PI*n2) - gamma*SQR(dp*(arg1-arg2)-2*M_PI*(n1-n2))))
-                    boltz_H = 0.5*(Hp.rho * (SQR(u1) +SQR(u2)) - Hp.nu*SQR(u1-u2) );
+                    //std::cout<< "u1: "<< u1<< " u2: "<< u2<< " n1: "<< n1 << " n2: "<< n2<< " norm: "<< norm << std::endl;
+                    //u1=dp*arg1 - 2*M_PI*n1;
+                    //u2=dp*arg2 - 2*M_PI*n2;
+                    boltz_H=0.5*(Hp.rho*(SQR(dp*arg1-2*M_PI*n1) + SQR(dp*arg2-2*M_PI*n2)) - Hp.nu*SQR(dp*(arg1-arg2)-2*M_PI*(n1-n2)));
+                    //boltz_H = 0.5*(Hp.rho * (SQR(u1) +SQR(u2)) - Hp.nu*SQR(u1-u2) );
                     boltz = exp(-my_beta*boltz_H);
                     norm += boltz;
                     sum_1 += boltz_H*boltz;
@@ -77,8 +78,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
                 for (n1 = -MCp.nMAX; n1 < (MCp.nMAX+1); n1++) {
                     u2=dp*arg2 - 2*M_PI*n2;
                     u1=dp*arg1 - 2*M_PI*n1;
-                    sum_np+=exp(-0.5*beta_np*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
-                    sum_nm+=exp(-0.5*beta_nm*(Hp.rho * (u1*u1 +u2*u2) - Hp.nu*SQR(u1-u2) ));
+                    sum_np+=exp(-0.5*beta_np*(Hp.rho*(SQR(dp*arg1-2*M_PI*n1) + SQR(dp*arg2-2*M_PI*n2)) - Hp.nu*SQR(dp*(arg1-arg2)-2*M_PI*(n1-n2))));
+                    sum_nm+=exp(-0.5*beta_nm*(Hp.rho*(SQR(dp*arg1-2*M_PI*n1) + SQR(dp*arg2-2*M_PI*n2)) - Hp.nu*SQR(dp*(arg1-arg2)-2*M_PI*(n1-n2))));
                 }
             }
             vil.potential_bplus[start + arg1 + MaxP*arg2]= -log(sum_np)/beta_np;
