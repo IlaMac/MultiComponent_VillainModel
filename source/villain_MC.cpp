@@ -7,7 +7,7 @@
 
 void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
-    unsigned int ix, iy, iz;
+    int ix, iy, iz;
     int ip, im, alpha, vec, i;
     int n_var, start=0.5*(MaxP*MaxP-1);
     int new_int_phase[NC]={0};
@@ -35,16 +35,16 @@ void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_p
                     // std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
                         for (vec = 0; vec < 3; vec++) {
                             if (vec == 0) {
-                                ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
-                                im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+                                ip = mod(ix + 1, (int)Lx) + Lx * (iy + iz * Ly);
+                                im = mod(ix - 1, (int)Lx) + Lx * (iy + iz * Ly);
                             }
                             if (vec == 1) {
-                                ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
-                                im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+                                ip = ix + Lx * (mod(iy + 1, (int)Ly) + iz * Ly);
+                                im = ix + Lx * (mod(iy - 1, (int)Ly) + iz * Ly);
                             }
                             if (vec == 2) {
-                                ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
-                                im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+                                ip = ix + Lx * (iy + mod(iz + 1, (int)Lz) * Ly);
+                                im = ix + Lx * (iy + mod(iz - 1, (int)Lz) * Ly);
                             }
                             arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
                             arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);

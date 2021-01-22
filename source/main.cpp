@@ -187,7 +187,7 @@ int main(int argc, char *argv[]){
 
 void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
 
-    int n, t;
+    int n, t,i;
     std::vector <double> all_beta;
     double E_betanp=0., E_betanm=0.;
     double beta_np=0., beta_nm=0.;
@@ -242,12 +242,21 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
     std::cout<< "START I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << std::endl;
     init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
     mis.reset();
+
+    for(i=0;i<N;i++){
+        if(Site[i].Psi[1]!=0 ){
+            printf("Here is non zero! Site %d\n", i);
+        }
+    }
+
     for (n = NSTART; n<MCp.nmisu; n++) {
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
+
+
         //Measures
         t_measures.tic();
         mis.reset();

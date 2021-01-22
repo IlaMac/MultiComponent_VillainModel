@@ -8,9 +8,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
-    double dp=C_TWO_PI/MaxP;
     unsigned int i, ix, iy, iz, nn_i;
-    double inv_V=1./N;
 
     for(iz=0;iz<Lz;iz++){
         for(iy=0;iy<Ly;iy++){
@@ -61,7 +59,6 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
                     if(vec==2){
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
-
                     arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
                     arg_2 = arg((Site[nn_i].Psi[1]- Site[i].Psi[1]), MaxP);
                     E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
@@ -216,7 +213,7 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
                 for(alpha=0; alpha<NC; alpha++){
                     cos_phi[alpha]+= cos(Site[i].Psi[alpha]*dp);
                     sin_phi[alpha]+= sin(Site[i].Psi[alpha]*dp);
-                    //std::cout << "alpha: "<< alpha <<  " phase: "<< Site[i].Psi[alpha]*dp << "int phase: " << Site[i].Psi[alpha]<< std::endl;
+                    //if(alpha==1){std::cout << "alpha: "<< alpha <<  " phase: "<< Site[i].Psi[alpha]*dp << "int phase: " << Site[i].Psi[alpha]<< std::endl;}
                 }
             }
         }
