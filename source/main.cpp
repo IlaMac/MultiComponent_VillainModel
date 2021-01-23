@@ -66,7 +66,6 @@ int main(int argc, char *argv[]){
     struct MC_parameters MCp;
     struct PT_parameters PTp;
     struct PTroot_parameters PTroot;
-    unsigned int i, alpha, vec;
     long int seednumber=-1; /*by default it is a negative number which means that rng will use random_device*/
     double my_beta=0.244;
     int my_ind=0;
@@ -183,7 +182,7 @@ int main(int argc, char *argv[]){
 
 void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
 
-    int n, t,i;
+    int n, t;
     std::vector <double> all_beta;
     double E_betanp=0., E_betanm=0.;
     double beta_np=0., beta_nm=0.;
@@ -236,7 +235,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     std::cout<< "START I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << std::endl;
-    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp, directory_write_temp ); /*This has to be recomputed each time because beta changes*/
+    init_villainpotential_nnbeta(beta_np, beta_nm, vil, Hp, MCp ); /*This has to be recomputed each time because beta changes*/
     mis.reset();
 
     for (n = NSTART; n<MCp.nmisu; n++) {
@@ -249,7 +248,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         //Measures
         t_measures.tic();
         mis.reset();
-        helicity_modulus(my_beta, mis, vil, Site);
+        helicity_modulus(mis, vil, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         energy(mis, vil, Site, my_beta);
         energy_nn(vil, E_betanp, E_betanm, Site);

@@ -26,9 +26,9 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                         nn_i = ix + Lx * (iy + mod(iz + 1, (int)Lz) * Ly);
                     }
 
-                    arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                    arg_2 = arg((Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
-                    mis.U+= vil.upotential[start + arg_1 +MaxP*arg_2];
+                    arg_1 = arg((Site.at(nn_i).Psi[0] - Site.at(i).Psi[0]), MaxP);
+                    arg_2 = arg((Site[nn_i].Psi[1] - Site.at(i).Psi[1]), MaxP);
+                    mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
 
             }
@@ -41,7 +41,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
 void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site){
 
     unsigned int vec;
-    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    int arg_1, arg_2;
     int i, ix, iy, iz, nn_i;
     double E_betanp_temp=0., E_betanm_temp=0.;
 
@@ -59,10 +59,10 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
                     if(vec==2){
                         nn_i= ix + Lx * (iy + mod(iz+1,(int)Lz) * Ly);
                     }
-                    arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                    arg_2 = arg((Site[nn_i].Psi[1]- Site[i].Psi[1]), MaxP);
-                    E_betanm_temp+= vil.potential_bminus[start + arg_1 +MaxP*arg_2];
-                    E_betanp_temp+= vil.potential_bplus[start + arg_1 +MaxP*arg_2];
+                    arg_1 = arg((Site[nn_i].Psi[0] - Site.at(i).Psi[0]), MaxP);
+                    arg_2 = arg((Site[nn_i].Psi[1]- Site.at(i).Psi[1]), MaxP);
+                    E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
             }
         }
@@ -75,7 +75,7 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
 void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, double my_beta){
 
     unsigned int vec;
-    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);
+    int arg_1, arg_2;
     int i, ix, iy, iz, nn_i;
 
     for(iz=0;iz<Lz;iz++){
@@ -93,9 +93,9 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
                         nn_i= ix + Lx * (iy + mod(iz+1,(int)Lz) * Ly);
                     }
 
-                    arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                    arg_2 = arg((Site[nn_i].Psi[1]- Site[i].Psi[1]), MaxP);
-                    mis.E+= vil.potential[start + arg_1 +MaxP*arg_2]/my_beta;
+                    arg_1 = arg((Site[nn_i].Psi[0] - Site.at(i).Psi[0]), MaxP);
+                    arg_2 = arg((Site[nn_i].Psi[1]- Site.at(i).Psi[1]), MaxP);
+                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2)/my_beta;
 
                 }
             }
@@ -105,10 +105,10 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
 }
 
 
-void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
+void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
-    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    int arg_1, arg_2;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
     int i, ix, iy, iz, nn_i;
 
@@ -116,17 +116,16 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
         for(iy=0;iy<Ly;iy++){
             for(ix=0; ix<Lx; ix++) {
                 i = ix + Lx * (iy + iz * Ly);
-                nn_i = mod(ix + 1, (int)Lx) + Lx * (iy + iz * Ly);
+                nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = arg((Site[nn_i].Psi[0] - Site[i].Psi[0]), MaxP);
-                arg_2 = arg((Site[nn_i].Psi[1] - Site[i].Psi[1]), MaxP);
+                arg_1 = arg((Site[nn_i].Psi[0] - Site.at(i).Psi[0]), MaxP);
+                arg_2 = arg((Site[nn_i].Psi[1] - Site.at(i).Psi[1]), MaxP);
 
-                d1+= vil.d1_potential[start + arg_1 +MaxP*arg_2];
-                d2+= vil.d2_potential[start + arg_1 +MaxP*arg_2];
-                d11+= vil.d11_potential[start + arg_1 +MaxP*arg_2];
-                d22+= vil.d22_potential[start + arg_1 +MaxP*arg_2];
-                d12+= vil.d12_potential[start + arg_1 +MaxP*arg_2];
-
+                d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                d11+= vil.d11_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                d22+= vil.d22_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                d12+= vil.d12_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
             }
         }
     }
@@ -138,31 +137,6 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
     mis.D2H_Dd12=d12;
 
 }
-
-//TO CHANGE!!!!!!!
-//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site){
-//
-//    double qx_min=2*M_PI/(Lx);
-//    double invNorm= 1./((2*M_PI)*(2*M_PI)*N);
-//    unsigned int i, ix, iy, iz;
-//    double Re_rhoz=0.;
-//    double Im_rhoz=0.;
-//    double Dx_Ay, Dy_Ax;
-//
-//    for(ix=0; ix<Lx;ix++){
-//        for(iy=0; iy<Ly;iy++){
-//            for(iz=0; iz<Lz;iz++){
-//                i=ix +Lx*(iy+Ly*iz);
-//                Dx_Ay=(Site[mod(ix + 1, Lx) +Lx*(iy+Ly*iz)].A[1]- Site[i].A[1])/Hp.h;
-//                Dy_Ax=(Site[ix +Lx*(mod(iy + 1, Ly) +Ly*iz) ].A[0]- Site[i].A[0])/Hp.h;
-//
-//                Re_rhoz+=(cos((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
-//                Im_rhoz+=(sin((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
-//            }
-//        }
-//    }
-//    mis.d_rhoz=invNorm*((Re_rhoz*Re_rhoz) +(Im_rhoz*Im_rhoz));
-//}
 
 //DESIGNED FOR 3 COMPONENTs
 void magnetization(struct Measures &mis, const std::vector<Node> &Site){
@@ -177,13 +151,13 @@ void magnetization(struct Measures &mis, const std::vector<Node> &Site){
             for (ix = 0; ix < Lx; ix++) {
                 i=ix +Lx*(iy+Ly*iz);
 
-                phi_shifted_1= Site[i].Psi[1] - Site[i].Psi[0];
+                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
                 while(phi_shifted_1 >= 2*M_PI){
                         phi_shifted_1-= 2*M_PI;}
                 while(phi_shifted_1< 0){
                         phi_shifted_1+=2*M_PI;}
 
-                phi_shifted_2= Site[i].Psi[2] - Site[i].Psi[0];
+                phi_shifted_2= Site.at(i).Psi[2] - Site.at(i).Psi[0];
                 while(phi_shifted_2 >= 2*M_PI){
                         phi_shifted_2-= 2*M_PI;}
                 while(phi_shifted_2< 0){
@@ -206,16 +180,11 @@ void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Si
     double dp=2*M_PI/MaxP;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
     double inv_N=1./N;
-    for(iz=0; iz<Lz;iz++) {
-        for (iy = 0; iy < Ly; iy++) {
-            for (ix = 0; ix < Lx; ix++) {
-                i=ix +Lx*(iy+Ly*iz);
-                for(alpha=0; alpha<NC; alpha++){
-                    cos_phi[alpha]+= cos(Site[i].Psi[alpha]*dp);
-                    sin_phi[alpha]+= sin(Site[i].Psi[alpha]*dp);
-                    //if(alpha==1){std::cout << "alpha: "<< alpha <<  " phase: "<< Site[i].Psi[alpha]*dp << "int phase: " << Site[i].Psi[alpha]<< std::endl;}
-                }
-            }
+
+    for(auto & s : Site) {
+        for (alpha = 0; alpha < NC; alpha++) {
+            cos_phi[alpha] += cos(s.Psi[alpha] * dp);
+            sin_phi[alpha] += sin(s.Psi[alpha] * dp);
         }
     }
 
@@ -241,18 +210,17 @@ void save_lattice(const std::vector<Node> &Site, const fs::path & directory_writ
 
     FILE *fPsi= nullptr;
     FILE *fA= nullptr;
-    unsigned int i=0;
 
     if((fPsi=fopen(psi_init_file.c_str(), "w"))) {
-        for (i = 0; i < N; i++) {
-            fwrite(Site[i].Psi.data(), sizeof(int), NC, fPsi);
+        for (auto & s: Site) {
+            fwrite(s.Psi.data(), sizeof(int), NC, fPsi);
         }
         fclose(fPsi);
     }
 
     if((fA=fopen(a_init_file.c_str(), "w"))) {
-    	for (i = 0; i < N; i++) {
-            fwrite(Site[i].A.data(), sizeof(double), 3, fA);
+        for (auto & s: Site) {
+            fwrite(s.A.data(), sizeof(double), 3, fA);
 	}
         fclose(fA);
     }
