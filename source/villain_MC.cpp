@@ -64,25 +64,24 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 }
                     /*Specific for the two component case*/
                     /*Phase updating phase componet 1*/
-//                   dE=0;
-//                   for (vec = 0; vec < 3; vec++) {
-//                       dE += (vil.potential.at(OFFSET_POTt + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
-//                             +vil.potential.at(OFFSET_POTt + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
-//                             -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
-//                             -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
-//                   }
-//                   rand = rn::uniform_real_box(0, 1);
-//                   //
-//                   //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
-//                   if (rand <exp(-my_beta*dE)) {
-//                       Site[i].Psi[0] = new_int_phase[0];
-//                       acc_theta++;
-
-//                       for(vec=0; vec<3;vec++){
-//                           arg_B_old[0][vec]=arg_B_new[0][vec];
-//                           arg_F_old[0][vec]=arg_F_new[0][vec];
-//                       }
-//                   }
+                   dE=0;
+                   for (vec = 0; vec < 3; vec++) {
+                       dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                             +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                   }
+                   rand = rn::uniform_real_box(0, 1);
+                   //
+                   //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
+                   if (rand <exp(-my_beta*dE)) {
+                       Site[i].Psi[0] = new_int_phase[0];
+                       acc_theta++;
+                       for(vec=0; vec<3;vec++){
+                           arg_B_old[0][vec]=arg_B_new[0][vec];
+                           arg_F_old[0][vec]=arg_F_new[0][vec];
+                       }
+                   }
 
                 /*Phase updating phase componet 2*/
                dE=0;
