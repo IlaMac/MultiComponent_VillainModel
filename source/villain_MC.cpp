@@ -51,10 +51,10 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                 ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                                 im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                             }
-                            arg_F_new[alpha][vec] = ARG( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
-                            arg_B_new[alpha][vec] = ARG( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
-                            arg_F_old[alpha][vec] = ARG( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
-                            arg_B_old[alpha][vec] = ARG( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
+                            arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
+                            arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
+                            arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
+                            arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
 
                            // std::cout<< "arg F new without arg : "<< Site[ip].Psi[alpha] - new_int_phase[alpha]  << " arg F old without arg: "<<  Site[ip].Psi[alpha] - Site[i].Psi[alpha]  << std::endl;
 
