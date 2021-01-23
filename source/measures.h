@@ -33,7 +33,7 @@ struct Measures{
 };
 
 
-void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, double my_beta);
+void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
 void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site);
 void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);

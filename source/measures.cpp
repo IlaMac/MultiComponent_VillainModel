@@ -72,7 +72,7 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
 }
 
 
-void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, double my_beta){
+void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
 
     unsigned int vec;
     int arg_1, arg_2;
@@ -95,7 +95,7 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
 
                     arg_1 = arg((Site[nn_i].Psi[0] - Site.at(i).Psi[0]), MaxP);
                     arg_2 = arg((Site[nn_i].Psi[1]- Site.at(i).Psi[1]), MaxP);
-                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2)/my_beta;
+                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
 
                 }
             }

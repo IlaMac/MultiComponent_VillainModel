@@ -250,7 +250,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         mis.reset();
         helicity_modulus(mis, vil, Site);
         MPI_Barrier(MPI_COMM_WORLD);
-        energy(mis, vil, Site, my_beta);
+        energy(mis, vil, Site);
         energy_nn(vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
