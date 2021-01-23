@@ -280,7 +280,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         MPI_Barrier(MPI_COMM_WORLD);
 
         //Parallel Tempering swap
-        parallel_temp(mis.E, E_betanp, E_betanm, beta_np, beta_nm,  my_beta, my_ind, vil, PTp, PTroot);
+        //parallel_temp(mis.E, E_betanp, E_betanm, beta_np, beta_nm,  my_beta, my_ind, vil, PTp, PTroot);
 
         //Files and directory
         directory_write_temp=directory_parameters_temp+"/beta_"+std::to_string(my_ind);
