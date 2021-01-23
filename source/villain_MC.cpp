@@ -12,10 +12,10 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     int n_var;
     int new_int_phase[NC]={0};
     //int old_int_phase;
-    int arg_F_new[NC][3]={0};
-    int arg_B_new[NC][3]={0}; /*Forward and Backward updated phases*/
-    int arg_F_old[NC][3]={0};
-    int arg_B_old[NC][3]={0}; /*Forward and Backward updated phases*/
+    int arg_F_new[NC][3]={{0}};
+    int arg_B_new[NC][3]={{0}}; /*Forward and Backward updated phases*/
+    int arg_F_old[NC][3]={{0}};
+    int arg_B_old[NC][3]={{0}}; /*Forward and Backward updated phases*/
     double acc_rate=0.5, acc_theta=0., rand;
     double dE;
 

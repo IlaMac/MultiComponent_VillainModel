@@ -20,7 +20,7 @@ extern int Lx, Ly, Lz, N;
 
 
 inline constexpr  int OFFSET_POT=0.5*(MaxP*MaxP-1);
-
+inline constexpr double dp=C_TWO_PI/MaxP;
 namespace settings {
 
 #ifdef NDEBUG

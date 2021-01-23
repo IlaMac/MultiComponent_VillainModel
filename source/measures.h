@@ -38,8 +38,8 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
 void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
 void magnetization(struct Measures &mis, const std::vector<Node> &Site);
-void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site, double my_beta);
-void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, std::string configuration);
+void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site);
+void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, const std::string& configuration);
 //void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site);
 
 #endif //MEASURES_H

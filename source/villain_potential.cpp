@@ -10,10 +10,10 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
     double u1, u2, sum_1, norm, boltz, boltz_H;
     double j1, j2;
     double d1, d2, d11, d12, d22;
-    double dp=2*M_PI/MaxP;
+
     fs::path vpotential_file = directory_write / std::string("Villain_potential.txt");
 
-    FILE *fVPotential= nullptr;
+    FILE *fVPotential;
     fVPotential=fopen(vpotential_file.c_str(), "w");
 
     vil.potential.resize(MaxP*MaxP);
@@ -56,16 +56,16 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                 }
             }
             /*Table Villain potential*/
-            vil.potential[OFFSET_POT + arg1 + MaxP*arg2]= -log(norm)/my_beta;
+            vil.potential.at(OFFSET_POT + arg1 + MaxP*arg2)= -log(norm)/my_beta;
             fprintf(fVPotential, "%d %d %19.12e \n", arg1, arg2, my_beta*vil.potential[OFFSET_POT + arg1 + MaxP*arg2]);
             /*Table for the helicity modulus*/
-            vil.d1_potential[OFFSET_POT + arg1 + MaxP*arg2]+= d1/norm;
-            vil.d2_potential[OFFSET_POT + arg1 + MaxP*arg2]+= d2/norm;
-            vil.d11_potential[OFFSET_POT + arg1 + MaxP*arg2]+=d11/norm + my_beta*(d1/norm)*(d1/norm);
-            vil.d22_potential[OFFSET_POT + arg1 + MaxP*arg2]+=d22/norm + my_beta*(d2/norm)*(d2/norm);
-            vil.d12_potential[OFFSET_POT + arg1 + MaxP*arg2]+= d12/norm + my_beta*(d1*d2)/(norm*norm);
+            vil.d1_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+= d1/norm;
+            vil.d2_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+= d2/norm;
+            vil.d11_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+=d11/norm + my_beta*(d1/norm)*(d1/norm);
+            vil.d22_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+=d22/norm + my_beta*(d2/norm)*(d2/norm);
+            vil.d12_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+= d12/norm + my_beta*(d1*d2)/(norm*norm);
             /*Calculating beta-derivative of the Villain potential needed for calculating the internal energy (which differs from the energy mean due to the temperature dependence of the Villain model).*/
-            vil.upotential[OFFSET_POT + (arg1 + MaxP*arg2)] = sum_1/norm;
+            vil.upotential.at(OFFSET_POT + (arg1 + MaxP*arg2)) = sum_1/norm;
 
         }
     }
@@ -76,7 +76,6 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
 
     int n1, n2, arg1, arg2;
     double sum_np, sum_nm, u1, u2;
-    double dp=2*M_PI/MaxP;
 
     vil.potential_bplus.resize(MaxP*MaxP);
     vil.potential_bminus.resize(MaxP*MaxP);
@@ -92,8 +91,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
                     sum_nm+=exp(-0.5*beta_nm*(Hp.rho*((u1*u1) + (u2*u2)) - Hp.nu*(u1-u2)*(u1-u2)));
                 }
             }
-            vil.potential_bplus[OFFSET_POT + arg1 + MaxP*arg2]= -log(sum_np)/beta_np;
-            vil.potential_bminus[OFFSET_POT + arg1 + MaxP*arg2]= -log(sum_nm)/beta_nm;
+            vil.potential_bplus.at(OFFSET_POT + arg1 + MaxP*arg2)= -log(sum_np)/beta_np;
+            vil.potential_bminus.at(OFFSET_POT + arg1 + MaxP*arg2)= -log(sum_nm)/beta_nm;
         }
     }
 }

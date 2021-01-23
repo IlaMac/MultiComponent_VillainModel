@@ -62,10 +62,10 @@ int main(int argc, char *argv[]){
 
     std::vector <Node> Lattice;
     //struct Node* Lattice;
-    struct H_parameters Hp;
-    struct MC_parameters MCp;
-    struct PT_parameters PTp;
-    struct PTroot_parameters PTroot;
+    struct H_parameters Hp{};
+    struct MC_parameters MCp{};
+    struct PT_parameters PTp{};
+    struct PTroot_parameters PTroot{};
     long int seednumber=-1; /*by default it is a negative number which means that rng will use random_device*/
     double my_beta=0.244;
     int my_ind=0;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
     //Initialize MC_parameters: file "MC_init.txt"
     initialize_MCparameters(MCp, directory_parameters);
 
-    MPI_Init(NULL, NULL); /* START MPI */
+    MPI_Init(nullptr, nullptr); /* START MPI */
 /*DETERMINE RANK OF THIS PROCESSOR*/
     MPI_Comm_rank(MPI_COMM_WORLD, &PTp.rank);
 /*DETERMINE TOTAL NUMBER OF PROCESSORS*/
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
+void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, const std::string& directory_parameters_temp, int NSTART) {
 
     int n, t;
     std::vector <double> all_beta;
@@ -254,7 +254,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         energy_nn(vil, E_betanp, E_betanm, Site);
         MPI_Barrier(MPI_COMM_WORLD);
         u_internal_energy(mis, vil, Site);
-        magnetization_singlephase(mis,  Site, my_beta);
+        magnetization_singlephase(mis,  Site);
 
         MPI_Barrier(MPI_COMM_WORLD);
 

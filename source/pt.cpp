@@ -79,47 +79,18 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
     auto tmp_d22_potential    = mpi::gather(vil.d22_potential     ,PTp.rank, PTp.root,PTp.np, MPI_DOUBLE);
     auto tmp_d12_potential    = mpi::gather(vil.d12_potential     ,PTp.rank, PTp.root,PTp.np, MPI_DOUBLE);
     if(PTp.rank== PTp.root){
-        for(size_t i = 0; i < PTroot.Villain_beta.size(); i++){
-            PTroot.Villain_beta[i].potential = tmp_potential[i];
-            PTroot.Villain_beta[i].potential_bplus = tmp_potential_bplus[i];
-            PTroot.Villain_beta[i].potential_bminus = tmp_potential_bminus[i];
-            PTroot.Villain_beta[i].upotential = tmp_upotential[i];
-            PTroot.Villain_beta[i].d1_potential = tmp_d1_potential[i];
-            PTroot.Villain_beta[i].d2_potential = tmp_d2_potential[i];
-            PTroot.Villain_beta[i].d11_potential = tmp_d11_potential[i];
-            PTroot.Villain_beta[i].d22_potential = tmp_d22_potential[i];
-            PTroot.Villain_beta[i].d12_potential = tmp_d12_potential[i];
+        for(size_t b = 0; b < PTroot.Villain_beta.size(); b++){
+            PTroot.Villain_beta[b].potential = tmp_potential[b];
+            PTroot.Villain_beta[b].potential_bplus = tmp_potential_bplus[b];
+            PTroot.Villain_beta[b].potential_bminus = tmp_potential_bminus[b];
+            PTroot.Villain_beta[b].upotential = tmp_upotential[b];
+            PTroot.Villain_beta[b].d1_potential = tmp_d1_potential[b];
+            PTroot.Villain_beta[b].d2_potential = tmp_d2_potential[b];
+            PTroot.Villain_beta[b].d11_potential = tmp_d11_potential[b];
+            PTroot.Villain_beta[b].d22_potential = tmp_d22_potential[b];
+            PTroot.Villain_beta[b].d12_potential = tmp_d12_potential[b];
         }
     }
-
-
-//    MPI_Gather(&vil.potential, vil.potential.size() , MPI_DOUBLE , temp_potential.data(), vil.potential.size() , MPI_DOUBLE , PTp.root, MPI_COMM_WORLD);
-//    if(PTp.rank== PTp.root) {
-//        int offset = 0;
-//        for (auto &villain : PTroot.Villain_beta) {
-//            auto last = temp_potential.begin() + offset + vil.potential.size();
-//            auto first = temp_potential.begin() + offset ;
-//            if(last > temp_potential.size()) throw std::runtime_error(...);
-//            villain.potential = std::vector<double>(temp_potential.begin() + offset,
-//                                                    temp_potential.begin() + offset + vil.potential.size());
-//            offset += vil.potential.size();
-//        }
-//    }
-//    MPI_Gather(&vil.potential, vil.potential.size() , MPI_DOUBLE , temp_potential.data(), vil.potential.size() , MPI_DOUBLE , PTp.root, MPI_COMM_WORLD);
-//    if(PTp.rank== PTp.root) {
-//        int offset = 0;
-//        for (auto &villain : PTroot.Villain_beta) {
-//            auto last = temp_potential.begin() + offset + vil.potential.size();
-//            auto first = temp_potential.begin() + offset ;
-//            if(last > temp_potential.size()) throw std::runtime_error(...);
-//            villain.potential = std::vector<double>(temp_potential.begin() + offset,
-//                                                    temp_potential.begin() + offset + vil.potential.size());
-//            offset += vil.potential.size();
-//        }
-//    }
-
-
-
 
 
     if (PTp.rank == PTp.root) { //Root forms the pairs and decides (given the energies and the betas) which pairs will swap

@@ -33,5 +33,5 @@ template<typename T>
 inline auto mod(const T x, const T y) {
     return (x % y + y) % y;
 }
-void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters, int NSTART);
+void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, const std::string& directory_parameters, int NSTART);
 void myhelp(int argd, char** argu);

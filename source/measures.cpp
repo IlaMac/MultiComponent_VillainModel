@@ -7,7 +7,7 @@
 void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site) {
 
     unsigned int vec;
-    int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
+    int arg_1, arg_2;
     int i, ix, iy, iz, nn_i;
 
     for(iz=0;iz<Lz;iz++){
@@ -107,7 +107,7 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
 
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
 
-    unsigned int vec=0; //I compute the helicity modulus only along one direction x
+    //I compute the helicity modulus only along one direction x
     int arg_1, arg_2;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
     int i, ix, iy, iz, nn_i;
@@ -138,46 +138,45 @@ void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vect
 
 }
 
-//DESIGNED FOR 3 COMPONENTs
-void magnetization(struct Measures &mis, const std::vector<Node> &Site){
+////DESIGNED FOR 3 COMPONENTs
+//void magnetization(struct Measures &mis, const std::vector<Node> &Site){
+//    //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
+//    unsigned ix, iy, iz, i;
+//
+//    double phi_shifted_1=0.;
+//    double phi_shifted_2=0.;
+//
+//    for(iz=0; iz<Lz;iz++) {
+//        for (iy = 0; iy < Ly; iy++) {
+//            for (ix = 0; ix < Lx; ix++) {
+//                i=ix +Lx*(iy+Ly*iz);
+//
+//                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
+//                while(phi_shifted_1 >= 2*M_PI){
+//                        phi_shifted_1-= 2*M_PI;}
+//                while(phi_shifted_1< 0){
+//                        phi_shifted_1+=2*M_PI;}
+//
+//                phi_shifted_2= Site.at(i).Psi[2] - Site.at(i).Psi[0];
+//                while(phi_shifted_2 >= 2*M_PI){
+//                        phi_shifted_2-= 2*M_PI;}
+//                while(phi_shifted_2< 0){
+//                        phi_shifted_2+=2*M_PI;}
+//
+//                if(phi_shifted_1>phi_shifted_2){
+//                    mis.m+=1;
+//                        }else if(phi_shifted_1<phi_shifted_2){
+//                    mis.m+=(-1);
+//                }
+//            }
+//        }
+//    }
+//    mis.m=mis.m/N;
+//}
+
+void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
-    unsigned ix, iy, iz, i;
-
-    double phi_shifted_1=0.;
-    double phi_shifted_2=0.;
-
-    for(iz=0; iz<Lz;iz++) {
-        for (iy = 0; iy < Ly; iy++) {
-            for (ix = 0; ix < Lx; ix++) {
-                i=ix +Lx*(iy+Ly*iz);
-
-                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
-                while(phi_shifted_1 >= 2*M_PI){
-                        phi_shifted_1-= 2*M_PI;}
-                while(phi_shifted_1< 0){
-                        phi_shifted_1+=2*M_PI;}
-
-                phi_shifted_2= Site.at(i).Psi[2] - Site.at(i).Psi[0];
-                while(phi_shifted_2 >= 2*M_PI){
-                        phi_shifted_2-= 2*M_PI;}
-                while(phi_shifted_2< 0){
-                        phi_shifted_2+=2*M_PI;}
-
-                if(phi_shifted_1>phi_shifted_2){
-                    mis.m+=1;
-                        }else if(phi_shifted_1<phi_shifted_2){
-                    mis.m+=(-1);
-                }
-            }
-        }
-    }
-    mis.m=mis.m/N;
-}
-
-void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site, double my_beta){
-    //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
-    unsigned ix, iy, iz, i, alpha;
-    double dp=2*M_PI/MaxP;
+    unsigned alpha;
     double cos_phi[NC]={0}, sin_phi[NC]={0};
     double inv_N=1./N;
 
@@ -199,7 +198,7 @@ void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Si
 
 }
 
-void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, std::string configuration){
+void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, const std::string& configuration){
 
     std::string sPsi;
     std::string sA;
