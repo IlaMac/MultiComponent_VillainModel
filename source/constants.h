@@ -6,7 +6,7 @@
 /*Number of components*/
 inline constexpr int DIM = 3;
 inline constexpr int NC = 2;
-extern unsigned int Lx, Ly, Lz, N;
+extern int Lx, Ly, Lz, N;
 
 #define C_TWO_PI (6.2831853071795864769252867665590058L)
 #define C_PI (3.1415926535897932384626433832795029L)

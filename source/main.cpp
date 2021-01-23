@@ -54,7 +54,7 @@ void signal_callback_handler(int signum) {
     std::quick_exit(signum);
 }
 
-unsigned int Lx, Ly, Lz, N;
+int Lx, Ly, Lz, N;
 
 
 
