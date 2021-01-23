@@ -28,7 +28,7 @@ option(GL_ENABLE_SPDLOG      "Spdlog is a fast logging library"                 
 option(GL_ENABLE_OPENMP      "Enable OpenMP flags such as -fopenmp"                     ON)
 option(GL_ENABLE_MPI         "Enable MPI parallelization"                               ON)
 option(GL_ENABLE_LTO         "Enable link time optimization"                            OFF)
-option(GL_ENABLE_ASAN        "Enable runtime address sanitizer -fsanitize=address"      OFF)
+option(GL_ENABLE_ASAN        "Enable runtime address sanitizer -fsanitize=address"      ON)
 option(GL_AS_SUBPROJECT      "Try using this as a subproject with add_subdirectory()"   OFF)
 option(GL_DEPS_IN_SUBDIR     "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>" ON)
 option(GL_PRINT_INFO         "Prints additional information during CMake configure"     ON)
@@ -113,7 +113,7 @@ endif ()
 ### Add all source files recursively
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 file(GLOB_RECURSE HEADERS "source/*.h")
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h source/constants.h source/mpi_tools.h)
 
 
 

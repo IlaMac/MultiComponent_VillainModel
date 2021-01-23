@@ -61,7 +61,7 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
 
 }
 
-void initialize_lattice(struct Node* Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp){
+void initialize_lattice(const std::vector<Node> &Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp){
 
     unsigned int i, alpha;
     fs::path psi_init_file = directory_read / "Psi_restart.bin";
@@ -81,25 +81,26 @@ void initialize_lattice(struct Node* Site, const fs::path & directory_read, int 
         FILE *fPsi= nullptr;
         FILE *fA= nullptr;
         if((fPsi=fopen(psi_init_file.c_str(), "r")) and (fA=fopen(a_init_file.c_str(), "r")) ) {
-            for (i = 0; i < N; i++) {
-                fread(Site[i].Psi, sizeof(int), NC, fPsi);
-                fread(Site[i].A, sizeof(double), 3, fA);
+            for(auto & s : Site){
+                fread(s.Psi.data(), sizeof(int), NC, fPsi);
+                fread(s.A.data(), sizeof(double), DIM, fA);
             }
             fclose(fA);
             fclose(fPsi);
         }
     }else{
         if(Hp.init==0) {
-            for (i = 0; i < N; i++) {
-                for (alpha = 0; alpha < NC; alpha++) {
-                    Site[i].Psi[alpha] = 0;
+            //for (i = 0; i < N; i++) {
+            for(auto & s : Site){
+                for(auto & a : s.Psi){
+                    a = 0;
                 }
             }
         }
         else if(Hp.init!=0) {
-            for (i = 0; i < N; i++) {
-                for (alpha = 0; alpha < NC; alpha++) {
-                    Site[i].Psi[alpha] = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
+            for(auto & s : Site){
+                for(auto & a : s.Psi){
+                    a = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
                 }
             }
         }

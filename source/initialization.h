@@ -1,22 +1,17 @@
 //
 // Created by ilaria on 2019-11-13.
 //
+#pragma once
 
-#ifndef INITIALIZATION_H
-#define INITIALIZATION_H
-
-#include "main.h"
+#include "constants.h"
 #include "robust_filesystem.h"
+#include "rng.h"
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#define C_TWO_PI (6.2831853071795864769252867665590058L)
-#define C_PI (3.1415926535897932384626433832795029L)
-/*MaxP corresponds to the number of q states of the theta field. Division of phase values in <-pi, pi>. Must have MaxP uneven to have a symmetric interval around zero.*/
-//static constexpr int MaxP=129;
-#define MaxP (129)
+
 #define Annealing (0) //To be implemented
 
 //static constexpr double C_TWO_PI = 6.2831853071795864769252867665590058;
@@ -24,12 +19,9 @@
 
 struct Node{
     /*three spatial dimensions*/
-    //std::array<double,3> A;
-    double *A;
+    mutable std::array<double,DIM> A{};
     /*three SC components*/
-    //std::array<O2, NC> Psi; 
-    //struct O2* Psi;
-    int *Psi; /*discretized values of the phase. To be multiplied by 2*M_PI/MaxP*/
+    mutable std::array<int, NC> Psi{}; /*discretized values of the phase. To be multiplied by 2*M_PI/MaxP*/
 };
 
 struct H_parameters{
@@ -56,8 +48,7 @@ struct MC_parameters{
     int nMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
 };
 
-void initialize_lattice(struct Node* Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp);
+void initialize_lattice(const std::vector<Node> &Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp);
 void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_parameters);
 void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directory_parameters);
 
-#endif //INITIALIZATION_H

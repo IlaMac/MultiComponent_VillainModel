@@ -3,6 +3,7 @@
 //
 
 #include "villain_potential.h"
+#include "main.h"
 
 void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write) {
 
@@ -15,6 +16,14 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
 
     FILE *fVPotential= nullptr;
     fVPotential=fopen(vpotential_file.c_str(), "w");
+
+    vil.potential.resize(MaxP*MaxP);
+    vil.upotential.resize(MaxP*MaxP);
+    vil.d1_potential.resize(MaxP*MaxP);
+    vil.d2_potential.resize(MaxP*MaxP);
+    vil.d11_potential.resize(MaxP*MaxP);
+    vil.d22_potential.resize(MaxP*MaxP);
+    vil.d12_potential.resize(MaxP*MaxP);
 
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
@@ -70,6 +79,8 @@ void init_villainpotential_nnbeta(double beta_np, double beta_nm, struct Villain
     double sum_np, sum_nm, u1, u2;
     double dp=2*M_PI/MaxP;
 
+    vil.potential_bplus.resize(MaxP*MaxP);
+    vil.potential_bminus.resize(MaxP*MaxP);
     for (arg2 = -(MaxP - 1) / 2; arg2 <= (MaxP - 1) / 2; arg2++) {
         for (arg1 = -(MaxP - 1) / 2; arg1 <= (MaxP - 1) / 2; arg1++) {
             sum_np = 0;

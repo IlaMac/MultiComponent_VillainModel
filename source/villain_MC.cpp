@@ -5,7 +5,7 @@
 #include "villain_MC.h"
 
 
-void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
+void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
     int ix, iy, iz;
     int ip, im, alpha, vec, i;

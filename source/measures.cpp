@@ -4,7 +4,7 @@
 
 #include "measures.h"
 
-void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* Site) {
+void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site) {
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
@@ -38,7 +38,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* S
 
 }
 
-void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site){
+void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site){
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
@@ -72,7 +72,7 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct N
 }
 
 
-void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double my_beta){
+void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, double my_beta){
 
     unsigned int vec;
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);
@@ -105,7 +105,7 @@ void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double
 }
 
 
-void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, struct Node* Site){
+void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
 
     unsigned int vec=0; //I compute the helicity modulus only along one direction x
     int arg_1, arg_2, start=0.5*(MaxP*MaxP-1);;
@@ -140,7 +140,7 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
 }
 
 //TO CHANGE!!!!!!!
-//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site){
+//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site){
 //
 //    double qx_min=2*M_PI/(Lx);
 //    double invNorm= 1./((2*M_PI)*(2*M_PI)*N);
@@ -165,7 +165,7 @@ void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil,
 //}
 
 //DESIGNED FOR 3 COMPONENTs
-void magnetization(struct Measures &mis, struct Node* Site){
+void magnetization(struct Measures &mis, const std::vector<Node> &Site){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i;
 
@@ -200,7 +200,7 @@ void magnetization(struct Measures &mis, struct Node* Site){
     mis.m=mis.m/N;
 }
 
-void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta){
+void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site, double my_beta){
     //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
     unsigned ix, iy, iz, i, alpha;
     double dp=2*M_PI/MaxP;
@@ -230,7 +230,7 @@ void magnetization_singlephase(struct Measures &mis, struct Node* Site, double m
 
 }
 
-void save_lattice(struct Node* Site, const fs::path & directory_write, std::string configuration){
+void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, std::string configuration){
 
     std::string sPsi;
     std::string sA;
@@ -245,14 +245,14 @@ void save_lattice(struct Node* Site, const fs::path & directory_write, std::stri
 
     if((fPsi=fopen(psi_init_file.c_str(), "w"))) {
         for (i = 0; i < N; i++) {
-            fwrite(Site[i].Psi, sizeof(int), NC, fPsi);
+            fwrite(Site[i].Psi.data(), sizeof(int), NC, fPsi);
         }
         fclose(fPsi);
     }
 
     if((fA=fopen(a_init_file.c_str(), "w"))) {
     	for (i = 0; i < N; i++) {
-            fwrite(Site[i].A, sizeof(double), 3, fA);
+            fwrite(Site[i].A.data(), sizeof(double), 3, fA);
 	}
         fclose(fA);
     }

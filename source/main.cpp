@@ -59,8 +59,9 @@ unsigned int Lx, Ly, Lz, N;
 
 
 int main(int argc, char *argv[]){
-    //std::vector<Node> Lattice;
-    struct Node* Lattice;
+
+    std::vector <Node> Lattice;
+    //struct Node* Lattice;
     struct H_parameters Hp;
     struct MC_parameters MCp;
     struct PT_parameters PTp;
@@ -100,13 +101,13 @@ int main(int argc, char *argv[]){
         paths_dir::TEMP_DIROUT=directory_parameters_temp = argv[3];
         RESTART= std::atoi(argv[4]);
     }
-    else if(argc == 6){
-        Lx=Ly=Lz=std::atoi(argv[1]);
-        N=Lx*Ly*Lz;
-        paths_dir::DIROUT=directory_parameters = argv[2];
-        paths_dir::TEMP_DIROUT=directory_parameters_temp = argv[3];
-        RESTART= std::atoi(argv[4]);
-        seednumber= reinterpret_cast<long> (argv[5]);
+    else if(argc == 6) {
+        Lx = Ly = Lz = std::atoi(argv[1]);
+        N = Lx * Ly * Lz;
+        paths_dir::DIROUT = directory_parameters = argv[2];
+        paths_dir::TEMP_DIROUT = directory_parameters_temp = argv[3];
+        RESTART = std::atoi(argv[4]);
+        seednumber = reinterpret_cast<long> (argv[5]);
     }
 
     //Safe exit
@@ -130,12 +131,7 @@ int main(int argc, char *argv[]){
     rn::seed(seednumber);
 
     //Declaration of structure Lattice
-    Lattice=(struct Node*)calloc(N,sizeof(struct Node));
-    // Lattice.resize(N);
-    for(i=0; i<N; i++) {
-        Lattice[i].A = (double *) calloc(3, sizeof(double));
-        Lattice[i].Psi = (int *) calloc(NC, sizeof( int));
-    }
+    Lattice.resize(N);
 
     //Initialize H_parameters: file "H_init.txt"
     initialize_Hparameters(Hp, directory_parameters);
@@ -185,7 +181,7 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
+void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, std::string directory_parameters_temp, int NSTART) {
 
     int n, t,i;
     std::vector <double> all_beta;
@@ -249,7 +245,6 @@ void mainloop(struct Node* Site, struct MC_parameters &MCp, struct H_parameters 
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
-
 
         //Measures
         t_measures.tic();

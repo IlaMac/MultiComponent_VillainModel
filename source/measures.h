@@ -5,6 +5,7 @@
 #ifndef MEASURES_H
 #define MEASURES_H
 
+#include "constants.h"
 #include "main.h"
 #include <fstream>
 #include "villain_potential.h"
@@ -32,13 +33,13 @@ struct Measures{
 };
 
 
-void energy(struct Measures &mis, struct Villain &vil, struct Node* Site, double my_beta);
-void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, struct Node* Site);
-void u_internal_energy(struct Measures &mis, struct Villain &vil, struct Node* Site);
-void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, struct Node* Site);
-void magnetization(struct Measures &mis, struct Node* Site);
-void magnetization_singlephase(struct Measures &mis, struct Node* Site, double my_beta);
-void save_lattice(struct Node* Site, const fs::path & directory_write, std::string configuration);
-//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, struct Node* Site);
+void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, double my_beta);
+void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site);
+void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
+void helicity_modulus(double my_beta, struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
+void magnetization(struct Measures &mis, const std::vector<Node> &Site);
+void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site, double my_beta);
+void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, std::string configuration);
+//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site);
 
 #endif //MEASURES_H

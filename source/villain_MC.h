@@ -5,6 +5,7 @@
 #ifndef VILLAIN_2COMPONENT_VILLAIN_MC_H
 #define VILLAIN_2COMPONENT_VILLAIN_MC_H
 
+#include "constants.h"
 #include "main.h"
 #include "initialization.h"
 #include "villain_potential.h"
@@ -20,7 +21,7 @@
 #define ARG(diff,N) ((diff) + (N)*((2*(diff)<(-(N)))*(1-(2*(diff)+(N)+1)/(2*(N))) - (2*(diff)>(N))*(1+(2*(diff)-(N)-1)/(2*(N)))))
 
 
-void metropolis_villain(struct Node* Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
+void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
 double arg_phase(double x);
 int arg(int x, int Max);
 int int_arg_phase(int x,  int Max);

@@ -5,7 +5,7 @@
 #ifndef VILLAIN_2COMPONENT_PT_H
 #define VILLAIN_2COMPONENT_PT_H
 
-#include "main.h"
+#include "constants.h"
 #include <fstream>
 #include "villain_potential.h"
 
@@ -27,7 +27,7 @@ struct PTroot_parameters{
     std::vector <double> E_rank_betap; /* H(x_rank, beta_{rank +1} )*/
     std::vector <double> E_rank_betam; /* H(x_rank, beta_{rank-1})*/
 
-    std::vector <struct Villain> Villain_beta;
+    std::vector <Villain> Villain_beta;
 
     std::vector <int> ind_to_rank;
     std::vector <int> rank_to_ind;

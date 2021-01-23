@@ -1,9 +1,7 @@
 //
 // Created by ilaria on 2020-01-09.
 //
-
-#ifndef RNG_H
-#define RNG_H
+#pragma once
 #include <random>
 #include <iostream>
 #include "pcg/pcg_random.hpp"
@@ -16,5 +14,3 @@ namespace rn{
     extern double uniform_real_box(const double min, const double max);
 }
 
-
-#endif
