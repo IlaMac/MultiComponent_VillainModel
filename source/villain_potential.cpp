@@ -45,7 +45,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                     sum_1 += boltz_H*boltz;
 
                     j1=Hp.rho*u1 - Hp.nu*(u1-u2);
-                    j2=Hp.rho*u2 - Hp.nu*(u1-u2);
+                    j2=Hp.rho*u2 + Hp.nu*(u1-u2);
 
                     d1+= j1*boltz;
                     d2+= j2*boltz;
