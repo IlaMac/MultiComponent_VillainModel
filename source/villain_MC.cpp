@@ -11,7 +11,6 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     int ip, im, alpha, vec, i;
     int n_var;
     int new_int_phase[NC]={0};
-    //int old_int_phase;
     int arg_F_new[NC][3]={{0}};
     int arg_B_new[NC][3]={{0}}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={{0}};
@@ -31,6 +30,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 for (alpha = 0; alpha < NC; alpha++) {
                     n_var = rn::uniform_integer_box(1, MCp.lbox);
                     //std::cout<< n_var<< " box: "<< MCp.lbox<< std::endl;
+                    //Try to extract a new value of the phase directly in the interval [-(MaxP-1)/2; (MaxP-1/2]
                     rand = rn::uniform_real_box(0, 1);
                     if(rand<0.5){
                         new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);}
@@ -51,6 +51,8 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                 ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
                                 im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                             }
+                            //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
+
                             arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
                             arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
                             arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
@@ -65,7 +67,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     /*Specific for the two component case*/
                     /*Phase updating phase componet 1*/
                    dE=0;
-                   for (vec = 0; vec < 3; vec++) {
+                   for (vec = 0; vec < DIM; vec++) {
                        dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
                              +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
                              -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
@@ -85,7 +87,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
 
                 /*Phase updating phase componet 2*/
                dE=0;
-               for (vec = 0; vec < 3; vec++) {
+               for (vec = 0; vec < DIM; vec++) {
                    dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
                          +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
                          -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
@@ -101,7 +103,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
         }
     }
 
-    acc_theta=(double) acc_theta/N; /*to add NC later*/
+    acc_theta=(double) acc_theta/(N*NC);
     //std::cout << acc_theta/acc_rate << "beta: "<<my_beta<<" lbox: "<< MCp.lbox <<std::endl;
     if(acc_theta/acc_rate>1){MCp.lbox+=1;}
     if(acc_theta/acc_rate<1){MCp.lbox-=1;}
