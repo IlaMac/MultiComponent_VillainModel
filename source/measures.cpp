@@ -30,7 +30,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                     arg_2 = arg((Site[nn_i].Psi[1] - Site.at(i).Psi[1]), MaxP);
                     mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
-
+//ADD JOSEPHSON
             }
         }
     }
@@ -38,7 +38,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
 
 }
 
-void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site){
+void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp){
 
     unsigned int vec;
     int arg_1, arg_2;
@@ -64,6 +64,8 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
                     E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                     E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
+                E_betanm_temp+=Hp.eta1*cos(dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1])) + Hp.eta2*cos(2*dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1]));
+                E_betanp_temp+=Hp.eta1*cos(dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1])) + Hp.eta2*cos(2*dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1]));
             }
         }
     }
@@ -72,7 +74,7 @@ void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const st
 }
 
 
-void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site){
+void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp){
 
     unsigned int vec;
     int arg_1, arg_2;
@@ -95,9 +97,10 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
 
                     arg_1 = arg((Site[nn_i].Psi[0] - Site.at(i).Psi[0]), MaxP);
                     arg_2 = arg((Site[nn_i].Psi[1]- Site.at(i).Psi[1]), MaxP);
-                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-
+                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
                 }
+                mis.E+=+Hp.eta1*cos(dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1])) + Hp.eta2*cos(2*dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1]));
+
             }
         }
     }
@@ -138,41 +141,34 @@ void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vect
 
 }
 
-////DESIGNED FOR 3 COMPONENTs
-//void magnetization(struct Measures &mis, const std::vector<Node> &Site){
-//    //The Ising parameter m(x,y)=+/-1 indicates the chirality of the three phases. If the phases are ordered as: phi_1, phi_2, phi_3 then m=1; otherwise if the order is phi_1, phi_3, phi_2 then m=-1.
-//    unsigned ix, iy, iz, i;
-//
-//    double phi_shifted_1=0.;
-//    double phi_shifted_2=0.;
-//
-//    for(iz=0; iz<Lz;iz++) {
-//        for (iy = 0; iy < Ly; iy++) {
-//            for (ix = 0; ix < Lx; ix++) {
-//                i=ix +Lx*(iy+Ly*iz);
-//
-//                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
-//                while(phi_shifted_1 >= 2*M_PI){
-//                        phi_shifted_1-= 2*M_PI;}
-//                while(phi_shifted_1< 0){
-//                        phi_shifted_1+=2*M_PI;}
-//
-//                phi_shifted_2= Site.at(i).Psi[2] - Site.at(i).Psi[0];
-//                while(phi_shifted_2 >= 2*M_PI){
-//                        phi_shifted_2-= 2*M_PI;}
-//                while(phi_shifted_2< 0){
-//                        phi_shifted_2+=2*M_PI;}
-//
-//                if(phi_shifted_1>phi_shifted_2){
-//                    mis.m+=1;
-//                        }else if(phi_shifted_1<phi_shifted_2){
-//                    mis.m+=(-1);
-//                }
-//            }
-//        }
-//    }
-//    mis.m=mis.m/N;
-//}
+////DESIGNED FOR 2 COMPONENTs
+void magnetization(struct Measures &mis, const std::vector<Node> &Site){
+    //The Ising parameter m(x,y)=+/-1 indicates the chirality of the two phases. If the phase difference is + \pi/2 then m=1; otherwise  m=-1.
+    unsigned ix, iy, iz, i;
+
+    double phi_shifted_1=0.;
+
+    for(iz=0; iz<Lz;iz++) {
+        for (iy = 0; iy < Ly; iy++) {
+            for (ix = 0; ix < Lx; ix++) {
+                i=ix +Lx*(iy+Ly*iz);
+
+                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
+                while(phi_shifted_1 > M_PI){
+                        phi_shifted_1-= 2*M_PI;}
+                while(phi_shifted_1<=-M_PI){
+                        phi_shifted_1+=2*M_PI;}
+
+                if(phi_shifted_1>0){
+                    mis.m+=1;
+                        }else if(phi_shifted_1<0){
+                    mis.m+=(-1);
+                }
+            }
+        }
+    }
+    mis.m=mis.m/N;
+}
 
 void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site){
     unsigned alpha;

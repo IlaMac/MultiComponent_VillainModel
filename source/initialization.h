@@ -27,7 +27,8 @@ struct Node{
 struct H_parameters{
     /*These values are externally given by an input file*/
     double rho;
-    double eta;
+    double eta1;
+    double eta2;
     double e;
     double h;
     double nu;
