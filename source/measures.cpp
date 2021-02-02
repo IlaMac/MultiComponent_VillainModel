@@ -153,7 +153,7 @@ void magnetization(struct Measures &mis, const std::vector<Node> &Site){
             for (ix = 0; ix < Lx; ix++) {
                 i=ix +Lx*(iy+Ly*iz);
 
-                phi_shifted_1= Site.at(i).Psi[1] - Site.at(i).Psi[0];
+                phi_shifted_1= dp*(Site.at(i).Psi[1] - Site.at(i).Psi[0]);
                 while(phi_shifted_1 > M_PI){
                         phi_shifted_1-= 2*M_PI;}
                 while(phi_shifted_1<=-M_PI){
