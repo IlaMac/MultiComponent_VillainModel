@@ -253,7 +253,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         energy(mis, vil, Site, Hp);
         energy_nn(vil, E_betanp, E_betanm, Site, Hp);
         MPI_Barrier(MPI_COMM_WORLD);
-        u_internal_energy(mis, vil, Site);
+        u_internal_energy(mis, vil, Site, Hp);
         magnetization_singlephase(mis,  Site);
         magnetization(mis, Site);
 

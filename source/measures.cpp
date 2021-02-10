@@ -4,7 +4,7 @@
 
 #include "measures.h"
 
-void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site) {
+void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp) {
 
     unsigned int vec;
     int arg_1, arg_2;
@@ -31,6 +31,7 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                     mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
 //ADD JOSEPHSON
+                mis.U+=Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]));
             }
         }
     }
@@ -161,7 +162,7 @@ void magnetization(struct Measures &mis, const std::vector<Node> &Site){
 
                 if(phi_shifted_1>0){
                     mis.m+=1;
-                        }else if(phi_shifted_1<0){
+                }else if(phi_shifted_1<0){
                     mis.m+=(-1);
                 }
             }

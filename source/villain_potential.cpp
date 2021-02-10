@@ -38,7 +38,6 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
                     //std::cout<< "u1: "<< u1<< " u2: "<< u2<< " n1: "<< n1 << " n2: "<< n2<< " norm: "<< norm << std::endl;
                     u1=dp*arg1 - 2*M_PI*n1;
                     u2=dp*arg2 - 2*M_PI*n2;
-                    //boltz_H=0.5*(Hp.rho*(SQR(dp*arg1-2*M_PI*n1) + SQR(dp*arg2-2*M_PI*n2)) - Hp.nu*SQR(dp*(arg1-arg2)-2*M_PI*(n1-n2)));
                     boltz_H = 0.5*(Hp.rho * ((u1*u1) + (u2*u2)) - Hp.nu*(u1-u2)*(u1-u2));
                     boltz = exp(-my_beta*boltz_H);
                     norm += boltz;

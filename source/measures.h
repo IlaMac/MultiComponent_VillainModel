@@ -35,7 +35,7 @@ struct Measures{
 
 void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp);
 void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp);
-void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
+void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp);
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
 void magnetization(struct Measures &mis, const std::vector<Node> &Site);
 void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site);
