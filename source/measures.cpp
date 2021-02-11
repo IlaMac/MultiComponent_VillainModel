@@ -30,7 +30,6 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                     arg_2 = arg((Site[nn_i].Psi[1] - Site.at(i).Psi[1]), MaxP);
                     mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
-//ADD JOSEPHSON
                 mis.U+=Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]));
             }
         }
