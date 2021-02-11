@@ -46,8 +46,8 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
 
 //                    j1=Hp.rho*u1 - Hp.nu*(u1-u2);
 //                    j2=Hp.rho*u2 + Hp.nu*(u1-u2);
-                    j1=Hp.rho*u1 - 2*Hp.nu*u2;
-                    j2=Hp.rho*u2 - 2*Hp.nu*u1;
+                    j1=Hp.rho*u1 - Hp.nu*u2;
+                    j2=Hp.rho*u2 - Hp.nu*u1;
 
                     d1+= j1*boltz;
                     d2+= j2*boltz;
@@ -56,7 +56,7 @@ void init_villain_potentials(double my_beta, struct Villain &vil,  struct H_para
 //                    d12+= (Hp.nu - my_beta*j1*j2)*boltz;
                     d11+= (Hp.rho - my_beta*j1*j1)*boltz;
                     d22+= (Hp.rho - my_beta*j2*j2)*boltz;
-                    d12+= (-2*Hp.nu - my_beta*j1*j2)*boltz;
+                    d12+= (-Hp.nu - my_beta*j1*j2)*boltz;
 
                 }
             }
