@@ -65,7 +65,6 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
 
 void initialize_lattice(const std::vector<Node> &Site, const fs::path & directory_read, int RESTART, struct H_parameters &Hp){
 
-    unsigned int i, alpha;
     fs::path psi_init_file = directory_read / "Psi_restart.bin";
     fs::path a_init_file = directory_read / "A_restart.bin";
 
