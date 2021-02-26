@@ -119,7 +119,7 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
                     PTroot.beta[oldrank_i] * (PTroot.E_rank_beta[oldrank_i] - E_ranknn_beta);
             //std::cout<< "rank i: "<< oldrank_i << " rank nn: "<< oldrank_nn << " Delta: "<< Delta << std::endl;
             //swapping condition
-            if ((n_rand < exp(-Delta)) && ((i - ind_nn)*(i-ind_nn) == 1 )) {
+            if ((n_rand < exp(-Delta)) ) {
 
                 //swap indices in the rank_to_ind array
                 PTroot.rank_to_ind[oldrank_i] = ind_nn;
