@@ -43,8 +43,8 @@ struct MC_parameters{
     int tau; // estimate of the auto-correlation time
     int nmisu; //total number of independent measures
     int n_autosave; //frequency at which intermediate configuration are saved
-    double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
-    //double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
+    //double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
+    double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
     int lbox; //length of the box of integer for the extraction of the new phase
     int nMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
 };

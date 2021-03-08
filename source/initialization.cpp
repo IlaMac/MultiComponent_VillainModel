@@ -45,7 +45,8 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
             fscanf(fin, "%d", &MCp.nmisu);
             fscanf(fin, "%d", &MCp.tau);
             fscanf(fin, "%d", &MCp.n_autosave);
-	        fscanf(fin, "%lf", &MCp.lbox_theta);
+	        //fscanf(fin, "%lf", &MCp.lbox_theta);
+            fscanf(fin, "%lf", &MCp.lbox_A);
             fscanf(fin, "%d", &MCp.lbox);
             fscanf(fin, "%d", &MCp.nMAX);
             fclose(fin);
@@ -54,8 +55,8 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
         MCp.nmisu=20;
         MCp.tau=1;
         MCp.n_autosave=2000; //not used now
-        MCp.lbox_theta=C_PI;
-        //MCp.lbox_A=0.1;
+        //MCp.lbox_theta=C_PI;
+        MCp.lbox_A=0.1;
         MCp.lbox=10;
         MCp.nMAX=30;
     }
@@ -91,23 +92,48 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
         }
     }else{
         if(Hp.init==0) {
-            //for (i = 0; i < N; i++) {
             for(auto & s : Site){
-                for(auto & a : s.Psi){
+                for(auto & p : s.Psi){
+                    p = 0;
+                }
+                for(auto & a : s.A){
                     a = 0;
                 }
             }
         }
-        else if(Hp.init!=0) {
+        else if(Hp.init==1) {
             for(auto & s : Site){
-                for(auto & a : s.Psi){
-                    a = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
+                for(auto & p : s.Psi){
+                    p = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
+                }
+                for(auto & a : s.A){
+                    a = 0;
                 }
             }
         }
-
+        else if(Hp.init==2) {
+            /*This initial conditions correspond to the case where the phase difference is ordered and the phase sum is not (quartic metal) */
+            for(auto & s : Site){
+                s.Psi[0] = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
+                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;  
+                
+                for(auto & a : s.A){
+                    a = 0;
+                }              
+            }
+        }
+        else if((Hp.init>2) || (Hp.init<0) ) {
+            /*This initial conditions correspond to the case where both the phase difference and the phase sum are ordered */
+            for(auto & s : Site){
+                s.Psi[0] = 0;
+                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;  
+                
+                for(auto & a : s.A){
+                    a = 0;
+                }              
+            }
+        }
     }
-
 }
 
 

@@ -27,8 +27,10 @@ option(CMAKE_POSITION_INDEPENDENT_CODE "Use -fPIC when compiling shared librarie
 
 include(ExternalProject)
 ExternalProject_Add(external_h5pp
-        GIT_REPOSITORY https://github.com/DavidAce/h5pp.git
-        GIT_TAG master
+        #GIT_REPOSITORY https://github.com/DavidAce/h5pp.git
+        #GIT_TAG master
+        URL https://github.com/DavidAce/h5pp/archive/v1.8.5.tar.gz
+        URL_MD5 82cb78908f9c87735051be4621dbcf37
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         BUILD_ALWAYS TRUE
