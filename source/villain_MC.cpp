@@ -8,6 +8,7 @@
 void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
     int ix, iy, iz;
+    int ipx, ipy, ipz;
     int ip, im, alpha, vec, i;
     int n_var;
     int new_int_phase[NC]={0};
@@ -57,20 +58,15 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                         }
                         //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
-                        arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]), MaxP);
-                        arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]), MaxP);
-                        arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]), MaxP);
-                        arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]), MaxP);
-                        // Implementing the charged case
-                        // arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - Hp.e*Site[i].A[vec], MaxP);
-                        // arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);
-                        // arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*Site[i].A[vec], MaxP);
-                        // arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);                            
+                         arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - Hp.e*Site[i].A[vec], MaxP);
+                         arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);
+                         arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*Site[i].A[vec], MaxP);
+                         arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);
                     }
                 }
-                    /*Specific for the two component case*/
+                /******************Specific for the two component case******************/
 
-                    /*Phase updating phase componet 1*/
+                /*******************Phase updating phase componet 1*******************/
                 dE=0;
                 for (vec = 0; vec < DIM; vec++) {
                    dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
@@ -90,7 +86,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     }
                 }
 
-                /*Phase updating phase componet 2*/
+                /*******************Phase updating phase componet 2*******************/
                 dE=0;
                 for (vec = 0; vec < DIM; vec++) {
                    dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
@@ -106,71 +102,71 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     acc_theta++;
                 }
 
-            /*******VECTOR POTENTIAL UPDATE**************/ 
-            if(Hp.e!=0){
-                for (vec=0; vec<DIM; vec++){
-                    OldA= Site[i].A[vec];
-                    dA = rn::uniform_real_box(-MCp.lbox_A, MCp.lbox_A);
-                    NewA = OldA + dA;
-                    if (vec == 0) {
-                        ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
-                        im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
-                    }
-                    if (vec == 1) {
-                        ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
-                        im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
-                    }
-                    if (vec == 2) {
-                        ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
-                        im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
-                    } 
-                    for(alpha=0; alpha<NC; alpha++){
-                        arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*NewA, MaxP);
-                        arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*OldA, MaxP);
-                    }
-                    dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec]) - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
-                    //curl A
-                    curl2_A_new=0.;
-                    curl2_A_old=0.;
-                    //All the plaquettes involving A_vec(i)
-                    for(l=0; l<DIM; l++){
-                        if(l==0){
-                            nn_ipl= mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
-                            nn_iml= mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
-                            nn_ipvec_iml= ip - ix + mod(ix - 1, Lx);
-                        }else if(l==1){
-                            nn_ipl= ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
-                            nn_iml= ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
-                            nn_ipvec_iml= ip - Lx*iy +  Lx *mod(iy - 1, Ly);
-                        }else if(l==2) {
-                            nn_ipl= ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
-                            nn_iml= ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
-                            nn_ipvec_iml= ip - Ly*Lx*iy +  Lx * Ly* mod(iz - 1, Lz);
+            /*******************VECTOR POTENTIAL UPDATE*******************/
+                if(Hp.e!=0){
+                    for (vec=0; vec<DIM; vec++){
+                        OldA= Site[i].A[vec];
+                        dA = rn::uniform_real_box(-MCp.lbox_A, MCp.lbox_A);
+                        NewA = OldA + dA;
+                        ipx=ix;
+                        ipy=iy;
+                        ipz=iz;
+                        if (vec == 0) {
+                            ipx=mod(ix + 1, Lx);
                         }
-                        if(l!= vec){
-                            //plaquette to the right (F="forward") side of newA
-                            F_A_new=(NewA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
-                            curl2_A_new+=0.5*(F_A_new*F_A_new);
-                            //plaquette to the left (B="backrward") side of newA
-                            B_A_new=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - NewA - Site[nn_iml].A[l]);
-                            curl2_A_new+=0.5*(B_A_new*B_A_new);
+                        if (vec == 1) {
+                            ipy=mod(iy + 1, Ly);
+                        }
+                        if (vec == 2) {
+                            ipz = mod(iz + 1, Lz);
+                        }
+                        ip = ipx + Lx * (ipy + ipz * Ly);
+                        for(alpha=0; alpha<NC; alpha++){
+                            arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*NewA, MaxP);
+                            arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*OldA, MaxP);
+                        }
+                        dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec]) - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
+                        //curl A
+                        curl2_A_new=0.;
+                        curl2_A_old=0.;
+                        //All the plaquettes involving A_vec(i)
+                        for(l=0; l<DIM; l++){
+                            if(l!= vec){
+                                if(l==0){
+                                    nn_ipl= mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+                                    nn_iml= mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+                                    nn_ipvec_iml= mod(ipx - 1, Lx) + Lx * (ipy + ipz * Ly);
+                                }else if(l==1){
+                                    nn_ipl= ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+                                    nn_iml= ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+                                    nn_ipvec_iml= ipx + Lx * (mod(ipy - 1, Ly) + ipz * Ly);
+                                }else if(l==2) {
+                                    nn_ipl= ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+                                    nn_iml= ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+                                    nn_ipvec_iml= ipx + Lx * (ipy + mod(ipz - 1, Lz) * Ly);
+                                }
+                                //plaquette to the right (F="forward") side of newA
+                                F_A_new=(NewA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
+                                curl2_A_new+=0.5*(F_A_new*F_A_new);
+                                //plaquette to the left (B="backrward") side of newA
+                                B_A_new=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - NewA - Site[nn_iml].A[l]);
+                                curl2_A_new+=0.5*(B_A_new*B_A_new);
 
-                            F_A_old=(OldA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
-                            curl2_A_old+=0.5*(F_A_old*F_A_old);
-                            B_A_old=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - OldA - Site[nn_iml].A[l]);
-                            curl2_A_old+=0.5*(B_A_old*B_A_old);
+                                F_A_old=(OldA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
+                                curl2_A_old+=0.5*(F_A_old*F_A_old);
+                                B_A_old=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - OldA - Site[nn_iml].A[l]);
+                                curl2_A_old+=0.5*(B_A_old*B_A_old);
+                            }
                         }
-                    }
-                    dE_A+= curl2_A_new -curl2_A_old;
-                    rand = rn::uniform_real_box(0, 1);
-                    //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                    if (rand < exp(-my_beta*dE)) {
-                       Site[i].A[vec] = NewA;
-                       acc_A++;
+                        dE_A+= curl2_A_new -curl2_A_old;
+                        rand = rn::uniform_real_box(0, 1);
+                        //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
+                        if (rand < exp(-my_beta*dE_A)) {
+                           Site[i].A[vec] = NewA;
+                           acc_A++;
+                        }
                     }
                 }
-            }
-    
             }
         }
     }

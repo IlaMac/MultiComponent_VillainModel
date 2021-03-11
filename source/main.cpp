@@ -220,6 +220,8 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
 
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E", HOFFSET(Measures, E), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "U", HOFFSET(Measures, U), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_gp", HOFFSET(Measures, E_gp), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "E_jp", HOFFSET(Measures, E_jp), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m", HOFFSET(Measures, m), H5T_NATIVE_DOUBLE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "m_phase", HOFFSET(Measures, m_phase),  HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "ds", HOFFSET(Measures, d_rhoz), H5T_NATIVE_DOUBLE);
@@ -248,14 +250,17 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         //Measures
         t_measures.tic();
         mis.reset();
-        helicity_modulus(mis, vil, Site);
-        MPI_Barrier(MPI_COMM_WORLD);
+        if(Hp.e!=0) {
+            gauge_potential(mis, Site, Hp);
+        }
+        josephson_potential(mis, Site, Hp);
         energy(mis, vil, Site, Hp);
-        energy_nn(vil, E_betanp, E_betanm, Site, Hp);
-        MPI_Barrier(MPI_COMM_WORLD);
+        energy_nn(mis, vil, E_betanp, E_betanm, Site, Hp);
         u_internal_energy(mis, vil, Site, Hp);
+        helicity_modulus(mis, vil, Site, Hp);
         magnetization_singlephase(mis,  Site);
         magnetization(mis, Site);
+        dual_stiffness(mis, Hp, Site);
 
         MPI_Barrier(MPI_COMM_WORLD);
 

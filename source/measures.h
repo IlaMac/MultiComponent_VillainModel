@@ -14,9 +14,10 @@
 struct Measures{
 
 /*******THE ORDER SHOULD BE THE SAME OF THE H5T INSERT REGISTRATION**************/
-
     double E=0.; //Energy
-    double U=0.;
+    double U=0.; //Internal Energy
+    double E_gp=0.; //Gauge potential energy
+    double E_jp=0.; //Josephson potential energy
     double m=0.; //magnetization (for the phase chirality of the three components
     //Binder cumulant U=<m⁴>/(3*<m²>²)
     double m_phase[NC]={0}; //magnetization of the single component phase
@@ -34,12 +35,14 @@ struct Measures{
 
 
 void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp);
-void energy_nn(struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp);
+void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp);
+void josephson_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp);
+void energy_nn(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp);
 void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp);
-void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site);
+void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp);
 void magnetization(struct Measures &mis, const std::vector<Node> &Site);
 void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Site);
+void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site);
 void save_lattice(const std::vector<Node> &Site, const fs::path & directory_write, const std::string& configuration);
-//void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site);
 
 #endif //MEASURES_H
