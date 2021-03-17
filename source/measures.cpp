@@ -81,8 +81,8 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                     }
                     nn_i = ipx + Lx * (ipy + ipz * Ly);
 
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - Hp.e * Site[i].A[vec], MaxP);
+                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
                     mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
 
                 }
@@ -122,8 +122,8 @@ void energy_nn(struct Measures &mis, struct Villain &vil, double &E_betanp, doub
                     }
                     nn_i = ipx + Lx * (ipy + ipz * Ly);
 
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - Hp.e * Site[i].A[vec], MaxP);
+                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
                     E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                     E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
@@ -158,8 +158,8 @@ void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &
                         nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                     }
 
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - Hp.e * Site[i].A[vec], MaxP);
+                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
                     mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
                 }
             }
@@ -185,8 +185,8 @@ void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vect
                 i = ix + Lx * (iy + iz * Ly);
                 nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - Hp.e * Site[i].A[0], MaxP);
-                arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - Hp.e * Site[i].A[0], MaxP);
+                arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp* Hp.e * Site[i].A[0], MaxP);
+                arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp* Hp.e * Site[i].A[0], MaxP);
 
                 d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);

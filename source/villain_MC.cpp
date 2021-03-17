@@ -58,10 +58,10 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
                         }
                         //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
-                         arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - Hp.e*Site[i].A[vec], MaxP);
-                         arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);
-                         arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*Site[i].A[vec], MaxP);
-                         arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - Hp.e*Site[im].A[vec], MaxP);
+                         arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+                         arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+                         arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+                         arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
                     }
                 }
                 /******************Specific for the two component case******************/
@@ -122,8 +122,8 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                         }
                         ip = ipx + Lx * (ipy + ipz * Ly);
                         for(alpha=0; alpha<NC; alpha++){
-                            arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*NewA, MaxP);
-                            arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - Hp.e*OldA, MaxP);
+                            arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*NewA, MaxP);
+                            arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*OldA, MaxP);
                         }
                         dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec]) - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
                         //curl A
