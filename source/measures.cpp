@@ -56,20 +56,19 @@ void josephson_potential(struct Measures &mis, const std::vector<Node> &Site, st
     }
 }
 
-void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp) {
+void energies(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp){
 
-    int vec;
-    int arg_1, arg_2;
-    int i, ix, iy, iz, ipx, ipy, ipz, nn_i;
+    double E_betanm_temp=0.;
+    double E_betanp_temp=0.;
 
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++) {
-                i = ix + Lx * (iy + iz * Ly);
-                for(vec=0; vec<3; vec++) {
-                    ipx=ix;
-                    ipy=iy;
-                    ipz=iz;
+    for(int iz=0;iz<Lz;iz++){
+        for(int iy=0;iy<Ly;iy++){
+            for(int ix=0; ix<Lx; ix++) {
+                int i = ix + Lx * (iy + iz * Ly);
+                for(int vec=0; vec<3; vec++) {
+                    int ipx=ix;
+                    int ipy=iy;
+                    int ipz=iz;
                     if (vec == 0) {
                         ipx=mod(ix + 1, Lx);
                     }
@@ -79,98 +78,36 @@ void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vec
                     if (vec == 2) {
                         ipz = mod(iz + 1, Lz);
                     }
-                    nn_i = ipx + Lx * (ipy + ipz * Ly);
+                   int nn_i = ipx + Lx * (ipy + ipz * Ly);
 
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    int arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    int arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
                     mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-
-                }
-            }
-        }
-    }
-
-    /****Gauge term***/
-    mis.U+=mis.E_gp;
-    /****Josephson term***/
-    mis.U+=mis.E_jp;
-}
-
-void energy_nn(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp){
-
-    unsigned int vec;
-    int arg_1, arg_2;
-    int i, ix, iy, iz, ipx, ipy, ipz, nn_i;
-    double E_betanp_temp=0., E_betanm_temp=0.;
-
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++){
-                i = ix + Lx * (iy + iz * Ly);
-                for(vec=0; vec<3; vec++) {
-                    ipx=ix;
-                    ipy=iy;
-                    ipz=iz;
-                    if (vec == 0) {
-                        ipx=mod(ix + 1, Lx);
-                    }
-                    if (vec == 1) {
-                        ipy=mod(iy + 1, Ly);
-                    }
-                    if (vec == 2) {
-                        ipz = mod(iz + 1, Lz);
-                    }
-                    nn_i = ipx + Lx * (ipy + ipz * Ly);
-
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
                     E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                     E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 }
-                //E_betanm_temp+=Hp.eta1*cos(dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1])) + Hp.eta2*cos(2*dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1]));
-                //E_betanp_temp+=Hp.eta1*cos(dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1])) + Hp.eta2*cos(2*dp*(Site.at(i).Psi[0] - Site.at(i).Psi[1]));
             }
         }
     }
-    E_betanp=E_betanp_temp + mis.E_jp + mis.E_gp;
-    E_betanm=E_betanp_temp + mis.E_jp + mis.E_gp;
-}
 
 
-void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp){
-
-    unsigned int vec;
-    int arg_1, arg_2;
-    int i, ix, iy, iz, nn_i;
-
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++){
-                i = ix + Lx * (iy + iz * Ly);
-                for(vec=0; vec<3; vec++) {
-                    if(vec==0){
-                        nn_i= mod(ix+1, Lx) + Lx * (iy + iz * Ly);
-                    }
-                    if(vec==1){
-                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
-                    }
-                    if(vec==2){
-                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
-                    }
-
-                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
-                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
-                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
-                }
-            }
-        }
-    }
     /****Gauge term***/
-    mis.U+=mis.E_gp;
+    if(Hp.e!=0) {
+        gauge_potential(mis, Site, Hp);
+    }
     /****Josephson term***/
-    mis.U+=mis.E_jp;
-}
+    if((Hp.eta1!=0) or (Hp.eta2!=0)) {
+        josephson_potential(mis, Site, Hp);
+    }
 
+    mis.U+=mis.E_gp + mis.E_jp;
+    mis.E+=mis.E_gp + mis.E_jp;
+
+    E_betanp=E_betanp_temp + mis.E_jp + mis.E_gp;
+    E_betanm=E_betanm_temp + mis.E_jp + mis.E_gp;
+
+}
 
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp){
 
@@ -304,4 +241,119 @@ void save_lattice(const std::vector<Node> &Site, const fs::path & directory_writ
     }
 
 }
+
+
+//
+//void u_internal_energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp) {
+//
+//    int vec;
+//    int arg_1, arg_2;
+//    int i, ix, iy, iz, ipx, ipy, ipz, nn_i;
+//
+//    for(iz=0;iz<Lz;iz++){
+//        for(iy=0;iy<Ly;iy++){
+//            for(ix=0; ix<Lx; ix++) {
+//                i = ix + Lx * (iy + iz * Ly);
+//                for(vec=0; vec<3; vec++) {
+//                    ipx=ix;
+//                    ipy=iy;
+//                    ipz=iz;
+//                    if (vec == 0) {
+//                        ipx=mod(ix + 1, Lx);
+//                    }
+//                    if (vec == 1) {
+//                        ipy=mod(iy + 1, Ly);
+//                    }
+//                    if (vec == 2) {
+//                        ipz = mod(iz + 1, Lz);
+//                    }
+//                    nn_i = ipx + Lx * (ipy + ipz * Ly);
+//
+//                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+//
+//                }
+//            }
+//        }
+//    }
+//
+//    /****Gauge term***/
+//    mis.U+=mis.E_gp;
+//    /****Josephson term***/
+//    mis.U+=mis.E_jp;
+//}
+//
+//void energy_nn(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp){
+//
+//    unsigned int vec;
+//    int arg_1, arg_2;
+//    int i, ix, iy, iz, ipx, ipy, ipz, nn_i;
+//    double E_betanp_temp=0., E_betanm_temp=0.;
+//
+//    for(iz=0;iz<Lz;iz++){
+//        for(iy=0;iy<Ly;iy++){
+//            for(ix=0; ix<Lx; ix++){
+//                i = ix + Lx * (iy + iz * Ly);
+//                for(vec=0; vec<3; vec++) {
+//                    ipx=ix;
+//                    ipy=iy;
+//                    ipz=iz;
+//                    if (vec == 0) {
+//                        ipx=mod(ix + 1, Lx);
+//                    }
+//                    if (vec == 1) {
+//                        ipy=mod(iy + 1, Ly);
+//                    }
+//                    if (vec == 2) {
+//                        ipz = mod(iz + 1, Lz);
+//                    }
+//                    nn_i = ipx + Lx * (ipy + ipz * Ly);
+//
+//                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+//                    E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+//                }
+//            }
+//        }
+//    }
+//    E_betanp=E_betanp_temp + mis.E_jp + mis.E_gp;
+//    E_betanm=E_betanm_temp + mis.E_jp + mis.E_gp;
+//}
+//
+//
+//void energy(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp){
+//
+//    unsigned int vec;
+//    int arg_1, arg_2;
+//    int i, ix, iy, iz, nn_i;
+//
+//    for(iz=0;iz<Lz;iz++){
+//        for(iy=0;iy<Ly;iy++){
+//            for(ix=0; ix<Lx; ix++){
+//                i = ix + Lx * (iy + iz * Ly);
+//                for(vec=0; vec<3; vec++) {
+//                    if(vec==0){
+//                        nn_i= mod(ix+1, Lx) + Lx * (iy + iz * Ly);
+//                    }
+//                    if(vec==1){
+//                        nn_i= ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+//                    }
+//                    if(vec==2){
+//                        nn_i= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
+//                    }
+//
+//                    arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
+//                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
+//                }
+//            }
+//        }
+//    }
+//    /****Gauge term***/
+//    mis.E+=mis.E_gp;
+//    /****Josephson term***/
+//    mis.E+=mis.E_jp;
+//}
 

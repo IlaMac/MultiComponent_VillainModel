@@ -114,9 +114,7 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
             }
 
             /*Delta= beta_nn*[H(x_nn, beta_nn) - H(x_i, beta_nn)] - beta_i*[H(x_nn,beta_i) - H(x_i, beta_i)] */
-            Delta = PTroot.beta[oldrank_nn] * (PTroot.E_rank_beta[oldrank_nn]- E_rank_betann) -
-                    PTroot.beta[oldrank_i] * (E_ranknn_beta  - PTroot.E_rank_beta[oldrank_i]);
-            //std::cout<< "rank i: "<< oldrank_i << " rank nn: "<< oldrank_nn << " Delta: "<< Delta << std::endl;
+            Delta = PTroot.beta[oldrank_nn] * (PTroot.E_rank_beta[oldrank_nn]- E_rank_betann) - PTroot.beta[oldrank_i] * (E_ranknn_beta  - PTroot.E_rank_beta[oldrank_i]);
             //swapping condition
             n_rand = rn::uniform_real_box(0, 1);
             if ((n_rand < exp(Delta)) ) {

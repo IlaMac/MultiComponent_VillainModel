@@ -232,10 +232,10 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
 
-    /*Initialization Villain potentials*/
-    init_villain_potentials(my_beta, beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
     MPI_Scatter(PTroot.beta_p.data(), 1, MPI_DOUBLE, &beta_np, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
+    /*Initialization Villain potentials*/
+    init_villain_potentials(my_beta, beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
     std::cout<< "START I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << std::endl;
 
     mis.reset();
@@ -250,13 +250,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         //Measures
         t_measures.tic();
         mis.reset();
-        if(Hp.e!=0) {
-            gauge_potential(mis, Site, Hp);
-        }
-        josephson_potential(mis, Site, Hp);
-        energy(mis, vil, Site, Hp);
-        energy_nn(mis, vil, E_betanp, E_betanm, Site, Hp);
-        u_internal_energy(mis, vil, Site, Hp);
+        energies(mis, vil, E_betanp, E_betanm, Site, Hp);
         helicity_modulus(mis, vil, Site, Hp);
         magnetization_singlephase(mis,  Site);
         magnetization(mis, Site);

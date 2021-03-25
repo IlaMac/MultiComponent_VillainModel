@@ -6,9 +6,6 @@
 
 void init_villain_potentials(double my_beta, double beta_np, double beta_nm, struct Villain &vil,  struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write) {
 
-    double u1, u2, sum_1, norm, boltz, boltz_H;
-    double j1, j2;
-
     fs::path vpotential_file = directory_write / std::string("Villain_potential.txt");
 
     FILE *fVPotential;
@@ -73,8 +70,6 @@ void init_villain_potentials(double my_beta, double beta_np, double beta_nm, str
             vil.d11_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+=d11/norm + my_beta*(d1/norm)*(d1/norm);
             vil.d22_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+=d22/norm + my_beta*(d2/norm)*(d2/norm);
             vil.d12_potential.at(OFFSET_POT + arg1 + MaxP*arg2)+= d12/norm + my_beta*(d1*d2)/(norm*norm);
-
-
         }
     }
     fclose(fVPotential);
