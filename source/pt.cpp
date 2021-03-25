@@ -102,24 +102,24 @@ void parallel_temp(double &my_E , double &E_betanp, double &E_betanm, double &be
             nn = -1;
         }
         while (i < PTp.np) {
-            n_rand = rn::uniform_real_box(0, 1);
             ind_nn = (PTp.np + i + nn) % PTp.np;
             oldrank_i = PTroot.ind_to_rank[i];
             oldrank_nn = PTroot.ind_to_rank[ind_nn];
-            if (nn == 1) {
-                E_rank_betann = PTroot.E_rank_betap[oldrank_i]; /*H[\beta_n=plus, x]*/
-                E_ranknn_beta = PTroot.E_rank_betam[oldrank_nn]; /*H[\beta_plus_minus=, x_n=plus]*/
+            if (nn == +1) {
+                E_rank_betann = PTroot.E_rank_betap[oldrank_i]; /*H[x_i, \beta_nn]*/
+                E_ranknn_beta = PTroot.E_rank_betam[oldrank_nn]; /*H[x_nn, \beta_i]*/
             } else if (nn == -1) {
-                E_rank_betann = PTroot.E_rank_betam[oldrank_i];
-                E_ranknn_beta = PTroot.E_rank_betap[oldrank_nn];
+                E_rank_betann = PTroot.E_rank_betam[oldrank_i]; /*H[x_i, \beta_nn]*/
+                E_ranknn_beta = PTroot.E_rank_betap[oldrank_nn]; /*H[x_nn, \beta_i]*/
             }
 
-            /*Delta= beta_new*[H(x, beta_new) - H(x_new, beta_new)] - beta*[H(x,beta) - H(x_new, beta)] */
-            Delta = PTroot.beta[oldrank_nn] * (E_rank_betann - PTroot.E_rank_beta[oldrank_nn]) -
-                    PTroot.beta[oldrank_i] * (PTroot.E_rank_beta[oldrank_i] - E_ranknn_beta);
+            /*Delta= beta_nn*[H(x_nn, beta_nn) - H(x_nn, beta_i)] - beta_i*[H(x_i,beta_nn) - H(x_i, beta_i)] */
+            Delta = PTroot.beta[oldrank_nn] * (PTroot.E_rank_beta[oldrank_nn]- E_ranknn_beta) -
+                    PTroot.beta[oldrank_i] * ( E_rank_betann - PTroot.E_rank_beta[oldrank_i]);
             //std::cout<< "rank i: "<< oldrank_i << " rank nn: "<< oldrank_nn << " Delta: "<< Delta << std::endl;
             //swapping condition
-            if ((n_rand < exp(-Delta)) ) {
+            n_rand = rn::uniform_real_box(0, 1);
+            if ((n_rand < exp(Delta)) ) {
 
                 //swap indices in the rank_to_ind array
                 PTroot.rank_to_ind[oldrank_i] = ind_nn;
