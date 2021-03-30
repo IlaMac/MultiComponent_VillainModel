@@ -193,19 +193,18 @@ void magnetization_singlephase(struct Measures &mis, const std::vector<Node> &Si
 void dual_stiffness(struct Measures &mis, struct H_parameters &Hp, const std::vector<Node> &Site){
     double qx_min=C_TWO_PI/(Lx);
     double invNorm= 1./((C_TWO_PI)*(C_TWO_PI)*N);
-    int i, ix, iy, iz, nn_i;
     double Re_rhoz=0.;
     double Im_rhoz=0.;
-    double Dx_Ay, Dy_Ax;
     double inv_h=1./(Hp.h);
 
-    for(ix=0; ix<Lx;ix++){
-        for(iy=0; iy<Ly;iy++){
-            for(iz=0; iz<Lz;iz++){
-                i = ix + Lx * (iy + iz * Ly);
-                nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
-                Dx_Ay=(Site[nn_i].A[1]- Site[i].A[1])*inv_h;
-                Dy_Ax=(Site[nn_i].A[0]- Site[i].A[0])*inv_h;
+    for(int ix=0; ix<Lx;ix++){
+        for(int iy=0; iy<Ly;iy++){
+            for(int iz=0; iz<Lz;iz++){
+                int i = ix + Lx * (iy + iz * Ly);
+                int ipx = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+                int ipy = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+                double Dx_Ay=(Site[ipx].A[1]- Site[i].A[1])*inv_h;
+                double Dy_Ax=(Site[ipy].A[0]- Site[i].A[0])*inv_h;
                 Re_rhoz+=(cos((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
                 Im_rhoz+=(sin((double)qx_min*ix)*(Dx_Ay -Dy_Ax));
             }

@@ -38,7 +38,7 @@ void init_villain_potentials(double my_beta, double beta_np, double beta_nm, str
                     double u1=dp*arg1 - 2*M_PI*n1;
                     double u2=dp*arg2 - 2*M_PI*n2;
                     //boltz_H = 0.5*(Hp.rho * ((u1*u1) + (u2*u2)) - Hp.nu*(u1-u2)*(u1-u2));
-                    double boltz_H = 0.5*(Hp.rho * ((u1*u1) + (u2*u2)) - 2*Hp.nu*(u1*u2));
+                    double boltz_H = 0.5*(Hp.rho * ((u1*u1) + Hp.alpha*(u2*u2)) - 2*Hp.nu*(u1*u2));
                     double boltz = exp(-my_beta*boltz_H);
                     norm += boltz;
                     sum_1 += boltz_H*boltz;
@@ -47,12 +47,12 @@ void init_villain_potentials(double my_beta, double beta_np, double beta_nm, str
                     sum_nm+=exp(-beta_nm*boltz_H);
 
                     double j1=Hp.rho*u1 - Hp.nu*u2;
-                    double j2=Hp.rho*u2 - Hp.nu*u1;
+                    double j2=Hp.rho*Hp.alpha*u2 - Hp.nu*u1;
 
                     d1+= j1*boltz;
                     d2+= j2*boltz;
                     d11+= (Hp.rho - my_beta*j1*j1)*boltz;
-                    d22+= (Hp.rho - my_beta*j2*j2)*boltz;
+                    d22+= (Hp.rho*Hp.alpha - my_beta*j2*j2)*boltz;
                     d12+= (-Hp.nu - my_beta*j1*j2)*boltz;
 
                 }

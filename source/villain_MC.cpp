@@ -147,18 +147,18 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                 }
                                 //plaquette to the right (F="forward") side of newA
                                 F_A_new=(NewA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
-                                curl2_A_new+=0.5*(F_A_new*F_A_new);
+                                curl2_A_new=0.5*(F_A_new*F_A_new);
                                 //plaquette to the left (B="backrward") side of newA
                                 B_A_new=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - NewA - Site[nn_iml].A[l]);
                                 curl2_A_new+=0.5*(B_A_new*B_A_new);
 
                                 F_A_old=(OldA + Site[ip].A[l] - Site[nn_ipl].A[vec] - Site[i].A[l]);
-                                curl2_A_old+=0.5*(F_A_old*F_A_old);
+                                curl2_A_old=0.5*(F_A_old*F_A_old);
                                 B_A_old=(Site[nn_iml].A[vec]+ Site[nn_ipvec_iml].A[l] - OldA - Site[nn_iml].A[l]);
                                 curl2_A_old+=0.5*(B_A_old*B_A_old);
+                                dE_A+= curl2_A_new -curl2_A_old;
                             }
                         }
-                        dE_A+= curl2_A_new -curl2_A_old;
                         rand = rn::uniform_real_box(0, 1);
                         //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
                         if (rand < exp(-my_beta*dE_A)) {
