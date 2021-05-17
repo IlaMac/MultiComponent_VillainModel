@@ -29,10 +29,10 @@ include(ExternalProject)
 ExternalProject_Add(external_h5pp
         #GIT_REPOSITORY https://github.com/DavidAce/h5pp.git
         #GIT_TAG master
-        #GIT_PROGRESS TRUE
-        #GIT_SHALLOW TRUE
-        URL https://github.com/DavidAce/h5pp/archive/refs/tags/v1.8.6.tar.gz
-        URL_MD5 996039d57775d5ab0d637c62ddb631f2
+        URL https://github.com/DavidAce/h5pp/archive/v1.8.5.tar.gz
+        URL_MD5 82cb78908f9c87735051be4621dbcf37
+        GIT_PROGRESS TRUE
+        GIT_SHALLOW TRUE
         BUILD_ALWAYS TRUE
         PREFIX          ${CMAKE_BINARY_DIR}
         INSTALL_DIR     ${CMAKE_INSTALL_PREFIX}
@@ -61,7 +61,7 @@ ExternalProject_Add(external_h5pp
         -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
         -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=TRUE
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=TRUE
-        -DCMAKE_FIND_DEBUG_MODE:BOOL=OFF
+        -DCMAKE_FIND_DEBUG_MODE:BOOL=ON
         # h5pp flags
         -DH5PP_BUILD_EXAMPLES:BOOL=${H5PP_BUILD_EXAMPLES}
         -DH5PP_ENABLE_TESTS:BOOL=${H5PP_ENABLE_TESTS}
@@ -73,8 +73,7 @@ ExternalProject_Add(external_h5pp
         -DH5PP_ENABLE_MPI:BOOL=${H5PP_ENABLE_MPI}
         -DH5PP_ENABLE_ASAN:BOOL=${H5PP_ENABLE_ASAN}
         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=${CMAKE_POSITION_INDEPENDENT_CODE}
-        #-DH5PP_DOWNLOAD_METHOD:STRING=${H5PP_DOWNLOAD_METHOD}
-        -DH5PP_PACKAGE_MANAGER:STRING=${H5PP_PACKAGE_MANAGER} #not present in the version 1.8.5
+        -DH5PP_DOWNLOAD_METHOD:STRING=${H5PP_DOWNLOAD_METHOD}
         -DH5PP_DIRECTORY_HINTS:PATH=${H5PP_DIRECTORY_HINTS}
         -DEigen3_ROOT:PATH=${Eigen3_ROOT}
         )

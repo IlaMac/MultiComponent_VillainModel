@@ -406,3 +406,105 @@ make[1]: Leaving directory '/home/ilaria/Desktop/MultiComponent_VillainModel/bui
 make: *** [Makefile:121: cmTC_5d60e/fast] Error 2
 
 
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9237e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9237e.dir/build.make CMakeFiles/cmTC_9237e.dir/build
+make[1]: Entering directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9237e.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++    -march=native -mtune=native  -fPIE   -std=c++17 -o CMakeFiles/cmTC_9237e.dir/CheckSymbolExists.cxx.o -c /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+Linking CXX executable cmTC_9237e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9237e.dir/link.txt --verbose=1
+/usr/bin/c++  -march=native -mtune=native     CMakeFiles/cmTC_9237e.dir/CheckSymbolExists.cxx.o  -o cmTC_9237e 
+/usr/bin/ld: CMakeFiles/cmTC_9237e.dir/CheckSymbolExists.cxx.o: in function `main':
+CheckSymbolExists.cxx:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_9237e.dir/build.make:87: cmTC_9237e] Error 1
+make[1]: Leaving directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_9237e/fast] Error 2
+
+File /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0bd1b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0bd1b.dir/build.make CMakeFiles/cmTC_0bd1b.dir/build
+make[1]: Entering directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_0bd1b.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++    -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE   -std=c++17 -o CMakeFiles/cmTC_0bd1b.dir/CheckFunctionExists.cxx.o -c /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_0bd1b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0bd1b.dir/link.txt --verbose=1
+/usr/bin/c++  -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_0bd1b.dir/CheckFunctionExists.cxx.o  -o cmTC_0bd1b -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_0bd1b.dir/build.make:87: cmTC_0bd1b] Error 1
+make[1]: Leaving directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_0bd1b/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2bdc2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2bdc2.dir/build.make CMakeFiles/cmTC_2bdc2.dir/build
+make[1]: Entering directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_2bdc2.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++    -march=native -mtune=native  -fPIE   -std=c++17 -o CMakeFiles/cmTC_2bdc2.dir/CheckSymbolExists.cxx.o -c /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+Linking CXX executable cmTC_2bdc2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2bdc2.dir/link.txt --verbose=1
+/usr/bin/c++  -march=native -mtune=native     CMakeFiles/cmTC_2bdc2.dir/CheckSymbolExists.cxx.o  -o cmTC_2bdc2 
+/usr/bin/ld: CMakeFiles/cmTC_2bdc2.dir/CheckSymbolExists.cxx.o: in function `main':
+CheckSymbolExists.cxx:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_2bdc2.dir/build.make:87: cmTC_2bdc2] Error 1
+make[1]: Leaving directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_2bdc2/fast] Error 2
+
+File /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c14ce/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c14ce.dir/build.make CMakeFiles/cmTC_c14ce.dir/build
+make[1]: Entering directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_c14ce.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++    -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE   -std=c++17 -o CMakeFiles/cmTC_c14ce.dir/CheckFunctionExists.cxx.o -c /home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_c14ce
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c14ce.dir/link.txt --verbose=1
+/usr/bin/c++  -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_c14ce.dir/CheckFunctionExists.cxx.o  -o cmTC_c14ce -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_c14ce.dir/build.make:87: cmTC_c14ce] Error 1
+make[1]: Leaving directory '/home/ilaria/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_c14ce/fast] Error 2
+
+
