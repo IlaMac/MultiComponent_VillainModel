@@ -27,7 +27,7 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.rho=1;
         Hp.alpha=1;
         Hp.eta1=0;
-        Hp.eta2=0.1;
+        Hp.eta2=1000;
         Hp.e=0.1;
         Hp.h= 1.0;
         Hp.nu=0.1;
@@ -124,15 +124,26 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
                 }              
             }
         }
-        else if((Hp.init>2) || (Hp.init<0) ) {
-            /*This initial conditions correspond to the case where both the phase difference and the phase sum are ordered */
+        else if(Hp.init==3) {
+            double shift_phase=rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
+            /*This initial conditions correspond to the case where the phase sum is ordered and the phase difference is not */
             for(auto & s : Site){
                 s.Psi[0] = 0;
-                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;  
+                s.Psi[1]=s.Psi[0] + shift_phase;
                 
                 for(auto & a : s.A){
                     a = 0;
                 }              
+            }
+        }else if((Hp.init>3) || (Hp.init<0) ) {
+            /*This initial conditions correspond to the case where both the phase difference and the phase sum are ordered */
+            for(auto & s : Site){
+                s.Psi[0] = 0;
+                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;
+
+                for(auto & a : s.A){
+                    a = 0;
+                }
             }
         }
     }

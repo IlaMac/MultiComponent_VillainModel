@@ -6,13 +6,12 @@
 
 void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp){
     int vec, l;
-    int i, ix, iy, iz, nn_i, nn_il;
-    double F_A;
+    int nn_i, nn_il;
 
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++) {
-                i = ix + Lx * (iy + iz * Ly);
+    for(int iz=0;iz<Lz;iz++){
+        for(int iy=0;iy<Ly;iy++){
+            for(int ix=0; ix<Lx; ix++) {
+                int i = ix + Lx * (iy + iz * Ly);
                 for(vec=0; vec<3; vec++) {
                     if(vec==0){
                         nn_i= mod(ix+1, Lx) + Lx * (iy + iz * Ly);
@@ -34,7 +33,7 @@ void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct
                             nn_il= ix + Lx * (iy + mod(iz+1,Lz) * Ly);
                         }
                         //F_{vec, l}= A_vec(r_i) + A_l(ri+vec) - A_vec(r_i+l) - A_l(ri)
-                        F_A = (Site[i].A[vec] + Site[nn_i].A[l] - Site[nn_il].A[vec] -Site[i].A[l]);
+                        double F_A = (Site[i].A[vec] + Site[nn_i].A[l] - Site[nn_il].A[vec] -Site[i].A[l]);
                         mis.E_gp += (0.5 * (F_A * F_A));
                     }
                 }
@@ -45,15 +44,18 @@ void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct
 
 void josephson_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp){
 
-    int i, ix, iy, iz;
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++) {
-                i = ix + Lx * (iy + iz * Ly);
+    std::cout<< "Start Josephson: "<<  mis.E_jp<< std::endl;
+
+    for(int iz=0;iz<Lz;iz++){
+        for(int iy=0;iy<Ly;iy++){
+            for(int ix=0; ix<Lx; ix++) {
+                int i = ix + Lx * (iy + iz * Ly);
                 mis.E_jp+=Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]));
+                std::cout<< i << "J: "<<  Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))<< std::endl;
             }
         }
     }
+
 }
 
 void energies(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp){
@@ -112,18 +114,16 @@ void energies(struct Measures &mis, struct Villain &vil, double &E_betanp, doubl
 void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vector<Node> &Site, struct H_parameters &Hp){
 
     //I compute the helicity modulus only along one direction x
-    int arg_1, arg_2;
     double d1=0., d2=0., d11=0., d22=0., d12=0.;
-    int i, ix, iy, iz, nn_i;
 
-    for(iz=0;iz<Lz;iz++){
-        for(iy=0;iy<Ly;iy++){
-            for(ix=0; ix<Lx; ix++) {
-                i = ix + Lx * (iy + iz * Ly);
-                nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+    for(int iz=0;iz<Lz;iz++){
+        for(int iy=0;iy<Ly;iy++){
+            for(int ix=0; ix<Lx; ix++) {
+                int i = ix + Lx * (iy + iz * Ly);
+                int nn_i = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
 
-                arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp* Hp.e * Site[i].A[0], MaxP);
-                arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp* Hp.e * Site[i].A[0], MaxP);
+                int arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp* Hp.e * Site[i].A[0], MaxP);
+                int arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp* Hp.e * Site[i].A[0], MaxP);
 
                 d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
                 d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
