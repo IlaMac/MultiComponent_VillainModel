@@ -43,15 +43,11 @@ void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct
 }
 
 void josephson_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp){
-
-    std::cout<< "Start Josephson: "<<  mis.E_jp<< std::endl;
-
     for(int iz=0;iz<Lz;iz++){
         for(int iy=0;iy<Ly;iy++){
             for(int ix=0; ix<Lx; ix++) {
                 int i = ix + Lx * (iy + iz * Ly);
                 mis.E_jp+=Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]));
-                std::cout<< i << "J: "<<  Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))<< std::endl;
             }
         }
     }

@@ -29,8 +29,8 @@ include(ExternalProject)
 ExternalProject_Add(external_h5pp
         #GIT_REPOSITORY https://github.com/DavidAce/h5pp.git
         #GIT_TAG master
-        URL https://github.com/DavidAce/h5pp/archive/v1.8.5.tar.gz
-        URL_MD5 82cb78908f9c87735051be4621dbcf37
+        URL https://github.com/Davidce/h5pp/archive/v1.8.5.tar.gz
+        URL_MD5 17011aa549b9405927bdd994b85b8e79
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         BUILD_ALWAYS TRUE
@@ -73,7 +73,8 @@ ExternalProject_Add(external_h5pp
         -DH5PP_ENABLE_MPI:BOOL=${H5PP_ENABLE_MPI}
         -DH5PP_ENABLE_ASAN:BOOL=${H5PP_ENABLE_ASAN}
         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=${CMAKE_POSITION_INDEPENDENT_CODE}
-        -DH5PP_DOWNLOAD_METHOD:STRING=${H5PP_DOWNLOAD_METHOD}
+        #-DH5PP_DOWNLOAD_METHOD:STRING=${H5PP_DOWNLOAD_METHOD}
+        -DH5PP_PACKAGE_MANAGER:STRING=${H5PP_PACKAGE_MANAGER} #not present in the version 1.8.5
         -DH5PP_DIRECTORY_HINTS:PATH=${H5PP_DIRECTORY_HINTS}
         -DEigen3_ROOT:PATH=${Eigen3_ROOT}
         )
