@@ -176,6 +176,7 @@ int main(int argc, char *argv[]){
     MPI_Barrier(MPI_COMM_WORLD);
 
     t_tot.print_measured_time();
+    MPI_Barrier(MPI_COMM_WORLD);
 
     return 0;
 }
@@ -287,6 +288,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         file = h5pp::File(directory_write_temp+"/Output.h5", h5pp::FilePermission::READWRITE);
     }
     save_lattice(Site, directory_write_temp, std::string("final"));
+    MPI_Barrier(MPI_COMM_WORLD);
 
     t_h5pp.print_measured_time_w_percent();
     t_measures.print_measured_time_w_percent();
