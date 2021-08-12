@@ -1,3 +1,15 @@
+
+include(cmake/InstallPackage.cmake)
+
+list(APPEND h5pp_ARGS -DH5PP_PACKAGE_MANAGER:STRING=cmake)
+list(APPEND h5pp_ARGS -DH5PP_ENABLE_MPI:BOOL=ON)
+list(APPEND h5pp_ARGS -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE})
+# h5pp for writing to file binary in format
+install_package(h5pp VERSION 1.9.0 CMAKE_ARGS ${h5pp_ARGS})
+
+
+return()
+########### OLD VERSION ###########
 if(NOT TARGET h5pp::h5pp AND GL_DOWNLOAD_METHOD STREQUAL "find")
     find_package(h5pp 1.7.2 QUIET
             HINTS ${CMAKE_INSTALL_PREFIX}

@@ -5,6 +5,17 @@ if(GL_DOWNLOAD_METHOD MATCHES "find|fetch")
     # when we rerun the cmake config.
     list(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 
+    # Setup build and install directories for dependencies
+    if(NOT GL_DEPS_BUILD_DIR)
+        set(GL_DEPS_BUILD_DIR ${CMAKE_BINARY_DIR}/deps-build)
+    endif()
+
+    # Install dependencies to the same location as the main project by default
+    if(NOT GL_DEPS_INSTALL_DIR)
+        set(GL_DEPS_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+    endif()
+
+
     include(cmake/Fetch_h5pp.cmake)                         # h5pp for writing to file binary in format
 
 

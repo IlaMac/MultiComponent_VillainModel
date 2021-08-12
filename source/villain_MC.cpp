@@ -105,56 +105,56 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     acc_theta++;
                 }
 
-                /*******************PHASE UPDATING OF BOTH PHASES BY THE SAME PHASE SHIFT*******************/
-                /*This kind of updates does not change the local Josephson energy since the phase difference is not modified*/
-
-                n_var = rn::uniform_integer_box(1, MCp.lbox);
-                rand = rn::uniform_real_box(0, 1);
-                for (alpha = 0; alpha < NC; alpha++) {
-                    if(rand<0.5){
-                        new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);}
-                    else{
-                        new_int_phase[alpha]= arg(Site[i].Psi[alpha] - n_var, MaxP);
-                    }
-                    //std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
-                    for (vec = 0; vec < 3; vec++) {
-                        if (vec == 0) {
-                            ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
-                            im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
-                        }
-                        if (vec == 1) {
-                            ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
-                            im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
-                        }
-                        if (vec == 2) {
-                            ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
-                            im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
-                        }
-                        //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
-                        arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
-                        arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
-                        arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
-                        arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
-                    }
-                }
-                dE=0;
-                for (vec = 0; vec < DIM; vec++) {
-                    dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
-                            +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
-                            -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
-                            -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
-                }
-                rand = rn::uniform_real_box(0, 1);
-                std::cout<<"dE prima: "<< dE<<std::endl;
-                dE+=( (Hp.eta1*cos(dp*(new_int_phase[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(new_int_phase[0] - Site[i].Psi[1])) )
-                        -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
-                std::cout<<"dE dopo: "<< dE<<std::endl;
-
-                //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
-                if (rand <exp(-my_beta*dE)) {
-                    Site[i].Psi[0] = new_int_phase[0];
-                    Site[i].Psi[1] = new_int_phase[1];
-                }
+//                /*******************PHASE UPDATING OF BOTH PHASES BY THE SAME PHASE SHIFT*******************/
+//                /*This kind of updates does not change the local Josephson energy since the phase difference is not modified*/
+//
+//                n_var = rn::uniform_integer_box(1, MCp.lbox);
+//                rand = rn::uniform_real_box(0, 1);
+//                for (alpha = 0; alpha < NC; alpha++) {
+//                    if(rand<0.5){
+//                        new_int_phase[alpha]= arg(Site[i].Psi[alpha] + n_var, MaxP);}
+//                    else{
+//                        new_int_phase[alpha]= arg(Site[i].Psi[alpha] - n_var, MaxP);
+//                    }
+//                    //std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
+//                    for (vec = 0; vec < 3; vec++) {
+//                        if (vec == 0) {
+//                            ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+//                            im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+//                        }
+//                        if (vec == 1) {
+//                            ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+//                            im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+//                        }
+//                        if (vec == 2) {
+//                            ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+//                            im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+//                        }
+//                        //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
+//                        arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - new_int_phase[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                        arg_B_new[alpha][vec] = arg( (new_int_phase[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//                        arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                        arg_B_old[alpha][vec] = arg( (Site[i].Psi[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//                    }
+//                }
+//                dE=0;
+//                for (vec = 0; vec < DIM; vec++) {
+//                    dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+//                            +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+//                            -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+//                            -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+//                }
+//                rand = rn::uniform_real_box(0, 1);
+//                std::cout<<"dE prima: "<< dE<<std::endl;
+//                dE+=( (Hp.eta1*cos(dp*(new_int_phase[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(new_int_phase[0] - Site[i].Psi[1])) )
+//                        -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
+//                std::cout<<"dE dopo: "<< dE<<std::endl;
+//
+//                //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
+//                if (rand <exp(-my_beta*dE)) {
+//                    Site[i].Psi[0] = new_int_phase[0];
+//                    Site[i].Psi[1] = new_int_phase[1];
+//                }
 
 
                 /*******************VECTOR POTENTIAL UPDATE*******************/
