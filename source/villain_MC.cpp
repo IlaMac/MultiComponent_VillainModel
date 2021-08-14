@@ -35,7 +35,6 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 /*******INDIVIDUAL PHASES ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
                     n_var = rn::uniform_integer_box(1, MCp.lbox);
-                    //std::cout<< n_var<< " box: "<< MCp.lbox<< std::endl;
                     //Try to extract a new value of the phase directly in the interval [-(MaxP-1)/2; (MaxP-1/2]
                     rand = rn::uniform_real_box(0, 1);
                     if(rand<0.5){
@@ -116,7 +115,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     else{
                         new_int_phase[alpha]= arg(Site[i].Psi[alpha] - n_var, MaxP);
                     }
-                    //std::cout<< "Component: "<< alpha << " Old phase: "<<  Site[i].Psi[alpha] << " New phase: " << new_int_phase[alpha] << " increment: " << n_var << std::endl;
+
                     for (vec = 0; vec < 3; vec++) {
                         if (vec == 0) {
                             ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
@@ -228,12 +227,12 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
 
     acc_theta=(double) acc_theta/(N*NC);
     acc_A=(double) acc_A/(DIM*N);
-    std::cout << acc_A/acc_rate << "beta: "<<my_beta<<" lbox_A: "<< MCp.lbox_A <<std::endl;
-    if(acc_theta/acc_rate>1){MCp.lbox+=1;}
-    if(acc_theta/acc_rate<1){MCp.lbox-=1;}
+
+//    if(acc_theta/acc_rate>1){MCp.lbox+=1;}
+//    if(acc_theta/acc_rate<1){MCp.lbox-=1;}
+
     MCp.lbox_A= MCp.lbox_A*((0.5*acc_A/acc_rate)+0.5);
 
-    //if(MCp.lbox>(0.25*(MaxP-1))){MCp.lbox=0.25*(MaxP-1);}
 
 }
 
