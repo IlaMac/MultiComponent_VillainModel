@@ -126,7 +126,7 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
         }
         else if(Hp.init==3) {
             double shift_phase=rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
-            /*This initial conditions correspond to the case where the phase sum is ordered and the phase difference is not */
+            /*This initial conditions correspond to the case where the phase of the component 1 is ordered while both the phase difference and the phase of the second component are not */
             for(auto & s : Site){
                 s.Psi[0] = 0;
                 s.Psi[1]=s.Psi[0] + shift_phase;
