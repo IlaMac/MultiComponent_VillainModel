@@ -242,6 +242,13 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     mis.reset();
 
     for (n = NSTART; n<MCp.nmisu; n++) {
+
+        //Save a configuration for the restarting
+        save_lattice(Site, directory_write_temp, std::string("restart"));
+        if((n%(MCp.n_autosave))==0){
+            save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
+        }
+
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
@@ -270,12 +277,6 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         std::ofstream restart_file(directory_write_temp+"/restart-0");
         restart_file << n <<std::endl;
         restart_file.close();
-
-        //Save a configuration for the restarting
-        save_lattice(Site, directory_write_temp, std::string("restart"));
-	    if((n%(MCp.n_autosave))==0){
-	        save_lattice(Site, directory_write_temp, std::string("n") + std::to_string(n));
-	    }
 
         //std::cout<< "I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << " my Vbeta in 0 is: "<< vil.potential[(int)0.5*(MaxP*MaxP-1)] <<  " my Vbetaplus in 0 is: "<< vil.potential_bplus[(int)0.5*(MaxP*MaxP-1)]  <<  " my Vbetaminus in 0 is: "<< vil.potential_bminus[(int)0.5*(MaxP*MaxP-1)]  <<  std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
