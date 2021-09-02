@@ -278,9 +278,6 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         restart_file << n <<std::endl;
         restart_file.close();
 
-        //std::cout<< "I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << " my Vbeta in 0 is: "<< vil.potential[(int)0.5*(MaxP*MaxP-1)] <<  " my Vbetaplus in 0 is: "<< vil.potential_bplus[(int)0.5*(MaxP*MaxP-1)]  <<  " my Vbetaminus in 0 is: "<< vil.potential_bminus[(int)0.5*(MaxP*MaxP-1)]  <<  std::endl;
-        MPI_Barrier(MPI_COMM_WORLD);
-
         //Parallel Tempering swap
         parallel_temp(mis.E, E_betanp, E_betanm, beta_np, beta_nm,  my_beta, my_ind, vil, PTp, PTroot);
 

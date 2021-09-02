@@ -22,7 +22,6 @@ struct Measures{
     //Binder cumulant U=<m⁴>/(3*<m²>²)
     double m_phase[NC]={0}; //magnetization of the single component phase
     double d_rhoz=0.; //Dual stiffness along z
-
     double DH_Ddi[NC]={0}; //1st derivative in the twisted phase of the i component
     double D2H_Dd2i[NC]={0}; //2nd derivative in the twisted phase of the i component
     double D2H_Dd12=0.; //2nd mixed derivative in the twisted phases of the component 1 and 2

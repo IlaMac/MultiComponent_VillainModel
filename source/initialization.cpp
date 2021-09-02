@@ -27,13 +27,13 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.rho=1;
         Hp.alpha=1;
         Hp.eta1=0;
-        Hp.eta2=1000;
-        Hp.e=0.1;
+        Hp.eta2=50;
+        Hp.e=0;
         Hp.h= 1.0;
-        Hp.nu=0.1;
-        Hp.b_low=0.4;
-        Hp.b_high=0.5;
-        Hp.init=2;
+        Hp.nu=0;
+        Hp.b_low=0.15;
+        Hp.b_high=0.35;
+        Hp.init=1;
     }
 
 }
@@ -125,12 +125,13 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
             }
         }
         else if(Hp.init==3) {
-            double shift_phase=rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
-            /*This initial conditions correspond to the case where the phase of the component 1 is ordered while both the phase difference and the phase of the second component are not */
+            /*OLD: This initial conditions correspond to the case where the phase of the component 1 and phase of component 2 are ordered, but the phase difference between them is fixed to a random value */
+            /*NEW 2 SEPT: This initial conditions correspond to the case where the phase of the component 1 is ordered, while both the phase difference and the phase of the component 2 are disordered  */
+
             for(auto & s : Site){
+                double shift_phase=rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
                 s.Psi[0] = 0;
                 s.Psi[1]=s.Psi[0] + shift_phase;
-                
                 for(auto & a : s.A){
                     a = 0;
                 }              
