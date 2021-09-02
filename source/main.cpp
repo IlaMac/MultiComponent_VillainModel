@@ -10,6 +10,11 @@
 #include <iostream>
 #include <csignal>
 
+
+#ifdef GUI_ENABLED
+  #include "GUI/GUI.h"
+#endif
+
 void clean_up() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -18,7 +23,7 @@ void clean_up() {
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
-    
+
     if(src_file == tgt_file) return;
 
     fs::copy(paths_dir::TEMP_DIROUT, paths_dir::DIROUT , fs::copy_options::overwrite_existing | fs::copy_options::recursive );
@@ -158,6 +163,8 @@ int main(int argc, char *argv[]){
 
     initialize_lattice(Lattice, directory_read, RESTART, Hp);
 
+
+
     if(RESTART==1){
         std::fstream restart_file(directory_read+"/restart-0", std::ios::in);
         restart_file >> NSTART;
@@ -167,6 +174,14 @@ int main(int argc, char *argv[]){
 
     //Mainloop
     mainloop(Lattice, MCp, Hp, my_beta, my_ind, PTp, PTroot, directory_parameters_temp, NSTART);
+
+
+    ////
+    //// render
+    ////
+    runGUI(Lattice);
+    exit(1);
+
 
     t_tot.toc();
 
@@ -215,7 +230,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     // Enable compression
     file.setCompressionLevel(0);
 //    // Register the compound type
-    std::vector<hsize_t> rho_dims = {NC};	
+    std::vector<hsize_t> rho_dims = {NC};
     h5pp::hid::h5t HDF5_RHO_TYPE = H5Tarray_create(H5T_NATIVE_DOUBLE,rho_dims.size(),rho_dims.data());
     h5pp::hid::h5t MY_HDF5_MEASURES_TYPE = H5Tcreate(H5T_COMPOUND, sizeof(Measures));
 

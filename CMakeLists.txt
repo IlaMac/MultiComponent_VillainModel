@@ -111,9 +111,58 @@ endif ()
 
 
 ### Add all source files recursively
-file(GLOB_RECURSE SOURCES "source/*.cpp")
-file(GLOB_RECURSE HEADERS "source/*.h")
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h source/constants.h source/mpi_tools.h)
+# file(GLOB_RECURSE SOURCES "source/*.cpp")
+# file(GLOB_RECURSE HEADERS "source/*.h")
+file(GLOB_RECURSE SOURCES "source/*.cpp" "OpenGL/*.cpp")
+file(GLOB_RECURSE HEADERS "source/*.h"   "OpenGL/*.h")
+# add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h source/constants.h source/mpi_tools.h)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+
+# activate GUI
+add_definitions(-D GUI_ENABLED)
+
+####
+#### OpenGL libraries
+####
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# GLM
+find_package(GLM REQUIRED)
+message(STATUS "GLM included at ${GLM_INCLUDE_DIR}")
+
+# GLFW
+find_package(GLFW3 REQUIRED)
+message(STATUS "Found GLFW3 in ${GLFW3_INCLUDE_DIR}")
+
+# FreeType
+find_package(Freetype REQUIRED)
+# message(STATUS "Found Freetype in ${Freetype_INCLUDE_DIR}")
+
+# GLAD
+add_library(GLAD "thirdparty/glad.cpp")
+
+
+# set(LIBS glfw3 GL freetype GLAD)
+
+set(LIBS glfw3 EGL Xext dl GL X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt m freetype GLAD)
+
+
+
+# Define the include DIRs
+include_directories(
+    "${CMAKE_SOURCE_DIR}/source"
+    "${CMAKE_SOURCE_DIR}/include"
+)
+
+# Define the link libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
+# target_link_libraries(project-settings INTERFACE ${LIBS})
+
+add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
+
+
 
 
 

@@ -27,13 +27,13 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.rho=1;
         Hp.alpha=1;
         Hp.eta1=0;
-        Hp.eta2=1000;
-        Hp.e=0.1;
+        Hp.eta2=0;
+        Hp.e=0;
         Hp.h= 1.0;
         Hp.nu=0.1;
         Hp.b_low=0.4;
         Hp.b_high=0.5;
-        Hp.init=2;
+        Hp.init=1;
     }
 
 }
