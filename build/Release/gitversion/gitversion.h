@@ -4,8 +4,8 @@
 #include <string>
 namespace GIT{
 	inline std::string BRANCH 		= "GUI";
-	inline std::string REVISION		= "83";
-	inline std::string COMMIT_HASH 	= "d00195d";
+	inline std::string REVISION		= "84";
+	inline std::string COMMIT_HASH 	= "fd0a003";
 
 }
 

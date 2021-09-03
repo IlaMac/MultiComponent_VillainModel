@@ -24,6 +24,16 @@ void Window::drawCylinder (
 }
 
 
+void Window::drawRectangle (
+  const glm::vec3 & pos,
+  const glm::vec3 & dim,
+  const glm::vec3 & color,
+  const bool        useWireFrames
+) {
+  this->rectangle->draw(this->camera.pos, this->VP, pos, dim, color, useWireFrames);
+}
+
+
 void Window::drawLine (
   const glm::vec3 & p1,
   const glm::vec3 & p2,

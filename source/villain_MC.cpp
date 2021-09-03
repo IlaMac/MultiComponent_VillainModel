@@ -16,7 +16,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     int arg_B_new[NC][3]={{0}}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={{0}};
     int arg_B_old[NC][3]={{0}}; /*Forward and Backward updated phases*/
-    double acc_rate=0.5, acc_theta=0., rand;
+    double acc_rate=0.5, acc_theta=0., acc_theta1=0., acc_theta2=0., acc_locked=0., rand;
     double dE;
     double dE_A;
     double OldA, NewA, dA, acc_A=0.;
@@ -25,7 +25,6 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     double curl2_A_new, curl2_A_old;
 
     class_tic_toc t_localHtheta(true,5,"local_Htheta");
-
 
     for (iz= 0; iz < Lz; iz++) {
         for (iy = 0; iy < Ly; iy++) {
@@ -81,6 +80,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 if (rand <exp(-my_beta*dE)) {
                     Site[i].Psi[0] = new_int_phase[0];
                     acc_theta++;
+                    acc_theta1++;
                     for(vec=0; vec<3;vec++){
                         arg_B_old[0][vec]=arg_B_new[0][vec];
                         arg_F_old[0][vec]=arg_F_new[0][vec];
@@ -102,6 +102,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 if (rand < exp(-my_beta*dE)) {
                     Site[i].Psi[1] = new_int_phase[1];
                     acc_theta++;
+                    acc_theta2++;
                 }
 
                 /*******************PHASE UPDATING OF BOTH PHASES BY THE SAME PHASE SHIFT*******************/
@@ -153,6 +154,8 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 if (rand <exp(-my_beta*dE)) {
                     Site[i].Psi[0] = new_int_phase[0];
                     Site[i].Psi[1] = new_int_phase[1];
+                    acc_theta++;
+                    acc_locked++;
                 }
 
 
@@ -228,8 +231,13 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     acc_theta=(double) acc_theta/(N*NC);
     acc_A=(double) acc_A/(DIM*N);
 
-//    if(acc_theta/acc_rate>1){MCp.lbox+=1;}
-//    if(acc_theta/acc_rate<1){MCp.lbox-=1;}
+    if(acc_theta/acc_rate>1){MCp.lbox+=1;}
+    if( (acc_theta/acc_rate<1) and (MCp.lbox>1)){ MCp.lbox-=1;}
+
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    std::cout<<" beta: "<< my_beta << std::endl;
+//    std::cout<<" acc_theta: "<< acc_theta << " MCp_lbox: " << MCp.lbox << std::endl;
+//    std::cout<<" acc_theta1: "<< acc_theta1 << " acc_theta2: "<< acc_theta2 <<" acc_locked: " <<  acc_locked << std::endl;
 
     MCp.lbox_A= MCp.lbox_A*((0.5*acc_A/acc_rate)+0.5);
 

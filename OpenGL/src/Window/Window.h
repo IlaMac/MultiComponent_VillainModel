@@ -8,6 +8,7 @@
 #include "../Camera/Camera.h"
 #include "../Sphere/Sphere.h"
 #include "../Cylinder/Cylinder.h"
+#include "../Rectangle/Rectangle.h"
 #include "../Line/Line.h"
 #include "../Text/Text.h"
 #include "../Line_2D/Line_2D.h"
@@ -41,6 +42,7 @@ class Window {
 
     Sphere *       sphere;
     Cylinder *     cylinder;
+    Rectangle *    rectangle;
     Line *         line;
     Text *         text;
     Line_2D *      line_2D;
@@ -116,6 +118,11 @@ class Window {
                        const float,
                        const glm::vec3 &,
                        const bool = false);
+
+    void drawRectangle (const glm::vec3 &,
+                        const glm::vec3 &,
+                        const glm::vec3 &,
+                        const bool = false);
 
     void drawLine (const glm::vec3 &,
                    const glm::vec3 &,
