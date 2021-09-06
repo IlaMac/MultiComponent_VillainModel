@@ -8,6 +8,7 @@
 #include "../Camera/Camera.h"
 #include "../Sphere/Sphere.h"
 #include "../Cylinder/Cylinder.h"
+#include "../Cone/Cone.h"
 #include "../Rectangle/Rectangle.h"
 #include "../Line/Line.h"
 #include "../Text/Text.h"
@@ -42,6 +43,7 @@ class Window {
 
     Sphere *       sphere;
     Cylinder *     cylinder;
+    Cone *         cone;
     Rectangle *    rectangle;
     Line *         line;
     Text *         text;
@@ -118,6 +120,11 @@ class Window {
                        const float,
                        const glm::vec3 &,
                        const bool = false);
+    void drawCone (const glm::vec3 &,
+                   const glm::vec3 &,
+                   const float,
+                   const glm::vec3 &,
+                   const bool = false);
 
     void drawRectangle (const glm::vec3 &,
                         const glm::vec3 &,
@@ -128,6 +135,14 @@ class Window {
                    const glm::vec3 &,
                    const glm::vec3 &,
                    const float = 1);
+
+    void drawArrow (
+      const glm::vec3 &,
+      const glm::vec3 &,
+      const float,
+      const float,
+      const float,
+      const glm::vec3 &);
 
     void drawText (const std::string &,
                    float,

@@ -24,6 +24,17 @@ void Window::drawCylinder (
 }
 
 
+void Window::drawCone (
+  const glm::vec3 & p_base,
+  const glm::vec3 & p_top,
+  const float       radius,
+  const glm::vec3 & color,
+  const bool        useWireFrames
+) {
+  this->cone->draw(this->camera.pos, this->VP, p_base, p_top, radius, color, useWireFrames);
+}
+
+
 void Window::drawRectangle (
   const glm::vec3 & pos,
   const glm::vec3 & dim,
@@ -41,6 +52,22 @@ void Window::drawLine (
   const float       width
 ) {
   this->line->draw(this->VP, p1, p2, color, width);
+}
+
+
+
+void Window::drawArrow (
+  const glm::vec3 & p_bottom,
+  const glm::vec3 & p_top,
+  const float       r_bottom,
+  const float       r_head,
+  const float       l_head,
+  const glm::vec3 & color
+) {
+  const auto p_inter = p_top - l_head*(p_top - p_bottom);
+  this->drawCylinder(p_bottom, p_inter, r_bottom, color);
+  this->drawCone(p_inter, p_top, r_head, color);
+
 }
 
 

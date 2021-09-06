@@ -6,7 +6,7 @@
 // #include <thread>
 // #include <unistd.h>
 // #include <chrono>
-
+#include <iomanip>
 
 #include "../../OpenGL/src/Window/Window.h"
 
@@ -16,6 +16,11 @@
 
 using Lattice = std::vector<Node>;
 
+template<typename T>
+static inline
+T positive_modulo(T i, T n) {
+  return (n + (i % n)) % n;
+}
 
 class GUI {
   private:
@@ -24,12 +29,26 @@ class GUI {
 
     Lattice & lattice;
 
+    ////
+    //// cross section variables
+    ////
+    bool displayCrossSection   = false;
+    unsigned crossSectionIndex = 0;
+
   public:
 
   private:
 
     // the main render loop
     bool renderLoop (const double &);
+
+    // event listeners
+    void onKeyPress (const int,
+                     const int,
+                     const int);
+    void onKeyRepeat (const int,
+                      const int,
+                      const int);
 
 
   public:

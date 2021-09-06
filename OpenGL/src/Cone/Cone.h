@@ -1,13 +1,15 @@
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
+#ifndef CONE_H
+#define CONE_H
 
 #include "../common.h"
 #include "../util/util.h"
 
-class Rectangle {
+class Cone {
   private:
+    const unsigned numPhis;
 
-    GLuint VAO, VAO_wire, shaderProgram_fill, shaderProgram_frame;
+
+    GLuint VAO, shaderProgram_fill, shaderProgram_frame;
 
   public:
 
@@ -16,14 +18,17 @@ class Rectangle {
 
 
   public:
-    Rectangle ();
+    Cone (const unsigned = 20);
 
     void draw (const glm::vec3 &,
                const glm::mat4 &,
                const glm::vec3 &,
                const glm::vec3 &,
+               const float,
                const glm::vec3 &,
                const bool = false);
+
 };
+
 
 #endif

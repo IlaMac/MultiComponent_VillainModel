@@ -64,6 +64,7 @@ void Window::init () {
   ////
   this->sphere       = new Sphere{20, 20};
   this->cylinder     = new Cylinder{20, 1};
+  this->cone         = new Cone{20};
   this->rectangle    = new Rectangle{};
   this->line         = new Line{};
   this->text         = new Text{};

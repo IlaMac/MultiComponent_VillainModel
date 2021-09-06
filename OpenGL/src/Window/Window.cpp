@@ -97,6 +97,7 @@ Window::~Window () {
   ////
   delete this->sphere;
   delete this->cylinder;
+  delete this->cone;
   delete this->rectangle;
   delete this->line;
   delete this->text;
