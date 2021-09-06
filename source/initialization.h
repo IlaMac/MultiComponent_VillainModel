@@ -46,7 +46,8 @@ struct MC_parameters{
     int n_autosave; //frequency at which intermediate configuration are saved
     //double lbox_theta; //length of the box for the uniform distribution of theta (polar transformation of Psi --> phase)
     double lbox_A; //length of the box for the uniform distribution of dA (transformation of the vector potential)
-    int lbox; //length of the box of integer for the extraction of the new phase
+    int lbox; //length of the box of integer for the extraction of the new single phases
+    int lbox_coupled; //length of the box of integer for the extraction of the new coupled phases
     int nMAX; // the sum over integer number in the villain approximation will run from -INT_NMAX to +INT_MAX
 };
 

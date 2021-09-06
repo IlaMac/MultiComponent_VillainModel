@@ -16,7 +16,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     int arg_B_new[NC][3]={{0}}; /*Forward and Backward updated phases*/
     int arg_F_old[NC][3]={{0}};
     int arg_B_old[NC][3]={{0}}; /*Forward and Backward updated phases*/
-    double acc_rate=0.5, acc_theta=0., acc_theta1=0., acc_theta2=0., acc_locked=0., rand;
+    double acc_rate=0.5, acc_theta=0., acc_locked=0., rand;
     double dE;
     double dE_A;
     double OldA, NewA, dA, acc_A=0.;
@@ -31,6 +31,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
             for (ix = 0; ix < Lx; ix++) {
                 i = ix + Lx * (iy + iz * Ly);
 
+                //std::cout<< "site: "<< i <<"cos phase_diff: "<< cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1])) << "phase 0: "<< dp*(Site[i].Psi[0]) << "phase 1: "<< dp*(Site[i].Psi[1])  << std::endl;
                 /*******INDIVIDUAL PHASES ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
                     n_var = rn::uniform_integer_box(1, MCp.lbox);
@@ -77,10 +78,12 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                         -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
 
                 //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
+                //std::cout<< rand << " exp mybetadE: "<< exp(-my_beta*dE)<< std::endl;
+                //std::cout<< -log(rand) << " mybetadE: "<< my_beta*dE<< std::endl;
+
                 if (rand <exp(-my_beta*dE)) {
                     Site[i].Psi[0] = new_int_phase[0];
                     acc_theta++;
-                    acc_theta1++;
                     for(vec=0; vec<3;vec++){
                         arg_B_old[0][vec]=arg_B_new[0][vec];
                         arg_F_old[0][vec]=arg_F_new[0][vec];
@@ -102,7 +105,6 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 if (rand < exp(-my_beta*dE)) {
                     Site[i].Psi[1] = new_int_phase[1];
                     acc_theta++;
-                    acc_theta2++;
                 }
 
                 /*******************PHASE UPDATING OF BOTH PHASES BY THE SAME PHASE SHIFT*******************/
@@ -154,7 +156,6 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 if (rand <exp(-my_beta*dE)) {
                     Site[i].Psi[0] = new_int_phase[0];
                     Site[i].Psi[1] = new_int_phase[1];
-                    acc_theta++;
                     acc_locked++;
                 }
 
@@ -229,14 +230,20 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
     }
 
     acc_theta=(double) acc_theta/(N*NC);
+    acc_locked=(double) acc_locked/(N);
     acc_A=(double) acc_A/(DIM*N);
 
     if(acc_theta/acc_rate>1){MCp.lbox+=1;}
     if( (acc_theta/acc_rate<1) and (MCp.lbox>1)){ MCp.lbox-=1;}
 
+    if(acc_locked/acc_rate>1){MCp.lbox_coupled+=1;}
+    if( (acc_locked/acc_rate<1) and (MCp.lbox_coupled>1)){ MCp.lbox_coupled-=1;}
+
 //    MPI_Barrier(MPI_COMM_WORLD);
 //    std::cout<<" beta: "<< my_beta << std::endl;
 //    std::cout<<" acc_theta: "<< acc_theta << " MCp_lbox: " << MCp.lbox << std::endl;
+//    std::cout<<" acc_locked: "<< acc_locked << " MCp_lbox_coupled: " << MCp.lbox_coupled << std::endl;
+
 //    std::cout<<" acc_theta1: "<< acc_theta1 << " acc_theta2: "<< acc_theta2 <<" acc_locked: " <<  acc_locked << std::endl;
 
     MCp.lbox_A= MCp.lbox_A*((0.5*acc_A/acc_rate)+0.5);

@@ -27,7 +27,7 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.rho=1;
         Hp.alpha=1;
         Hp.eta1=0;
-        Hp.eta2=50;
+        Hp.eta2=100;
         Hp.e=0;
         Hp.h= 1.0;
         Hp.nu=0;
@@ -50,16 +50,18 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
 	        //fscanf(fin, "%lf", &MCp.lbox_theta);
             fscanf(fin, "%lf", &MCp.lbox_A);
             fscanf(fin, "%d", &MCp.lbox);
+            fscanf(fin, "%d", &MCp.lbox_coupled);
             fscanf(fin, "%d", &MCp.nMAX);
             fclose(fin);
         }
     }else{
-        MCp.nmisu=20;
+        MCp.nmisu=100;
         MCp.tau=1;
         MCp.n_autosave=2000; //not used now
         //MCp.lbox_theta=C_PI;
         MCp.lbox_A=0.1;
         MCp.lbox=10;
+        MCp.lbox_coupled=10;
         MCp.nMAX=30;
     }
 
