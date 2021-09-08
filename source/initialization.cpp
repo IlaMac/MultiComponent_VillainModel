@@ -6,6 +6,7 @@
 
 void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_parameters){
 
+
     fs::path hp_init_file = directory_parameters / "HP_init.txt";
     if(fs::exists(hp_init_file)){
         FILE *fin= nullptr;
@@ -30,16 +31,15 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.eta2=0;
         Hp.e=0;
         Hp.h= 1.0;
-        Hp.nu=0.1;
-        Hp.b_low=0.4;
-        Hp.b_high=0.5;
+        Hp.nu=0.9;
+        Hp.b_low=0.01;
+        Hp.b_high=10.0;
         Hp.init=1;
     }
 
 }
 
 void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directory_parameters){
-
     fs::path mc_init_file = directory_parameters / "MC_init.txt";
     if(fs::exists(mc_init_file)){
         FILE *fin= nullptr;
@@ -117,11 +117,11 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
             /*This initial conditions correspond to the case where the phase difference is ordered and the phase sum is not (quartic metal) */
             for(auto & s : Site){
                 s.Psi[0] = rn::uniform_integer_box(0, MaxP-1) - 0.5*(MaxP-1);
-                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;  
-                
+                s.Psi[1]=s.Psi[0] + (MaxP)*0.25;
+
                 for(auto & a : s.A){
                     a = 0;
-                }              
+                }
             }
         }
         else if(Hp.init==3) {
@@ -134,7 +134,7 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
                 s.Psi[1]=s.Psi[0] + shift_phase;
                 for(auto & a : s.A){
                     a = 0;
-                }              
+                }
             }
         }else if((Hp.init>3) || (Hp.init<0) ) {
             /*This initial conditions correspond to the case where both the phase difference and the phase sum are ordered */
@@ -148,6 +148,12 @@ void initialize_lattice(const std::vector<Node> &Site, const fs::path & director
             }
         }
     }
+/*    std::cout<< "H_init: "<< Hp.init <<std::endl;
+
+    for(auto & s : Site){
+        std::cout<< " psi_0: " << s.Psi[0] << " psi_1: " << s.Psi[1] << std::endl;
+    }
+    exit(1);*/
 }
 
 

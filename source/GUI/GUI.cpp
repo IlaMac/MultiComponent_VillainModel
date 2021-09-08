@@ -6,9 +6,17 @@ using namespace std;
 
 
 GUI::GUI (
-  Lattice & lattice
+  const Lattice        & lattice,
+  struct MC_parameters & MCp,
+  struct H_parameters  & Hp,
+  const double           beta,
+  struct Villain       & villain
 ) :
-  lattice{lattice}
+  lattice{lattice},
+  MCp{MCp},
+  Hp{Hp},
+  beta{beta},
+  villain{villain}
 {
   ////
   //// create window
@@ -16,6 +24,16 @@ GUI::GUI (
   // this->window = new Window{1000, 600, "Villain GUI"};
   this->window = new Window{2*1000, 2*600, "Villain GUI"};
 
+
+  ////
+  //// listen to key press and key repeat
+  ////
+  window->listenOnKeyPress([] (void* self, const int key, const int scancode, const int mods) {
+    reinterpret_cast<GUI*>(self)->onKeyPress(key, scancode, mods);
+  }, this);
+  window->listenOnKeyRepeat([] (void* self, const int key, const int scancode, const int mods) {
+    reinterpret_cast<GUI*>(self)->onKeyRepeat(key, scancode, mods);
+  }, this);
 
 
   ////
@@ -52,14 +70,10 @@ GUI::GUI (
 
 
   ////
-  //// listen to key press and key repeat
+  //// setup variables
   ////
-  window->listenOnKeyPress([] (void* self, const int key, const int scancode, const int mods) {
-    reinterpret_cast<GUI*>(self)->onKeyPress(key, scancode, mods);
-  }, this);
-  window->listenOnKeyRepeat([] (void* self, const int key, const int scancode, const int mods) {
-    reinterpret_cast<GUI*>(self)->onKeyRepeat(key, scancode, mods);
-  }, this);
+  this->vs.resize(Lx * Ly * Lz * NC);
+  this->maxVs2.resize(NC);
 
 
   ////

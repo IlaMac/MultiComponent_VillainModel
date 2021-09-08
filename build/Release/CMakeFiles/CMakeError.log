@@ -277,3 +277,152 @@ make: *** [cmTC_0e735/fast] Error 2
 
 
 
+Performing C++ SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_e8c35/fast && /usr/bin/make  -f CMakeFiles/cmTC_e8c35.dir/build.make CMakeFiles/cmTC_e8c35.dir/build
+make[1]: Entering directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_e8c35.dir/src.cxx.o
+/usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -march=native -mtune=native  -fPIE -std=c++1z -o CMakeFiles/cmTC_e8c35.dir/src.cxx.o -c /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_e8c35
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e8c35.dir/link.txt --verbose=1
+/usr/bin/c++ -march=native -mtune=native  CMakeFiles/cmTC_e8c35.dir/src.cxx.o -o cmTC_e8c35 
+CMakeFiles/cmTC_e8c35.dir/src.cxx.o: In function `main':
+src.cxx:(.text+0x3e): undefined reference to `pthread_create'
+src.cxx:(.text+0x4a): undefined reference to `pthread_detach'
+src.cxx:(.text+0x56): undefined reference to `pthread_cancel'
+src.cxx:(.text+0x67): undefined reference to `pthread_join'
+src.cxx:(.text+0x7b): undefined reference to `pthread_atfork'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_e8c35.dir/build.make:98: recipe for target 'cmTC_e8c35' failed
+make[1]: *** [cmTC_e8c35] Error 1
+make[1]: Leaving directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_e8c35/fast' failed
+make: *** [cmTC_e8c35/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_de6a7/fast && /usr/bin/make  -f CMakeFiles/cmTC_de6a7.dir/build.make CMakeFiles/cmTC_de6a7.dir/build
+make[1]: Entering directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_de6a7.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++   -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE -std=c++1z -o CMakeFiles/cmTC_de6a7.dir/CheckFunctionExists.cxx.o -c /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_de6a7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_de6a7.dir/link.txt --verbose=1
+/usr/bin/c++ -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_de6a7.dir/CheckFunctionExists.cxx.o -o cmTC_de6a7  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_de6a7.dir/build.make:98: recipe for target 'cmTC_de6a7' failed
+make[1]: *** [cmTC_de6a7] Error 1
+make[1]: Leaving directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_de6a7/fast' failed
+make: *** [cmTC_de6a7/fast] Error 2
+
+
+
+Determining if the include file filesystem exists failed with the following output:
+Change Dir: /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_ed881/fast && /usr/bin/make  -f CMakeFiles/cmTC_ed881.dir/build.make CMakeFiles/cmTC_ed881.dir/build
+make[1]: Entering directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ed881.dir/CheckIncludeFile.cxx.o
+/usr/bin/c++   -march=native -mtune=native  -fPIE -std=c++1z -o CMakeFiles/cmTC_ed881.dir/CheckIncludeFile.cxx.o -c /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckIncludeFile.cxx
+/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/CheckIncludeFile.cxx:1:10: fatal error: filesystem: No such file or directory
+ #include <filesystem>
+          ^~~~~~~~~~~~
+compilation terminated.
+CMakeFiles/cmTC_ed881.dir/build.make:77: recipe for target 'CMakeFiles/cmTC_ed881.dir/CheckIncludeFile.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_ed881.dir/CheckIncludeFile.cxx.o] Error 1
+make[1]: Leaving directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_ed881/fast' failed
+make: *** [cmTC_ed881/fast] Error 2
+
+
+
+Performing C++ SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_9484e/fast && /usr/bin/make  -f CMakeFiles/cmTC_9484e.dir/build.make CMakeFiles/cmTC_9484e.dir/build
+make[1]: Entering directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9484e.dir/src.cxx.o
+/usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -march=native -mtune=native  -fPIE -std=c++17 -o CMakeFiles/cmTC_9484e.dir/src.cxx.o -c /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_9484e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9484e.dir/link.txt --verbose=1
+/usr/bin/c++ -march=native -mtune=native  CMakeFiles/cmTC_9484e.dir/src.cxx.o -o cmTC_9484e 
+CMakeFiles/cmTC_9484e.dir/src.cxx.o: In function `main':
+src.cxx:(.text+0x3e): undefined reference to `pthread_create'
+src.cxx:(.text+0x4a): undefined reference to `pthread_detach'
+src.cxx:(.text+0x56): undefined reference to `pthread_cancel'
+src.cxx:(.text+0x67): undefined reference to `pthread_join'
+src.cxx:(.text+0x7b): undefined reference to `pthread_atfork'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_9484e.dir/build.make:98: recipe for target 'cmTC_9484e' failed
+make[1]: *** [cmTC_9484e] Error 1
+make[1]: Leaving directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_9484e/fast' failed
+make: *** [cmTC_9484e/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_9348c/fast && /usr/bin/make  -f CMakeFiles/cmTC_9348c.dir/build.make CMakeFiles/cmTC_9348c.dir/build
+make[1]: Entering directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9348c.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++   -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE -std=c++17 -o CMakeFiles/cmTC_9348c.dir/CheckFunctionExists.cxx.o -c /home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_9348c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9348c.dir/link.txt --verbose=1
+/usr/bin/c++ -march=native -mtune=native -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_9348c.dir/CheckFunctionExists.cxx.o -o cmTC_9348c  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_9348c.dir/build.make:98: recipe for target 'cmTC_9348c' failed
+make[1]: *** [cmTC_9348c] Error 1
+make[1]: Leaving directory '/home/bogoliubov/Desktop/MultiComponent_VillainModel/build/Release/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_9348c/fast' failed
+make: *** [cmTC_9348c/fast] Error 2
+
+
+

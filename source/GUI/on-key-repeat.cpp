@@ -10,25 +10,17 @@ void GUI::onKeyRepeat (
   const int scancode,
   const int mods
 ) {
-  // ////
-  // //// update worm
-  // ////
-  // if (key == GLFW_KEY_ENTER) {
-  //   if ( ! this->sampleOnlyZ) {
-  //     // enter -> single update
-  //     this->worm.singleUpdate();
+  ////
+  //// update configuration
+  ////
+  if (key == GLFW_KEY_ENTER) {
+    // press enter -> single updates
+    this->singleUpdate();
 
-  //     // inactivate multiple updates process
-  //     // (the thread listens to "this->multipleUpdatesActive" and will terminate itself)
-  //     this->multipleUpdatesActive = false;
-  //   } else if ( ! this->multipleUpdatesActive) {
-  //     // enter -> update until Z
-  //     this->multipleUpdatesActive = true;
-  //     std::thread( [this] {
-  //       this->updateWorm(true);
-  //     } ).detach();
-  //   }
-  // }
+    // inactivate multiple updates process
+    // (the thread listens to "this->multipleUpdatesActive" and will terminate itself)
+    this->multipleUpdatesActive = false;
+  }
 
 
   ////

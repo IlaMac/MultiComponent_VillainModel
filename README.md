@@ -13,8 +13,8 @@ Installation
 Run
 ---
 
-`mpirun -np 1 ./build/Release/Villain_2component 4 Output/ Output/ 1`
+`mpirun -np 1 ./build/Release/Villain_2component 4 Output/ Output/ 0`
 
 or 
 
-`./build/Release/Villain_2component 4 Output/ Output/ 1`
+`./build/Release/Villain_2component 4 Output/ Output/ 0`

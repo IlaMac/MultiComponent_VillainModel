@@ -61,13 +61,18 @@ void Window::drawArrow (
   const glm::vec3 & p_top,
   const float       r_bottom,
   const float       r_head,
-  const float       l_head,
+  const float       head_l_r_ratio, // compared to its width
   const glm::vec3 & color
 ) {
-  const auto p_inter = p_top - l_head*(p_top - p_bottom);
-  this->drawCylinder(p_bottom, p_inter, r_bottom, color);
+  const auto l = r_head * head_l_r_ratio;
+  const auto L = distance(p_bottom, p_top);
+
+  const auto p_inter = p_top - l/L*(p_top - p_bottom);
+
   this->drawCone(p_inter, p_top, r_head, color);
 
+  // draw only if it has a finite length
+  if (L > l) this->drawCylinder(p_bottom, p_inter, r_bottom, color);
 }
 
 

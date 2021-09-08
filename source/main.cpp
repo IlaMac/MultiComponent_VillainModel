@@ -176,13 +176,6 @@ int main(int argc, char *argv[]){
     mainloop(Lattice, MCp, Hp, my_beta, my_ind, PTp, PTroot, directory_parameters_temp, NSTART);
 
 
-    ////
-    //// render
-    ////
-    runGUI(Lattice);
-    exit(1);
-
-
     t_tot.toc();
 
     std::cout << "Proccess current resident ram usage: " << process_memory_in_mb("VmRSS") << " MB" << std::endl;
@@ -197,6 +190,7 @@ int main(int argc, char *argv[]){
 }
 
 void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double &my_beta, int &my_ind, struct PT_parameters PTp, struct PTroot_parameters PTroot, const std::string& directory_parameters_temp, int NSTART) {
+
 
     int n, t;
     std::vector <double> all_beta;
@@ -256,6 +250,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
 
     mis.reset();
 
+
     for (n = NSTART; n<MCp.nmisu; n++) {
 
         //Save a configuration for the restarting
@@ -269,6 +264,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
+
 
         //Measures
         t_measures.tic();
@@ -306,6 +302,14 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     t_h5pp.print_measured_time_w_percent();
     t_measures.print_measured_time_w_percent();
     t_metropolis.print_measured_time_w_percent();
+
+
+
+    ////
+    //// render
+    ////
+    runGUI(Site, MCp, Hp, my_beta, vil);
+    exit(1);
 }
 
 
