@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0          # Name of the job
+#SBATCH --job-name=Sym_L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4          # Name of the job
 #SBATCH --time=7-00:00:00               # Allocation time
 #SBATCH --mem-per-cpu=2000              # Memory per allocated cpu
 #SBATCH --nodes=2               # Number of nodes
 #SBATCH --ntasks=64
-#SBATCH --output=/home/x_ilama/3Component_LondonModel/Output_London_3C/e_0/nu_0/h_1/L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0/logs/log_L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0.o
-#SBATCH --error=/home/x_ilama/3Component_LondonModel/Output_London_3C/e_0/nu_0/h_1/L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0/logs/log_L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0.e
+#SBATCH --output=/home/x_ilama/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_0/nu_0/eta2_100/h_1/L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4/logs/log_Sym_L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4.o
+#SBATCH --error=/home/x_ilama/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_0/nu_0/eta2_100/h_1/L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4/logs/log_Sym_L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4.e
 
-srun ../build/Release/LondonModel_3component 20 /home/x_ilama/3Component_LondonModel/Output_London_3C/e_0/nu_0/h_1/L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0 /home/x_ilama/3Component_LondonModel/Output_London_3C/e_0/nu_0/h_1/L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0 0 &> /home/x_ilama/3Component_LondonModel/Output_London_3C/e_0/nu_0/h_1/L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0/logs/log_L20_rho1_eta5_e0_h1_nu0_bmin0.29_bmax0.31_init0.o
+srun ../build/Release/Villain_2component 32 /home/x_ilama/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_0/nu_0/eta2_100/h_1/L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4 /home/x_ilama/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_0/nu_0/eta2_100/h_1/L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4 0 &> /home/x_ilama/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_0/nu_0/eta2_100/h_1/L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4/logs/log_Sym_L32_rho1_alpha1_eta10_eta2100_e0_h1_nu0_bmin0.05_bmax0.3_nMAX30_init4.o
 
 
