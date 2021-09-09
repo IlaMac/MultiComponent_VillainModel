@@ -5,6 +5,133 @@
 #include "villain_MC.h"
 
 
+void growCluster(int i, int* clusterSpin, const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
+
+    int new_Psi[NC]={0};
+    int old_Psi[NC]={0};
+    int ix, iy, iz;
+    int ip, im, vec, alpha;
+    int beta;
+    int arg_F_new[NC]={0};
+    int arg_B_new[NC]={0}; /*Forward and Backward updated phases*/
+    int arg_F_old[NC]={0};
+    int arg_B_old[NC]={0}; /*Forward and Backward updated phases*/
+    //addProbability for the link i,j has the form: 1- exp(-beta \Delta E_ij) with \Delta E_ij
+    double rand=0., addProbability;
+    double dE=0;
+
+    ix= i%Lx;
+    iy= (i/Lx)%Ly;
+    iz= i/(Lx*Ly);
+
+
+    //phase in i added to the cluster and flipped
+    clusterSpin[i]=1;
+    int phase_diff = Site[i].Psi[0] - Site[i].Psi[1];
+
+    old_Psi[0]= Site[i].Psi[0];
+    old_Psi[1]= Site[i].Psi[1];
+
+    new_Psi[0] = Site[i].Psi[1];
+    new_Psi[1] = Site[i].Psi[0];
+
+    Site[i].Psi[0]= new_Psi[0];
+    Site[i].Psi[1]= new_Psi[1];
+
+    //Check of the neighbours of i
+    // if the neighbor spin does not belong to the cluster, but it has the preconditions to be added, then try to add it to the cluster
+    for (vec = 0; vec < 3; vec++) {
+        if (vec == 0) {
+            ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+            im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+        }
+        if (vec == 1) {
+            ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+            im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+        }
+        if (vec == 2) {
+            ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+            im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+        }
+        if (clusterSpin[im]==0){
+            for(alpha=0; alpha<NC; alpha++){
+                arg_B_new[alpha]  = arg( (new_Psi[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+                arg_B_old[alpha] = arg( (old_Psi[alpha]  - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+            }
+            //with this sweep I am not touching the Josephson term.
+            dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+            addProbability=1-exp(-my_beta*dE);
+            rand= rn::uniform_real_box(0, 1);;
+            if (rand < addProbability){
+                growCluster(im, clusterSpin, Site, MCp, Hp, my_beta, vil);}
+        }
+        if (clusterSpin[ip]==0){
+            for(alpha=0; alpha<NC; alpha++){
+                arg_F_new[alpha] = arg( (Site[ip].Psi[alpha] - new_Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+                arg_F_old[alpha] = arg( (Site[ip].Psi[alpha] - old_Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+            }
+            //with this sweep I am not touching the Josephson term.
+            dE = (  vil.potential.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) - vil.potential.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+            addProbability=1-exp(-my_beta*dE);
+
+            rand= rn::uniform_real_box(0, 1);;
+            if (rand < addProbability){
+                growCluster(ip, clusterSpin, Site, MCp, Hp, my_beta, vil);}
+        }
+    }
+
+    return;
+}
+
+void wolff(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
+
+    double rand=0;
+    int i, iseed, count=0;
+    int clusterSpin[N]={0};
+    double  phase_diff, phase_diff_seed;
+
+    /*choose randomly a site of the lattice*/
+    iseed = rn::uniform_integer_box(0, N-1);
+    phase_diff_seed=dp*(Site.at(iseed).Psi[1] - Site.at(iseed).Psi[0]);
+    while(phase_diff_seed > M_PI){
+        phase_diff_seed-= 2*M_PI;}
+    while(phase_diff_seed<=-M_PI){
+        phase_diff_seed+=2*M_PI;}
+
+    for(int iz=0; iz<Lz; iz++){
+        for(int iy=0; iy<Ly; iy++){
+            for(int ix=0; ix<Lx; ix++){
+                i=ix+ Lx*(iy +iz*Ly);
+                phase_diff=dp*(Site.at(i).Psi[1] - Site.at(i).Psi[0]);
+                while(phase_diff > M_PI){
+                    phase_diff-= 2*M_PI;}
+                while(phase_diff<=-M_PI){
+                    phase_diff+=2*M_PI;}
+                if( (phase_diff_seed)*(phase_diff)<0){
+                    clusterSpin[i]=-1;
+                }
+            }
+        }
+    }
+
+    growCluster(iseed, clusterSpin, Site, MCp, Hp, my_beta, vil);
+
+    for(int iz=0; iz<Lz; iz++){
+        for(int iy=0; iy<Ly; iy++){
+            for(int ix=0; ix<Lx; ix++){
+                i=ix+ Lx*(iy +iz*Ly);
+                if( clusterSpin[i]==1){count++;}
+            }
+        }
+    }
+
+//    std::cout<< "WOLFF size: "<< count<<std::endl;
+
+    return;
+}
+
+
+
 void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
 
     int ix, iy, iz;
@@ -31,7 +158,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
             for (ix = 0; ix < Lx; ix++) {
                 i = ix + Lx * (iy + iz * Ly);
 
-                //std::cout<< "site: "<< i <<"cos phase_diff: "<< cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1])) << "phase 0: "<< dp*(Site[i].Psi[0]) << "phase 1: "<< dp*(Site[i].Psi[1])  << std::endl;
+//                std::cout<< "site: "<< i <<"cos phase_diff: "<< cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1])) << "phase diff/pi: "<<dp*(Site[i].Psi[0] - Site[i].Psi[1])/M_PI << std::endl;
                 /*******INDIVIDUAL PHASES ONLY UPDATE**************/
                 for (alpha = 0; alpha < NC; alpha++) {
                     n_var = rn::uniform_integer_box(1, MCp.lbox);
@@ -80,13 +207,21 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
                 //std::cout<< rand << " exp mybetadE: "<< exp(-my_beta*dE)<< std::endl;
                 //std::cout<< -log(rand) << " mybetadE: "<< my_beta*dE<< std::endl;
-
-                if (rand <exp(-my_beta*dE)) {
+                if(dE<0){
                     Site[i].Psi[0] = new_int_phase[0];
                     acc_theta++;
                     for(vec=0; vec<3;vec++){
                         arg_B_old[0][vec]=arg_B_new[0][vec];
                         arg_F_old[0][vec]=arg_F_new[0][vec];
+                    }
+                }else{
+                    if (rand <exp(-my_beta*dE)) {
+                        Site[i].Psi[0] = new_int_phase[0];
+                        acc_theta++;
+                        for(vec=0; vec<3;vec++){
+                            arg_B_old[0][vec]=arg_B_new[0][vec];
+                            arg_F_old[0][vec]=arg_F_new[0][vec];
+                        }
                     }
                 }
 
@@ -100,12 +235,19 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 }
                 dE+=( (Hp.eta1*cos(dp*(new_int_phase[1] - Site[i].Psi[0])) + Hp.eta2*cos(2*dp*(new_int_phase[1] - Site[i].Psi[0])))
                         -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
-                rand = rn::uniform_real_box(0, 1);
-                //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                if (rand < exp(-my_beta*dE)) {
+
+                if(dE<0){
                     Site[i].Psi[1] = new_int_phase[1];
                     acc_theta++;
+                }else{
+                    rand = rn::uniform_real_box(0, 1);
+                    //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
+                    if (rand < exp(-my_beta*dE)) {
+                        Site[i].Psi[1] = new_int_phase[1];
+                        acc_theta++;
+                    }
                 }
+
 
                 /*******************PHASE UPDATING OF BOTH PHASES BY THE SAME PHASE SHIFT*******************/
                 /*This kind of updates does not change the local Josephson energy since the phase difference is not modified*/
@@ -146,19 +288,24 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
                             -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
                 }
-                rand = rn::uniform_real_box(0, 1);
 //                std::cout<<"dE prima: "<< dE<<std::endl;
 //                dE+=( (Hp.eta1*cos(dp*(new_int_phase[0] - new_int_phase[1])) + Hp.eta2*cos(2*dp*(new_int_phase[0] - new_int_phase[1])) )
 //                        -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
 //                std::cout<<"dE dopo: "<< dE<<std::endl;
 
-                //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
-                if (rand <exp(-my_beta*dE)) {
+                if(dE<0){
                     Site[i].Psi[0] = new_int_phase[0];
                     Site[i].Psi[1] = new_int_phase[1];
                     acc_locked++;
+                }else{
+                    //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
+                    rand = rn::uniform_real_box(0, 1);
+                    if (rand <exp(-my_beta*dE)) {
+                        Site[i].Psi[0] = new_int_phase[0];
+                        Site[i].Psi[1] = new_int_phase[1];
+                        acc_locked++;
+                    }
                 }
-
 
                 /*******************VECTOR POTENTIAL UPDATE*******************/
                 if(Hp.e!=0){
@@ -217,11 +364,16 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             }
                         }
                         dE_A+= curl2_A_new -curl2_A_old;
-                        rand = rn::uniform_real_box(0, 1);
-                        //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
-                        if (rand < exp(-my_beta*dE_A)) {
-                           Site[i].A[vec] = NewA;
-                           acc_A++;
+                        if(dE_A<0){
+                            Site[i].A[vec] = NewA;
+                            acc_A++;
+                        }else{
+                            rand = rn::uniform_real_box(0, 1);
+                            //Boltzmann weight: exp(-\beta E) E= h³ \sum_i E(i)
+                            if (rand < exp(-my_beta*dE_A)) {
+                                Site[i].A[vec] = NewA;
+                                acc_A++;
+                            }
                         }
                     }
                 }
@@ -238,16 +390,74 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
 
     if(acc_locked/acc_rate>1){MCp.lbox_coupled+=1;}
     if( (acc_locked/acc_rate<1) and (MCp.lbox_coupled>1)){ MCp.lbox_coupled-=1;}
+    MCp.lbox_A= MCp.lbox_A*((0.5*acc_A/acc_rate)+0.5);
 
 //    MPI_Barrier(MPI_COMM_WORLD);
 //    std::cout<<" beta: "<< my_beta << std::endl;
 //    std::cout<<" acc_theta: "<< acc_theta << " MCp_lbox: " << MCp.lbox << std::endl;
 //    std::cout<<" acc_locked: "<< acc_locked << " MCp_lbox_coupled: " << MCp.lbox_coupled << std::endl;
-
 //    std::cout<<" acc_theta1: "<< acc_theta1 << " acc_theta2: "<< acc_theta2 <<" acc_locked: " <<  acc_locked << std::endl;
 
-    MCp.lbox_A= MCp.lbox_A*((0.5*acc_A/acc_rate)+0.5);
-
+//    //New Metropolis sweeps consisting in the reflection of one phase respect to the other so to switch between \phi_12 = \pi/2 and \phi_12 = -\pi/2
+//    for (iz= 0; iz < Lz; iz++) {
+//        for (iy = 0; iy < Ly; iy++) {
+//            for (ix = 0; ix < Lx; ix++) {
+//                i = ix + Lx * (iy + iz * Ly);
+//                new_int_phase[0]= Site[i].Psi[0] ;
+//                new_int_phase[1]= Site[i].Psi[1] ;
+//                alpha=rn::uniform_integer_box(0,1);
+//                int phase_diff= Site[i].Psi[0] - Site[i].Psi[1];
+//                // if alpha=0: phi_1 -> phi_1 -2*phase_diff; if alpha=1: phi_2 -> phi_2 +2*phase_diff;
+//                new_int_phase[alpha]= arg(Site[i].Psi[alpha] + 2*(2*alpha -1)*phase_diff, MaxP);
+//                int new_phase_diff=new_int_phase[0] -new_int_phase[1];
+//
+//                for (vec = 0; vec < 3; vec++) {
+//                    if (vec == 0) {
+//                        ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+//                        im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+//                    }
+//                    if (vec == 1) {
+//                        ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+//                        im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+//                    }
+//                    if (vec == 2) {
+//                        ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+//                        im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+//                    }
+//                    //std::cout<< "ix: "<< ix << " iy: "<< iy <<" iz: "<< iz << " vec= "<< vec << " ip: " << ip << " im: "<< im << std::endl;
+//
+//                    arg_F_new[0][vec] = arg( (Site[ip].Psi[0] - new_int_phase[0]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                    arg_B_new[0][vec] = arg( (new_int_phase[0] - Site[im].Psi[0]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//                    arg_F_old[0][vec] = arg( (Site[ip].Psi[0] - Site[i].Psi[0]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                    arg_B_old[0][vec] = arg( (Site[i].Psi[0] - Site[im].Psi[0]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//
+//                    arg_F_new[1][vec] = arg( (Site[ip].Psi[1] - new_int_phase[1]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                    arg_B_new[1][vec] = arg( (new_int_phase[1] - Site[im].Psi[1]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//                    arg_F_old[1][vec] = arg( (Site[ip].Psi[1] - Site[i].Psi[1]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+//                    arg_B_old[1][vec] = arg( (Site[i].Psi[1] - Site[im].Psi[1]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+//                }
+//                dE= 0;
+//                //with this sweep I am not touching the Josephson term.
+//                for (vec = 0; vec < DIM; vec++) {
+//                    dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+//                            +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+//                            -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+//                            -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+//                }
+//                if(dE<0){
+//                    Site[i].Psi[0] = new_int_phase[0];
+//                    Site[i].Psi[1] = new_int_phase[1];
+//                }else{
+//                    //Boltzmann weight: exp(-\beta dH) dH= 1/beta dE
+//                    rand = rn::uniform_real_box(0, 1);
+//                    if (rand <exp(-my_beta*dE)) {
+//                        Site[i].Psi[0] = new_int_phase[0];
+//                        Site[i].Psi[1] = new_int_phase[1];
+//                    }
+//                }
+//        }
+//    }
+//}
 
 }
 

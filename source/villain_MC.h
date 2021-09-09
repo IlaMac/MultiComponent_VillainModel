@@ -16,7 +16,8 @@
 #include "o2.h"
 #include "measures.h"
 
-
+void wolff(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
+void growCluster(int i, int* clusterSpin, const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
 void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil);
 double arg_phase(double x);
 int arg(int x, int Max);

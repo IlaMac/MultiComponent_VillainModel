@@ -31,7 +31,7 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         Hp.e=0;
         Hp.h= 1.0;
         Hp.nu=0;
-        Hp.b_low=0.15;
+        Hp.b_low=0.1;
         Hp.b_high=0.35;
         Hp.init=1;
     }
@@ -55,7 +55,7 @@ void initialize_MCparameters(struct MC_parameters &MCp, const fs::path & directo
             fclose(fin);
         }
     }else{
-        MCp.nmisu=100;
+        MCp.nmisu=1000;
         MCp.tau=1;
         MCp.n_autosave=2000; //not used now
         //MCp.lbox_theta=C_PI;

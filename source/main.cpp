@@ -252,6 +252,7 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
         for (t = 0; t < MCp.tau; t++) {
             t_metropolis.tic();
             metropolis_villain(Site, MCp, Hp, my_beta, vil);
+            wolff(Site, MCp, Hp, my_beta, vil);
             t_metropolis.toc();
         }
 
