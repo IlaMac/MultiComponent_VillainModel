@@ -11,6 +11,9 @@
 
 #include "../../OpenGL/src/Window/Window.h"
 
+#include "etc/cout-types.h"
+#include "etc/throw-error.h"
+
 #include "../constants.h"
 #include "../initialization.h"
 #include "../villain_MC.h"
@@ -36,7 +39,12 @@ class GUI {
     struct Villain       & villain;
 
 
-    unsigned actComp = NC;
+
+    // comps: N
+    // all:   1
+    // diffs: N(N-1)/2
+    // sum:   1
+    unsigned actComp = 0;
 
 
     ////
@@ -97,6 +105,11 @@ class GUI {
 
     static
     int is2i (const int, const int, const int, const int);
+
+    static
+    std::tuple<unsigned, unsigned> i2iaib (const unsigned);
+    static
+    unsigned iaib2i (const unsigned, const unsigned);
 
 
 

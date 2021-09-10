@@ -41,7 +41,14 @@ void GUI::onKeyPress (
   //// change component
   ////
   if (key == GLFW_KEY_C) {
-    this->actComp = (this->actComp + 1) % (NC + 1);
+    // comps: N
+    // all:   1
+    // diffs: N(N-1)/2
+    // sum:   1
+    int d = mods == 0 ? 1 : -1;
+    // this->actComp = (this->actComp + d) % (NC + 1 + NC*(NC-1)/2 + 1);
+
+    this->actComp = positive_modulo((int) this->actComp + d, NC + 1 + NC*(NC-1)/2 + 1);
   }
 
 

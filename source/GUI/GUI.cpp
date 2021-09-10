@@ -73,7 +73,9 @@ GUI::GUI (
   //// setup variables
   ////
   this->vs.resize(Lx * Ly * Lz * NC);
-  this->avgVsLength.resize(NC);
+
+  // individual (3) + differences ( N*[N-1]/2 ) + sum
+  this->avgVsLength.resize(NC + NC*(NC-1)/2 + 1);
 
 
   ////

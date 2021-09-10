@@ -23,10 +23,15 @@ grad (
 
 
 void GUI::computeVelocities () {
+  ////
+  //// TODO: compute only if not already done! store some sort of update number count which is incremented when when an update is carried out
+  ////
 
+
+  ////
+  //// compute velocities
+  ////
   for (int a = 0; a < NC; a++) {
-    this->avgVsLength[a] = 0;
-
     for (int iz = 0; iz < Lz; iz++) {
       for (int iy = 0; iy < Ly; iy++) {
         for (int ix = 0; ix < Lx; ix++) {
@@ -43,15 +48,51 @@ void GUI::computeVelocities () {
           const auto iz0 = is2i(ix, iy, iz == 0      ? Lz - 1 : iz - 1);
           const auto iz1 = is2i(ix, iy, iz == Lz - 1 ? 0      : iz + 1);
           this->vs[i].z = grad(this->lattice[iz1].Psi[a], this->lattice[iz].Psi[a], this->lattice[iz0].Psi[a]);
-
-          this->avgVsLength[a] += glm::length(this->vs[i]);
         }
       }
     }
-
-    // normalize
-    this->avgVsLength[a] /= Lz * Ly * Lx;
   }
+
+
+  ////
+  //// compute averages
+  ////
+
+  // reset
+  fill(this->avgVsLength.begin(), this->avgVsLength.end(), 0);
+
+  for (int iz = 0; iz < Lz; iz++) {
+    for (int iy = 0; iy < Ly; iy++) {
+      for (int ix = 0; ix < Lx; ix++) {
+
+        glm::vec3 sum = {0, 0, 0};
+
+        for (int a = 0; a < NC; a++) {
+          const auto i = is2i(a, ix, iy, iz);
+
+          // add
+          sum += this->vs[i];
+
+          // individual
+          this->avgVsLength[a] += glm::length(this->vs[i]);
+
+          // difference
+          for (int b = a + 1; b < NC; b++) {
+            const auto j = is2i(b, ix, iy, iz);
+
+            const auto I = iaib2i(a, b);
+            this->avgVsLength[NC + I] += glm::length(this->vs[i] - this->vs[j]);
+          }
+        }
+
+        // sum
+        this->avgVsLength[NC + NC*(NC-1)/2] += glm::length(sum);
+      }
+    }
+  }
+
+  // normalize
+  for (auto & x : this->avgVsLength) x /= Lz * Ly * Lx;
 }
 
 
