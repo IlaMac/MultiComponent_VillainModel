@@ -59,7 +59,7 @@ class GUI {
     //// container for velocities etc.
     ////
     std::vector<glm::vec3> vs;
-    std::vector<float> maxVs2;
+    std::vector<float> avgVsLength;
 
   public:
 

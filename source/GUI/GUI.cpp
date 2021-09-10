@@ -73,7 +73,7 @@ GUI::GUI (
   //// setup variables
   ////
   this->vs.resize(Lx * Ly * Lz * NC);
-  this->maxVs2.resize(NC);
+  this->avgVsLength.resize(NC);
 
 
   ////

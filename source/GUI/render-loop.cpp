@@ -7,6 +7,7 @@ using namespace std;
 bool GUI::renderLoop (
   const double & t
 ) {
+  // cout << "sum + difference + print avg velocity" << endl;
 
   ////
   //// compute velocities from phases
@@ -45,7 +46,7 @@ bool GUI::renderLoop (
           }
 
           auto i = is2i(this->actComp, ix, iy, iz);
-          
+
           const auto & node = this->lattice[is2i(ix, iy, iz)];
 
 
@@ -53,7 +54,7 @@ bool GUI::renderLoop (
 
           const glm::vec3 mid = {ix + 0.5, iy + 0.5, iz + 0.5};
 
-          auto v = this->vs[i] / sqrt(this->maxVs2[this->actComp]);
+          auto v = this->vs[i] / this->avgVsLength[this->actComp];
 
           const glm::vec3 p0 = mid - 0.4f*v;
           const glm::vec3 p1 = mid + 0.4f*v;
@@ -68,8 +69,8 @@ bool GUI::renderLoop (
     ////
     //// display all components
     ////
-    float maxV2 = 0;
-    for (int a = 0; a < NC; a++) maxV2 = max(this->maxVs2[a], maxV2);
+    float maxAvgVLength = 0;
+    for (int a = 0; a < NC; a++) maxAvgVLength = max(this->avgVsLength[a], maxAvgVLength);
 
     for (int a = 0; a < NC; a++) {
 
@@ -90,7 +91,7 @@ bool GUI::renderLoop (
 
             const glm::vec3 mid = {ix + 0.5, iy + 0.5, iz + 0.5};
 
-            auto v = this->vs[i] / sqrt(maxV2);
+            auto v = this->vs[i] / maxAvgVLength;
 
             const glm::vec3 p0 = mid - 0.4f*v;
             const glm::vec3 p1 = mid + 0.4f*v;
@@ -106,6 +107,34 @@ bool GUI::renderLoop (
 
 
 
+  ////
+  //// display average velocity length
+  ////
+  {
+    float x = 10;
+    float y = this->window->getHeight() - 40;
+
+
+    this->window->_drawText("<|v|>: ", x, y, 1, glm::vec3(0.5, 0.5, 0.5));
+
+
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(3);
+    if (this->actComp < NC) {
+      stream << this->avgVsLength[this->actComp];
+      this->window->_drawText(stream.str(), x, y, 1, glm::vec3(1, 1, 1));
+    } else {
+      stream << this->avgVsLength[0];
+      this->window->_drawText(stream.str(), x, y, 1, glm::vec3(1, 1, 1));
+
+      this->window->_drawText(", ", x, y, 1, glm::vec3(0.5, 0.5, 0.5));
+
+      stream.str("");
+      stream << this->avgVsLength[1];
+      this->window->_drawText(stream.str(), x, y, 1, glm::vec3(1, 1, 1));
+    }
+
+  }
 
 
 
