@@ -98,21 +98,21 @@ void wolff(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_pa
     while(phase_diff_seed<=-M_PI){
         phase_diff_seed+=2*M_PI;}
 
-    for(int iz=0; iz<Lz; iz++){
-        for(int iy=0; iy<Ly; iy++){
-            for(int ix=0; ix<Lx; ix++){
-                i=ix+ Lx*(iy +iz*Ly);
-                phase_diff=dp*(Site.at(i).Psi[1] - Site.at(i).Psi[0]);
-                while(phase_diff > M_PI){
-                    phase_diff-= 2*M_PI;}
-                while(phase_diff<=-M_PI){
-                    phase_diff+=2*M_PI;}
-                if( (phase_diff_seed)*(phase_diff)<0){
-                    clusterSpin[i]=-1;
-                }
-            }
-        }
-    }
+//    for(int iz=0; iz<Lz; iz++){
+//        for(int iy=0; iy<Ly; iy++){
+//            for(int ix=0; ix<Lx; ix++){
+//                i=ix+ Lx*(iy +iz*Ly);
+//                phase_diff=dp*(Site.at(i).Psi[1] - Site.at(i).Psi[0]);
+//                while(phase_diff > M_PI){
+//                    phase_diff-= 2*M_PI;}
+//                while(phase_diff<=-M_PI){
+//                    phase_diff+=2*M_PI;}
+//                if( (phase_diff_seed)*(phase_diff)<0){
+//                    clusterSpin[i]=-1;
+//                }
+//            }
+//        }
+//    }
 
     growCluster(iseed, clusterSpin, Site, MCp, Hp, my_beta, vil);
 
