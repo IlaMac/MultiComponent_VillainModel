@@ -1,6 +1,6 @@
 if(GL_PRINT_INFO)
     # Print CMake options
-    message(STATUS "|---------------------------"
+    message(STATUS "|---------------------------\n"
             "-- | BUILD_SHARED_LIBS       : ${BUILD_SHARED_LIBS}\n"
             "-- | CMAKE_BUILD_TYPE        : ${CMAKE_BUILD_TYPE}\n"
             "-- | CMAKE_INSTALL_PREFIX    : ${CMAKE_INSTALL_PREFIX}\n"
