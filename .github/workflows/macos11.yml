@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup brew packages
         run: |
-          brew install llvm open-mpi
+          brew install llvm libomp open-mpi
 
       - name: Setup brew packages for opengl (?)
         if: github.ref == 'refs/heads/GUI'
