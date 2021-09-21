@@ -1,0 +1,68 @@
+name: macOS 11
+# INSPIRATION https://github.com/onqtam/doctest/pull/285/files/875052e18cf5f5f0b9176e59f847b6205f3efb78#
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - GUI
+
+jobs:
+  ci:
+    name: ${{ matrix.compiler }}-${{ matrix.linkage }}-${{ matrix.manager }}
+    runs-on: macos-11
+    env:
+      cache-name: cache-${{ matrix.compiler }}-${{ matrix.linkage }}-${{ matrix.manager }}
+    strategy:
+      fail-fast: false # True stops all on first error. Stick to false when debugging
+      matrix:
+        include:
+          - { compiler: cl, linkage: shared, manager: conan }
+          - { compiler: cl, linkage: shared, manager: cmake }
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        if: contains(matrix.manager, 'conan')
+        with:
+          python-version: '3.x'
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.conan/data
+            ~/gl-install
+          key: ${{ runner.os }}-${{ env.cache-name }}
+
+      - uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ runner.os }}-${{ env.cache-name }}
+          max-size: 500M
+
+      - name: Setup conan
+        if: matrix.manager == 'conan'
+        run: |
+          pip install conan
+          conan user
+
+      - name: Setup brew packages
+        run: |
+          brew install llvm libomp open-mpi
+
+      - name: Setup brew packages for opengl (?)
+        if: github.ref == 'refs/heads/GUI'
+        run: |
+          brew install glfw
+
+      - name: Build
+        shell: bash
+        run: ./build.sh --install-prefix=~/gl-install
+
+      - name: Test
+        run: |
+          cd build/Release
+          ctest -C Release --output-on-failure -R gl-
+
+
+

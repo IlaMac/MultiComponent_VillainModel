@@ -1,0 +1,22 @@
+# Here you can specify desired software packages to be downloaded by conan.
+# To activate reading this file from CMakeLists.txt, enable the setting -DGL_PACKAGE_MANAGER=conan
+
+
+[requires]
+h5pp/1.9.0@
+fmt/8.0.1@
+spdlog/1.9.2@
+eigen/3.4.0@
+
+# Make sure to have x11 and opengl installed in your system!
+glad/0.1.34@
+glm/0.9.9.8@
+glfw/3.3.4@
+freetype/2.11.0@
+
+
+[generators]
+cmake
+
+[options]
+

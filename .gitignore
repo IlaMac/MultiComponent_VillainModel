@@ -2,3 +2,6 @@ build/
 1/
 2/
 Output/
+cmake-build-*
+.idea/
+.vscode/
