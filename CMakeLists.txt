@@ -11,7 +11,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 endif()
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.15)
 ### Setup project name and language
 project(Villain_2component CXX)
 
@@ -20,18 +20,19 @@ list(INSERT CMAKE_MODULE_PATH 0  ${PROJECT_SOURCE_DIR}/cmake)
 
 
 ### Set options for compilation
-option(BUILD_SHARED_LIBS     "Enables shared library linking (recommended for MPI)"     ON)
-option(GL_ENABLE_TESTS       "Enables CTest testing"                                    ON)
-option(GL_ENABLE_H5PP        "h5pp is a C++ front-end to HDF5"                          ON)
-option(GL_ENABLE_EIGEN3      "Eigen3 is a linear algebra template library"              ON)
-option(GL_ENABLE_SPDLOG      "Spdlog is a fast logging library"                         ON)
-option(GL_ENABLE_OPENMP      "Enable OpenMP flags such as -fopenmp"                     ON)
-option(GL_ENABLE_MPI         "Enable MPI parallelization"                               ON)
-option(GL_ENABLE_LTO         "Enable link time optimization"                            OFF)
-option(GL_ENABLE_ASAN        "Enable runtime address sanitizer -fsanitize=address"      ON)
-option(GL_AS_SUBPROJECT      "Try using this as a subproject with add_subdirectory()"   OFF)
-option(GL_DEPS_IN_SUBDIR     "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>" ON)
-option(GL_PRINT_INFO         "Prints additional information during CMake configure"     ON)
+option(BUILD_SHARED_LIBS     "Enables shared library linking (recommended for MPI)"                     ON)
+option(GL_ENABLE_TESTS       "Enables CTest testing"                                                    ON)
+option(GL_ENABLE_H5PP        "h5pp is a C++ front-end to HDF5"                                          ON)
+option(GL_ENABLE_EIGEN3      "Eigen3 is a linear algebra template library"                              ON)
+option(GL_ENABLE_SPDLOG      "Spdlog is a fast logging library"                                         ON)
+option(GL_ENABLE_OPENMP      "Enable OpenMP flags such as -fopenmp"                                     ON)
+option(GL_ENABLE_OPENGL      "Enable OpenGL visualizations"                                             ON)
+option(GL_ENABLE_MPI         "Enable MPI parallelization"                                               ON)
+option(GL_ENABLE_LTO         "Enable link time optimization"                                            OFF)
+option(GL_ENABLE_ASAN        "Enable runtime address sanitizer -fsanitize=address"                      ON)
+option(GL_AS_SUBPROJECT      "Try using this as a subproject with add_subdirectory()"                   OFF)
+option(GL_PREFIX_ADD_PKGNAME "Install h5pp and dependencies into <CMAKE_INSTALL_PREFIX>/<PackageName>"  ON)
+option(GL_PRINT_INFO         "Prints additional information during CMake configure"                     ON)
 
 
 if(NOT GL_ENABLE_MPI)
@@ -42,13 +43,13 @@ if(GL_ENABLE_MPI AND NOT BUILD_SHARED_LIBS)
     message(WARNING "This project uses MPI which strongly encourages shared library linking")
 endif()
 #################################################################
-### Make an "enum" for valid download methods                 ###
+### Make an "enum" for valid package managers                 ###
 #################################################################
-set(GL_VALID_DOWNLOAD_METHODS none find fetch find-or-fetch conan)
-set(GL_DOWNLOAD_METHOD fetch CACHE STRING "Download method for external dependencies")
-set_property(CACHE GL_DOWNLOAD_METHOD  PROPERTY STRINGS ${VALID_DOWNLOAD_METHODS})
-if(NOT GL_DOWNLOAD_METHOD IN_LIST GL_VALID_DOWNLOAD_METHODS)
-    message(FATAL_ERROR "GL_DOWNLOAD_METHOD must be one of ${GL_VALID_DOWNLOAD_METHODS}")
+set(GL_VALID_PACKAGE_MANAGERS find cmake find-or-cmake conan)
+set(GL_PACKAGE_MANAGER cmake CACHE STRING "Package manager for external dependencies")
+set_property(CACHE GL_PACKAGE_MANAGER PROPERTY STRINGS ${GL_VALID_PACKAGE_MANAGERS})
+if(NOT GL_PACKAGE_MANAGER IN_LIST GL_VALID_PACKAGE_MANAGERS)
+    message(FATAL_ERROR "GL_PACKAGE_MANAGER must be one of ${GL_VALID_PACKAGE_MANAGERS}. Got [${GL_PACKAGE_MANAGER}]")
 endif()
 
 
@@ -85,6 +86,18 @@ include(cmake/PrintOptionInfo.cmake)
 message("Compiling with: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 
+### Add all source files recursively
+file(GLOB_RECURSE SOURCES "source/*.cpp" "OpenGL/*.cpp")
+file(GLOB_RECURSE HEADERS "source/*.h"   "OpenGL/*.h")
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+if(GL_ENABLE_OPENGL)
+    add_library(gl-opengl OBJECT)
+    file(GLOB_RECURSE OPENGL_SOURCES "OpenGL/*.cpp")
+    file(GLOB_RECURSE OPENGL_HEADERS "OpenGL/*.h")
+    target_sources(gl-opengl PRIVATE ${OPENGL_SOURCES} ${OPENGL_HEADERS})
+endif()
+
 
 ###########################################
 ###  Apply RELEASE/DEBUG compile flags  ###
@@ -94,124 +107,44 @@ include(cmake/CompilerFlags.cmake)
 ### Create a helper target with all the options you need to compile
 ### This one is useful to pass to tests and examples so that they compile
 ### In the same way as our main project.
-add_library(project-settings INTERFACE)
-target_compile_features(project-settings INTERFACE cxx_std_17)
+add_library(gl-flags INTERFACE IMPORTED)
 
-
-
-# Set default install directory for dependencies
-# Append directory <libname> to CMAKE_INSTALL_PREFIX
-# Useful if you want to have separate directories for each libs
-# and to easily delete them individually
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT GL_IS_SUBPROJECT)
-    message(STATUS "Setting default install prefix -- CMAKE_INSTALL_PREFIX --> ${CMAKE_BINARY_DIR}/deps-install")
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/deps-install" CACHE PATH "..." FORCE)
-endif ()
-
-
-
-### Add all source files recursively
-# file(GLOB_RECURSE SOURCES "source/*.cpp")
-# file(GLOB_RECURSE HEADERS "source/*.h")
-file(GLOB_RECURSE SOURCES "source/*.cpp" "OpenGL/*.cpp")
-file(GLOB_RECURSE HEADERS "source/*.h"   "OpenGL/*.h")
-# add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/pt.cpp source/pt.h source/villain_potential.cpp source/villain_potential.h source/villain_MC.cpp source/villain_MC.h source/constants.h source/mpi_tools.h)
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-
-
-# activate GUI
-add_definitions(-D GUI_ENABLED)
-
-####
-#### OpenGL libraries
-####
-# OpenGL
-find_package(OpenGL REQUIRED)
-
-# GLM
-find_package(GLM REQUIRED)
-message(STATUS "GLM included at ${GLM_INCLUDE_DIR}")
-
-# GLFW
-find_package(GLFW3 REQUIRED)
-message(STATUS "Found GLFW3 in ${GLFW3_INCLUDE_DIR}")
-
-# FreeType
-find_package(Freetype REQUIRED)
-# message(STATUS "Found Freetype in ${Freetype_INCLUDE_DIR}")
-
-# GLAD
-add_library(GLAD "thirdparty/glad.cpp")
-
-
-# set(LIBS glfw3 GL freetype GLAD)
-
-set(LIBS glfw3 EGL Xext dl GL X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt m freetype GLAD)
-
-
-
-# Define the include DIRs
-include_directories(
-    "${CMAKE_SOURCE_DIR}/source"
-    "${CMAKE_SOURCE_DIR}/include"
-)
-
-# Define the link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
-# target_link_libraries(project-settings INTERFACE ${LIBS})
-
-add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
-
-
-
-
-
-##################################################################
-###  Force cmake to find .a library suffixes on static builds  ###
-##################################################################
-if(BUILD_SHARED_LIBS)
-    set(LINK_TYPE SHARED)
-else()
-    set(LINK_TYPE STATIC)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX} )
-    #target_link_libraries  (project-settings INTERFACE -static)   ### Static linkage
-endif()
-
-
-##################################################################
-### Preempt Threads::Threads                                   ###
-### It's looked for in dependencies, so we make it right       ###
-### before it's done wrong, i.e. with pthread instead of       ###
-### -lpthread.                                     ###
-##################################################################
-if(NOT TARGET Threads::Threads)
-    set(CMAKE_THREAD_PREFER_PTHREAD FALSE)
-    set(THREADS_PREFER_PTHREAD_FLAG FALSE)
-    find_package(Threads)
-    set_target_properties(Threads::Threads PROPERTIES INTERFACE_LINK_LIBRARIES pthread)
-endif()
 
 
 #######################################
 # Settings for sanitizers           ###
 #######################################
 if(GL_ENABLE_ASAN)
-    target_compile_options(project-settings INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: -fsanitize=address -fno-omit-frame-pointer>)
-    target_link_options(project-settings INTERFACE -fsanitize=address)
+    target_compile_options(gl-flags INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: -fsanitize=address -fno-omit-frame-pointer>)
+    target_link_options(gl-flags INTERFACE -fsanitize=address)
+endif()
+
+
+
+##################################################
+###  Add optional RELEASE/DEBUG compile flags  ###
+##################################################
+# -fsanitize=leak -fsanitize=undefined -fsanitize=alignment  -fsanitize=leak -fsanitize=undefined -fsanitize=alignment
+target_compile_options(gl-flags INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+target_compile_options(gl-flags INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELEASE>>:-g>)
+target_compile_options(gl-flags INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: -Wpedantic -Wextra>)
+target_compile_options(gl-flags INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELWITHDEBINFO>>:>)
+target_compile_options(gl-flags INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:MINSIZEREL>>:>)
+target_compile_features(gl-flags INTERFACE cxx_std_17)
+
+if(GL_ENABLE_OPENGL)
+    target_link_libraries(gl-opengl PUBLIC gl-flags)
 endif()
 
 
 # Fetch or find all the dependencies
-include(cmake/SetupDependenciesFind.cmake)
-include(cmake/SetupDependenciesFetch.cmake)
-include(cmake/SetupDependenciesConan.cmake)
+include(cmake/SetupDependencies.cmake)
+
 ##################################################################
 ### Link all the things!                                       ###
 ##################################################################
-find_package(Filesystem COMPONENTS Final Experimental REQUIRED)
-target_link_libraries(project-settings INTERFACE  std::filesystem)
-target_link_libraries(project-settings INTERFACE  ${CONAN_TARGETS} ${NATIVE_TARGETS} Threads::Threads) # Order is important here
-target_link_libraries(${PROJECT_NAME} PRIVATE project-settings)  # Link everything to main project
+target_link_libraries(${PROJECT_NAME} PRIVATE gl-deps gl-flags)  # Link everything to main project
+
 
 
 
@@ -220,11 +153,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE project-settings)  # Link everythi
 if (GL_PRINT_INFO)
     include(cmake/PrintTargetInfo.cmake)
     include(cmake/getExpandedTarget.cmake)
-    expand_target_all_targets(project-settings GL_TARGETS_EXPANDED)
+    expand_target_all_targets(gl-flags GL_FLAGS_EXPANDED)
+    expand_target_all_targets(gl-deps GL_DEPS_EXPANDED)
     message(STATUS "| GL TARGET SUMMARY")
     message(STATUS "|--------------------")
     print_compiler_info("| ")
-    foreach(tgt ${GL_TARGETS_EXPANDED})
+    foreach(tgt ${GL_FLAGS_EXPANDED};${GL_DEPS_EXPANDED})
         print_target_info(${tgt} "| ")
     endforeach()
     print_target_info(${PROJECT_NAME} "| ")
@@ -245,21 +179,6 @@ if(GL_ENABLE_LTO)
         message(STATUS "IPO / LTO not supported: <${error}>, will not enable")
     endif()
 endif()
-
-
-
-
-
-##################################################
-###  Add optional RELEASE/DEBUG compile flags  ###
-##################################################
-# -fsanitize=leak -fsanitize=undefined -fsanitize=alignment  -fsanitize=leak -fsanitize=undefined -fsanitize=alignment
-target_compile_options(project-settings INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wall>)
-target_compile_options(project-settings INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELEASE>>:-g>)
-target_compile_options(project-settings INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: -Wpedantic -Wextra>)
-target_compile_options(project-settings INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELWITHDEBINFO>>:>)
-target_compile_options(project-settings INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:MINSIZEREL>>:>)
-target_compile_features(project-settings INTERFACE cxx_std_17)
 
 
 ### CTest testing

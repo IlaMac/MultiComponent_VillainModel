@@ -8,7 +8,7 @@ include(GNUInstallDirs)
 option(BUILD_SHARED_LIBS               "Builds shared libraries"                                     OFF)
 option(H5PP_BUILD_EXAMPLES             "Builds examples"                                             OFF)
 option(H5PP_ENABLE_TESTS               "Enable testing"                                              OFF)
-option(H5PP_PREFIX_ADD_PKGNAME         "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>"    OFF)
+option(H5PP_PREFIX_ADD_PKGNAME         "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>"    ON)
 option(H5PP_PRINT_INFO                 "Print info during cmake configuration"                       ON)
 option(H5PP_ENABLE_EIGEN3              "Enables Eigen3 linear algebra library"                       ON)
 option(H5PP_ENABLE_FMT                 "Enables the {fmt} formatting library"                        ON)
@@ -21,26 +21,33 @@ option(CMAKE_POSITION_INDEPENDENT_CODE "Use -fPIC when compiling shared librarie
 include(ExternalProject)
 ExternalProject_Add(external_h5pp
         GIT_REPOSITORY https://github.com/DavidAce/h5pp.git
-        GIT_TAG v1.9.0
+        GIT_TAG dev
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         BUILD_ALWAYS TRUE
         PREFIX          ${CMAKE_BINARY_DIR}
         INSTALL_DIR     ${CMAKE_INSTALL_PREFIX}
+        #Give Ninja access to the terminal.
+        USES_TERMINAL_DOWNLOAD TRUE
+        USES_TERMINAL_UPDATE TRUE
+        USES_TERMINAL_CONFIGURE TRUE
+        USES_TERMINAL_BUILD TRUE
+        USES_TERMINAL_INSTALL TRUE
+        USES_TERMINAL_TEST TRUE
+
         CMAKE_ARGS
         ${INIT_CACHE_ARG}
         -DCMAKE_POLICY_DEFAULT_CMP0074=NEW
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_INSTALL_RPATH:PATH=<INSTALL_DIR>/${CMAKE_INSTALL_LIBDIR}
-        -DCMAKE_SKIP_BUILD_RPATH:BOOL=OFF
-        -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=OFF
+        #-DCMAKE_SKIP_BUILD_RPATH:BOOL=OFF
+        #-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=OFF
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON
         -DCMAKE_INSTALL_MESSAGE=LAZY
         # h5pp flags
         -DH5PP_BUILD_EXAMPLES:BOOL=${H5PP_BUILD_EXAMPLES}
         -DH5PP_ENABLE_TESTS:BOOL=${H5PP_ENABLE_TESTS}
         -DH5PP_PREFIX_ADD_PKGNAME:BOOL=${H5PP_PREFIX_ADD_PKGNAME}
-        -DH5PP_PRINT_INFO:BOOL=${H5PP_PRINT_INFO}
         -DH5PP_ENABLE_EIGEN3:BOOL=${H5PP_ENABLE_EIGEN3}
         -DH5PP_ENABLE_FMT:BOOL=${H5PP_ENABLE_FMT}
         -DH5PP_ENABLE_SPDLOG:BOOL=${H5PP_ENABLE_SPDLOG}
