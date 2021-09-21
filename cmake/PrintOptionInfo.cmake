@@ -1,6 +1,6 @@
 if(GL_PRINT_INFO)
     # Print CMake options
-    message(STATUS  "|----------------\n"
+    message(STATUS "|---------------------------"
             "-- | BUILD_SHARED_LIBS       : ${BUILD_SHARED_LIBS}\n"
             "-- | CMAKE_BUILD_TYPE        : ${CMAKE_BUILD_TYPE}\n"
             "-- | CMAKE_INSTALL_PREFIX    : ${CMAKE_INSTALL_PREFIX}\n"
@@ -12,7 +12,6 @@ if(GL_PRINT_INFO)
             "-- | GL_ENABLE_MPI           : ${GL_ENABLE_MPI}\n"
             "-- | GL_ENABLE_OPENMP        : ${GL_ENABLE_OPENMP}\n"
             "-- | GL_ENABLE_LTO           : ${GL_ENABLE_LTO}\n"
-            "-- | GL_DOWNLOAD_METHOD      : ${GL_DOWNLOAD_METHOD}\n"
-            "-- | GL_PREFER_CONDA_LIBS    : ${GL_PREFER_CONDA_LIBS}\n"
+            "-- | GL_PACKAGE_MANAGER      : ${GL_PACKAGE_MANAGER}\n"
             "-- | GL_PRINT_INFO           : ${GL_PRINT_INFO}\n")
 endif ()
