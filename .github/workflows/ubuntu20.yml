@@ -78,7 +78,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: ./build.sh --instal-prefix=~/gl-install
+        run: ./build.sh --install-prefix=~/gl-install
 
       - name: Test
         run: |

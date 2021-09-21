@@ -32,7 +32,7 @@ jobs:
         with:
           path: |
             ~/.conan/data
-            ~/cpm-cache
+            ~/gl-install
           key: ${{ runner.os }}-${{ env.cache-name }}
 
       - uses: hendrikmuhs/ccache-action@v1
@@ -57,7 +57,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: ./build.sh
+        run: ./build.sh --install-prefix=~/gl-install
 
       - name: Test
         run: |
