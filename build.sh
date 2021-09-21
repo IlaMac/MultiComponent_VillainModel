@@ -15,6 +15,7 @@ Usage            : $PROGNAME [-option | --option ] <=argument>
 -G | --generator [=arg]         : CMake generator  | many options... | (default = "CodeBlocks - Unix Makefiles")
    | --gcc-toolchain [=arg]     : Path to GCC toolchain. Use with Clang if it can't find stdlib (defailt = none)
 -h | --help                     : Help. Shows this text.
+-i | --install-prefix   [=path] : Install directory of GL and dependencies (default = CMAKE_INSTALL_PREFIX)
 -j | --make-threads [=num]      : Number of threads used by Make build (default = 8)
 -l | --clear-libs [=args]       : Clear libraries in comma separated list 'lib1,lib2...'. "all" deletes all.
 -s | --enable-shared            : Enable shared library linking (default is static)
@@ -39,8 +40,22 @@ EOF
 }
 
 
+portable_nproc() {
+    OS="$(uname -s)"
+    if [ "$OS" = "Linux" ]; then
+        NPROCS="$(nproc --all)"
+    elif [ "$OS" = "Darwin" ] || \
+         [ "$(echo "$OS" | grep -q BSD)" = "BSD" ]; then
+        NPROCS="$(sysctl -n hw.ncpu)"
+    else
+        NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
+    fi
+    echo "$NPROCS"
+}
+
+
 # Execute getopt on the arguments passed to this program, identified by the special character $@
-PARSED_OPTIONS=$(getopt -n "$0"   -o ha:b:cl:df:g:G:j:st:v \
+PARSED_OPTIONS=$(getopt -n "$0"   -o ha:b:cl:df:g:G:i:j:st:v \
                 --long "\
                 help\
                 arch:\
@@ -62,6 +77,7 @@ PARSED_OPTIONS=$(getopt -n "$0"   -o ha:b:cl:df:g:G:j:st:v \
                 enable-mpi\
                 enable-lto\
                 enable-asan\
+                install-prefix:\
                 no-module\
                 debug-find\
                 verbose\
@@ -92,7 +108,8 @@ enable_opengl="ON"
 enable_mpi="ON"
 enable_lto="OFF"
 enable_asan="OFF"
-make_threads=8
+install_prefix="gl-install"
+make_threads=$(portable_nproc)
 debug_find="OFF"
 verbose="OFF"
 print_info="ON"
@@ -115,6 +132,7 @@ do
     -f|--extra-flags)               extra_flags=$2                  ; echo " * Extra CMake flags        : $2"      ; shift 2 ;;
     -g|--compiler)                  compiler=$2                     ; echo " * C++ Compiler             : $2"      ; shift 2 ;;
     -G|--generator)                 generator=$2                    ; echo " * CMake generator          : $2"      ; shift 2 ;;
+    -i|--install-prefix)            install_prefix=$2               ; echo " * Install Prefix           : $2"      ; shift 2 ;;
     -j|--make-threads)              make_threads=$2                 ; echo " * MAKE threads             : $2"      ; shift 2 ;;
     -s|--enable-shared)             enable_shared="ON"              ; echo " * Link shared libraries    : ON"      ; shift   ;;
        --enable-tests)              enable_tests="ON"               ; echo " * CTest Testing            : ON"      ; shift   ;;
@@ -245,10 +263,15 @@ fi
 
 
 
+export MAKEFLAGS=-j$make_threads
+export CMAKE_BUILD_PARALLEL_LEVEL=$make_threads
+
+
+
 if [ -n "$dry_run" ]; then
     echo "Dry run build sequence"
 else
-    echo "Running build sequence"
+    echo "Running build with $make_threads threads"
 fi
 
 
@@ -258,6 +281,7 @@ Running script:
     cmake -E make_directory build/$build_type
     cd build/$build_type
     cmake   -DCMAKE_BUILD_TYPE=$build_type
+            -DCMAKE_INSTALL_PREFIX:PATH=$install_prefix
             -DBUILD_SHARED_LIBS=$enable_shared
             -DCMAKE_VERBOSE_MAKEFILE=$verbose
             -DCMAKE_FIND_DEBUG_MODE=$debug_find
@@ -286,6 +310,7 @@ if [ -z "$dry_run" ] ;then
     cmake -E make_directory build/$build_type
     cd build/$build_type
     cmake   -DCMAKE_BUILD_TYPE=$build_type \
+            -DCMAKE_INSTALL_PREFIX:PATH=$install_prefix \
             -DBUILD_SHARED_LIBS=$enable_shared \
             -DCMAKE_VERBOSE_MAKEFILE=$verbose \
             -DCMAKE_FIND_DEBUG_MODE=$debug_find \
