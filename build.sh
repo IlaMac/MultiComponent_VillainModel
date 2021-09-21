@@ -9,7 +9,7 @@ Usage            : $PROGNAME [-option | --option ] <=argument>
 -b | --build-type [=arg]        : Build type: [ Release | RelWithDebInfo | Debug | Profile ]  (default = Release)
 -c | --clear-cmake              : Clear CMake files before build (delete ./build)
 -d | --dry-run                  : Dry run
-   | --download-method          : Download method for dependencies [ find | fetch | find-or-fetch | conan ] (default = fetch)
+   | --package-manager          : Download method for dependencies [ find | cmake | find-or-cmake | conan ] (default = cmake)
 -f | --extra-flags [=arg]       : Extra CMake flags (defailt = none)
 -g | --compiler [=arg]          : Compiler        | GNU | Clang | (default = "")
 -G | --generator [=arg]         : CMake generator  | many options... | (default = "CodeBlocks - Unix Makefiles")
@@ -25,10 +25,10 @@ Usage            : $PROGNAME [-option | --option ] <=argument>
    | --enable-mpi               : Enable MPI
    | --enable-lto               : Enable Link Time Optimization
    | --enable-asan              : Enable runtime sanitizers, i.e. -fsanitize=address
+   | --enable-opengl            : Enable visualization with OpenGL
 -t | --target [=args]           : Select build target [ CMakeTemplate | all-tests | test-<name> ]  (default = none)
    | --enable-tests             : Enable CTest tests
    | --debug-find               : Enable debugging of find modules
-   | --prefer-conda             : Prefer libraries from anaconda
    | --no-module                : Disable use of "module load"
    | --quiet                    : Print less CMake info
 -v | --verbose                  : Verbose makefiles
@@ -50,7 +50,7 @@ PARSED_OPTIONS=$(getopt -n "$0"   -o ha:b:cl:df:g:G:j:st:v \
                 clear-libs:\
                 compiler:\
                 dry-run\
-                download-method:\
+                package-manager:\
                 enable-tests\
                 enable-shared\
                 make-threads:\
@@ -58,12 +58,12 @@ PARSED_OPTIONS=$(getopt -n "$0"   -o ha:b:cl:df:g:G:j:st:v \
                 enable-eigen3\
                 enable-spdlog\
                 enable-openmp\
+                enable-opengl\
                 enable-mpi\
                 enable-lto\
                 enable-asan\
                 no-module\
                 debug-find\
-                prefer-conda\
                 verbose\
                 quiet\
                 generator\
@@ -82,18 +82,18 @@ build_type="Release"
 target="all"
 arch="haswell"
 enable_shared="ON"
-download_method="fetch"
+package_manager="cmake"
 enable_tests="ON"
 enable_h5pp="ON"
 enable_eigen3="ON"
 enable_spdlog="ON"
 enable_openmp="ON"
+enable_opengl="ON"
 enable_mpi="ON"
 enable_lto="OFF"
 enable_asan="OFF"
 make_threads=8
 debug_find="OFF"
-prefer_conda="OFF"
 verbose="OFF"
 print_info="ON"
 generator="CodeBlocks - Unix Makefiles"
@@ -111,7 +111,7 @@ do
     -l|--clear-libs)
             clear_libs=($(echo "$2" | tr ',' ' '))                  ; echo " * Clear libraries          : $2"      ; shift 2 ;;
     -d|--dry-run)                   dry_run="ON"                    ; echo " * Dry run                  : ON"      ; shift   ;;
-       --download-method)           download_method=$2              ; echo " * Download method          : $2"      ; shift 2 ;;
+       --package-manager)           package_manager=$2              ; echo " * Package Manager          : $2"      ; shift 2 ;;
     -f|--extra-flags)               extra_flags=$2                  ; echo " * Extra CMake flags        : $2"      ; shift 2 ;;
     -g|--compiler)                  compiler=$2                     ; echo " * C++ Compiler             : $2"      ; shift 2 ;;
     -G|--generator)                 generator=$2                    ; echo " * CMake generator          : $2"      ; shift 2 ;;
@@ -123,12 +123,12 @@ do
        --enable-eigen3)             enable_eigen3="ON"              ; echo " * Enable Eigen3            : ON"      ; shift   ;;
        --enable-spdlog)             enable_spdlog="ON"              ; echo " * Enable spdlog            : ON"      ; shift   ;;
        --enable-openmp)             enable_openmp="ON"              ; echo " * Enable OpenMP            : ON"      ; shift   ;;
+       --enable-opengl)             enable_opengl="ON"              ; echo " * Enable OpenGL            : ON"      ; shift   ;;
        --enable-mpi)                enable_mpi="ON"                 ; echo " * Enable OpenMPI           : ON"      ; shift   ;;
        --enable-lto)                enable_lto="ON"                 ; echo " * Link Time Optimization   : ON"      ; shift   ;;
        --enable-asan)               enable_asan="ON"                ; echo " * Runtime sanitizers       : ON"      ; shift   ;;
        --no-module)                 no_module="ON"                  ; echo " * Disable module load      : ON"      ; shift   ;;
        --debug-find)                debug_find="ON"                 ; echo " * Debug find_package       : ON"      ; shift   ;;
-       --prefer-conda)              prefer_conda="ON"               ; echo " * Prefer anaconda libs     : ON"      ; shift   ;;
        --quiet)                     print_info="OFF"                ; echo " * Print less CMake info    : ON"      ; shift   ;;
     -v|--verbose)                   verbose="ON"                    ; echo " * Verbose makefiles        : ON"      ; shift   ;;
     --) shift; break;;
@@ -156,13 +156,13 @@ for lib in "${clear_libs[@]}"; do
     fi
 done
 
-if [[ ! "$download_method" =~ find|fetch|conan ]]; then
-    echo "Download method unsupported: $download_method"
+if [[ ! "$package_manager" =~ find|cmake|conan ]]; then
+    echo "Package manager unsupported: $package_manager"
     exit 1
 fi
 
 # Deactivate conda if not explicitly asked for
-if [[ "$prefer_conda" =~ OFF|off|False|false ]] && [ -n "$CONDA_PREFIX" ] ; then
+if [ -n "$CONDA_PREFIX" ] ; then
     if [ -f "$CONDA_PREFIX_1/etc/profile.d/conda.sh" ]; then
         source $CONDA_PREFIX_1/etc/profile.d/conda.sh
     fi
@@ -203,7 +203,7 @@ if [[ "$HOSTNAME" == *"tetralith"* ]];then
 elif [[ "$HOSTNAME" == *"raken"* ]];then
     if [ -z "$no_module" ]; then
         module load CMake
-        if [[ "$download_method" =~ find ]] ; then
+        if [[ "$package_manager" =~ find ]] ; then
                 module load foss/2019b
                 module load HDF5/1.10.5-GCCcore-8.3.0
                 module load Eigen/3.3.7
@@ -263,11 +263,12 @@ Running script:
             -DCMAKE_FIND_DEBUG_MODE=$debug_find
             -DGL_MARCH=$arch
             -DGL_PRINT_INFO=ON
-            -DGL_DOWNLOAD_METHOD=$download_method
+            -DGL_PACKAGE_MANAGER=$package_manager
             -DGL_ENABLE_SPDLOG=$enable_spdlog
             -DGL_ENABLE_EIGEN3=$enable_eigen3
             -DGL_ENABLE_H5PP=$enable_h5pp
             -DGL_ENABLE_OPENMP=$enable_openmp
+            -DGL_ENABLE_OPENGL=$enable_opengl
             -DGL_ENABLE_MPI=$enable_h5pp
             -DGL_ENABLE_TESTS=$enable_tests
             -DGL_PREFER_CONDA_LIBS=$prefer_conda
@@ -290,14 +291,14 @@ if [ -z "$dry_run" ] ;then
             -DCMAKE_FIND_DEBUG_MODE=$debug_find \
             -DGL_MARCH=$arch \
             -DGL_PRINT_INFO=$print_info \
-            -DGL_DOWNLOAD_METHOD=$download_method \
+            -DGL_PACKAGE_MANAGER=$package_manager \
             -DGL_ENABLE_SPDLOG=$enable_spdlog \
             -DGL_ENABLE_EIGEN3=$enable_eigen3 \
             -DGL_ENABLE_H5PP=$enable_h5pp \
             -DGL_ENABLE_OPENMP=$enable_openmp \
+            -DGL_ENABLE_OPENGL=$enable_opengl \
             -DGL_ENABLE_MPI=$enable_mpi \
             -DGL_ENABLE_TESTS=$enable_tests \
-            -DGL_PREFER_CONDA_LIBS=$prefer_conda \
             -DGL_ENABLE_LTO=$enable_lto \
             -DGL_ENABLE_ASAN=$enable_asan \
             $extra_flags \
