@@ -12,12 +12,12 @@
 H_rho=1
 H_alpha=1
 H_eta1=0
-H_eta2=50
+H_eta2=100
 H_e=0
 H_h=1
-H_nu=0
-H_blow=0.2
-H_bhigh=0.35
+H_nu=0.3
+H_blow=0.31
+H_bhigh=0.325
 nMAX=30
 H_init="1"
 flag=1 #vecchia nomenclatura cartella senza _init${H_init}
@@ -26,8 +26,8 @@ nbeta=64
 
 #LList="\"[[8] [10]]\""
 
-LList=("8")
-#LList=("8 10 12 16 20 24 32")
+#LList=("8 10 12")
+LList=("8 10 12 16 20 24 32")
 
 
 BASEDIR="/home/ilaria/Desktop/MultiComponent_VillainModel/Output_Villain_2C/Model_Sym/e_${H_e}/nu_${H_nu}/eta2_${H_eta2}/h_${H_h}"

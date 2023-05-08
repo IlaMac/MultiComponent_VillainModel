@@ -80,7 +80,7 @@ for H_nu in ${nu_list}; do
         Z2_H_bhigh=0.42
         U1_H_blow=${Z2_H_blow}
         U1_H_bhigh=${Z2_H_bhigh}
-        Z2_bmin=0.406
+        Z2_bmin=0.407
         Z2_bmax=0.42
         U1_bmin=${Z2_bmin}
         U1_bmax=${Z2_bmax}

@@ -50,5 +50,5 @@ for b in range(nbeta):
     ax3.hist(M, bins=20, density=True)
     ax3.plot(PM.support, PM.density)
     fig.tight_layout()
-    plt.savefig('%s/beta_%d/Check_M.png' %(BASEDIR, b))
-    plt.close()
+    #plt.savefig('%s/beta_%d/Check_M.png' %(BASEDIR, b))
+    #plt.close()

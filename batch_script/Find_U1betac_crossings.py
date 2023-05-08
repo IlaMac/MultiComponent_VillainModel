@@ -103,12 +103,14 @@ for l1 in range(len(L)-1):
             y2=Js_cross[n,index2, l2]
             m2= (y1-y2)/(x1-x2)
             q2= -x2*m2+y2
+            betac_test=(q2-q1)/(m1-m2)
             #betac_cross[n,l2-1]=(q2-q1)/(m1-m2)
-            betac_cross_l1.append((q2-q1)/(m1-m2))
+            if((betac_test>bmin) and (betac_test< bmax)):
+                betac_cross_l1.append(betac_test)
         #else:
             #print("nada")
     betac_u1_finitesize.append(np.mean(betac_cross_l1))
-    err_betac_u1_finitesize.append(np.sqrt(N_dataset-1)*np.std(betac_cross_l1))
+    err_betac_u1_finitesize.append(np.sqrt(len(betac_cross_l1)-1)*np.std(betac_cross_l1))
 
 
 
@@ -123,20 +125,39 @@ for l in range(len(L)-1):
     pair_l[l]=1./np.sqrt(L[l]*L[l+1])
 
 np.savetxt("%s/Betac_U1_finitesize_rho%s_eta2%s_e%s_nu%s.txt" %(BASEDIR, rho, eta2, e, nu), (pair_l, np.asarray(betac_u1_finitesize),np.asarray(err_betac_u1_finitesize)))
-#print("mean beta_c U(1):", np.mean(betac_u1_finitesize), np.std(betac_u1_finitesize)/np.sqrt(len(betac_u1_finitesize)-1))
+
 plt.rc('text',usetex=True)
 plt.rc('text.latex', preamble=r'\usepackage{bm}')
 fig, ax1 = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(6,6))
 ax1.errorbar(pair_l, betac_u1_finitesize,yerr= err_betac_u1_finitesize, fmt="o-")
 
 u1_popt, u1_pcov = curve_fit(linear_fit, pair_l , betac_u1_finitesize, sigma=err_betac_u1_finitesize, absolute_sigma=True)
-print( var, u1_popt[1], u1_pcov[1,1])
 
-ax1.plot(pair_l,linear_fit(pair_l, *u1_popt), ls="--", c="gray" )
+########## GOODNES OF THE FIT #############
+residuals = betac_u1_finitesize- linear_fit(pair_l, *u1_popt)
+ss_res = np.sum(residuals**2)
+ss_tot = np.sum((betac_u1_finitesize-np.mean(betac_u1_finitesize))**2)
+
+r_squared = 1 - (ss_res / ss_tot)
+# print("U1", ss_res, ss_tot, r_squared)
+##############################################
+threshold=0.5
+if(ss_res< threshold):
+    print( var, u1_popt[1], u1_pcov[1,1])
+else:
+    err_betac_u1_finitesize=np.asarray(err_betac_u1_finitesize)
+    print(var, np.mean(betac_u1_finitesize), np.sqrt(np.sum(err_betac_u1_finitesize*err_betac_u1_finitesize))/len(err_betac_u1_finitesize))
+
+bbox_props = dict(boxstyle="round", fc="w", ec="0.5", alpha=0.9)
+
+ax1.plot(pair_l,linear_fit(pair_l, *u1_popt), ls="--", c="gray" , label= r"$$RSS=%.2lf$$ $$RSS_{threshold}=%s$$" %(ss_res, threshold))
 ax1.set_ylabel(r"$\beta_c(U(1))$")
-ax1.set_xlabel(r"$(L_i L_{i+1})^{1/2}$")
+ax1.set_xlabel(r"$(L_i L_{i+1})^{-1/2}$")
+ax1.text(0.58, 0.1, r"$$\beta_c^{fit}=%.3lf$$ $$\beta_c^{mean}=%.3lf$$" %(u1_popt[1], np.mean(betac_u1_finitesize)),  transform=ax1.transAxes,  bbox=bbox_props)
+ax1.legend(loc="best")
 fig.suptitle(r"$\nu=%s$; $e=%s$; $\eta_2=%s$" %(nu, e, eta2))
 fig.tight_layout()
 fig.subplots_adjust(top=0.9)
+fig.savefig("%s/betacU1_nu%s_e%s_eta2%s_alpha%s.png" %(BASEDIR, nu, e, eta2, alpha))
 # plt.show()
 plt.close()

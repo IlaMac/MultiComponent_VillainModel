@@ -1,0 +1,146 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "GL_PACKAGE_MANAGER": "conan",
+        "GL_ENABLE_TESTS": "ON",
+        "GL_ENABLE_H5PP": "ON",
+        "GL_ENABLE_EIGEN3": "ON",
+        "GL_ENABLE_SPDLOG": "ON",
+        "GL_ENABLE_OPENMP": "ON",
+        "GL_ENABLE_MPI": "ON",
+        "GL_ENABLE_LTO": "OFF",
+        "GL_ENABLE_ASAN": "OFF",
+        "GL_AS_SUBPROJECT": "OFF",
+        "GL_DEPS_IN_SUBDIR": "ON",
+        "GL_PRINT_INFO": "ON",
+        "BUILD_SHARED_LIBS": "ON",
+        "CMAKE_VERBOSE_MAKEFILE": "FALSE",
+        "CMAKE_MESSAGE_LOG_LEVEL": "STATUS",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}/pkg-install",
+        "CMAKE_C_STANDARD": "17",
+        "CMAKE_CXX_STANDARD": "17",
+        "CMAKE_CXX_STANDARD_REQUIRED": "TRUE",
+        "CMAKE_CXX_EXTENSIONS": "FALSE",
+        "CMAKE_POSITION_INDEPENDENT_CODE": "TRUE",
+        "THREADS_PREFER_PTHREAD_FLAG": "TRUE",
+        "CMAKE_CXX_FLAGS": "-fno-strict-aliasing -fdiagnostics-color=always",
+        "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g3 -ggdb -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -march=native -mtune=native",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-Og -g3 -ggdb -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-omit-frame-pointer",
+        "CMAKE_C_FLAGS": "-fno-strict-aliasing -fdiagnostics-color=always",
+        "CMAKE_C_FLAGS_DEBUG": "-O0 -g3 -ggdb -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-omit-frame-pointer",
+        "CMAKE_C_FLAGS_RELWITHDEBINFO": "-Og -g3 -ggdb  -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-omit-frame-pointer",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "TRUE",
+        "CMAKE_SKIP_BUILD_RPATH": "FALSE",
+        "CMAKE_BUILD_WITH_INSTALL_RPATH": "FALSE",
+        "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE"
+      },
+      "environment": {
+        "NINJA_STATUS": "[run %r|beg %s|fin %f|tot %t|rate %o|time %e]:"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "GL_ENABLE_ASAN": "TRUE"
+      }
+    },
+    {
+      "name": "native",
+      "inherits": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -march=native -mtune=native",
+        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -march=native -mtune=native",
+        "GL_ENABLE_LTO": "TRUE"
+      }
+    },
+    {
+      "name": "haswell",
+      "inherits": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -march=haswell -mtune=haswell",
+        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -march=haswell -mtune=haswell",
+        "GL_ENABLE_LTO": "TRUE"
+      }
+    },
+    {
+      "name": "release-native",
+      "displayName": "Release|native",
+      "inherits": [
+        "release",
+        "native",
+        "default"
+      ]
+    },
+    {
+      "name": "release-kraken",
+      "displayName": "Release|native",
+      "inherits": [
+        "release",
+        "native",
+        "default"
+      ]
+    },
+    {
+      "name": "debug-asan",
+      "displayName": "Debug|asan",
+      "inherits": [
+        "debug",
+        "default"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release-native",
+      "displayName": "Release|march=native",
+      "configurePreset": "release-native"
+    },
+    {
+      "name": "release-kraken",
+      "displayName": "Release|march=haswell",
+      "configurePreset": "release-kraken"
+    },
+    {
+      "name": "debug-asan",
+      "displayName": "Debug|fsanitize=address",
+      "configurePreset": "debug-asan"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "configurePreset": "default",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ]
+}

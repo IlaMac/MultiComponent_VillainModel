@@ -11,7 +11,6 @@ void growCluster(int i, int* clusterSpin, const std::vector<Node> &Site, struct 
     int old_Psi[NC]={0};
     int ix, iy, iz;
     int ip, im, vec, alpha;
-    int beta;
     int arg_F_new[NC]={0};
     int arg_B_new[NC]={0}; /*Forward and Backward updated phases*/
     int arg_F_old[NC]={0};
@@ -88,31 +87,9 @@ void wolff(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_pa
     double rand=0;
     int i, iseed, count=0;
     int clusterSpin[N]={0};
-    double  phase_diff, phase_diff_seed;
 
     /*choose randomly a site of the lattice*/
     iseed = rn::uniform_integer_box(0, N-1);
-    phase_diff_seed=dp*(Site.at(iseed).Psi[1] - Site.at(iseed).Psi[0]);
-    while(phase_diff_seed > M_PI){
-        phase_diff_seed-= 2*M_PI;}
-    while(phase_diff_seed<=-M_PI){
-        phase_diff_seed+=2*M_PI;}
-
-//    for(int iz=0; iz<Lz; iz++){
-//        for(int iy=0; iy<Ly; iy++){
-//            for(int ix=0; ix<Lx; ix++){
-//                i=ix+ Lx*(iy +iz*Ly);
-//                phase_diff=dp*(Site.at(i).Psi[1] - Site.at(i).Psi[0]);
-//                while(phase_diff > M_PI){
-//                    phase_diff-= 2*M_PI;}
-//                while(phase_diff<=-M_PI){
-//                    phase_diff+=2*M_PI;}
-//                if( (phase_diff_seed)*(phase_diff)<0){
-//                    clusterSpin[i]=-1;
-//                }
-//            }
-//        }
-//    }
 
     growCluster(iseed, clusterSpin, Site, MCp, Hp, my_beta, vil);
 
@@ -129,6 +106,129 @@ void wolff(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_pa
 
     return;
 }
+
+void growCluster_general(int i, int  alpha, int rand_phase, int* clusterSpin, const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
+
+    int new_Psi[NC]={0};
+    int old_Psi[NC]={0};
+    int ix, iy, iz;
+    int ip, im, vec, beta;
+    int arg_F_new[NC]={0};
+    int arg_B_new[NC]={0}; /*Forward and Backward updated phases*/
+    int arg_F_old[NC]={0};
+    int arg_B_old[NC]={0}; /*Forward and Backward updated phases*/
+    //addProbability for the link i,j has the form: 1- exp(-beta \Delta E_ij) with \Delta E_ij
+    double rand=0., coeff, addProbability;
+    double dE=0;
+    struct O2 random_vec;
+    struct O2 old_spin;
+    struct O2 new_spin;
+
+    //phase in i added to the cluster and flipped
+    clusterSpin[i]=1;
+
+    old_Psi[0]= Site[i].Psi[0];
+    old_Psi[1]= Site[i].Psi[1];
+
+    new_Psi[0] = Site[i].Psi[0];
+    new_Psi[1] = Site[i].Psi[1];
+
+    random_vec.t=rand_phase*dp;
+    random_vec.r=1.;
+    polar_to_cartesian(random_vec);
+    old_spin.t=Site[i].Psi[alpha]*dp;
+    old_spin.r=1.;
+    polar_to_cartesian(old_spin);
+    coeff=O2prod(old_spin, random_vec);
+    O2comb(new_spin, 1, old_spin, -2*coeff, random_vec);
+    cartesian_to_polar(new_spin);
+
+    new_Psi[alpha]= new_spin.t*inv_dp;
+
+    ix= i%Lx;
+    iy= (i/Lx)%Ly;
+    iz= i/(Lx*Ly);
+
+
+    Site[i].Psi[0]= new_Psi[0];
+    Site[i].Psi[1]= new_Psi[1];
+
+    //Check of the neighbours of i
+    // if the neighbor spin does not belong to the cluster, but it has the preconditions to be added, then try to add it to the cluster
+    for (vec = 0; vec < 3; vec++) {
+        if (vec == 0) {
+            ip = mod(ix + 1, Lx) + Lx * (iy + iz * Ly);
+            im = mod(ix - 1, Lx) + Lx * (iy + iz * Ly);
+        }
+        if (vec == 1) {
+            ip = ix + Lx * (mod(iy + 1, Ly) + iz * Ly);
+            im = ix + Lx * (mod(iy - 1, Ly) + iz * Ly);
+        }
+        if (vec == 2) {
+            ip = ix + Lx * (iy + mod(iz + 1, Lz) * Ly);
+            im = ix + Lx * (iy + mod(iz - 1, Lz) * Ly);
+        }
+        if (clusterSpin[im]==0){
+            for(alpha=0; alpha<NC; alpha++){
+                arg_B_new[alpha]  = arg( (new_Psi[alpha] - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+                arg_B_old[alpha] = arg( (old_Psi[alpha]  - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
+            }
+            //with this sweep I am not touching the Josephson term.
+            dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+            addProbability=1-exp(-my_beta*dE);
+            rand= rn::uniform_real_box(0, 1);;
+            if (rand < addProbability){
+                growCluster(im, clusterSpin, Site, MCp, Hp, my_beta, vil);}
+        }
+        if (clusterSpin[ip]==0){
+            for(alpha=0; alpha<NC; alpha++){
+                arg_F_new[alpha] = arg( (Site[ip].Psi[alpha] - new_Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+                arg_F_old[alpha] = arg( (Site[ip].Psi[alpha] - old_Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
+            }
+            //with this sweep I am not touching the Josephson term.
+            dE = (  vil.potential.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) - vil.potential.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+            addProbability=1-exp(-my_beta*dE);
+
+            rand= rn::uniform_real_box(0, 1);;
+            if (rand < addProbability){
+                growCluster(ip, clusterSpin, Site, MCp, Hp, my_beta, vil);}
+        }
+    }
+
+    return;
+}
+
+void wolff_general(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H_parameters &Hp, double my_beta, struct Villain &vil){
+
+    double rand=0;
+    int i, iseed, count=0;
+    int alpha;
+    int rand_phase;
+    int clusterSpin[N]={0};
+
+    /*choose randomly a site of the lattice*/
+    iseed = rn::uniform_integer_box(0, N-1);
+    /*choose randomly one of the two component*/
+    alpha = rn::uniform_integer_box(0, 1);
+    /*choose randomly the phase of the unitary vector with respect which perform the reflection*/
+    rand_phase = rn::uniform_integer_box(0, MaxP-1);
+
+    growCluster_general(iseed, alpha, rand_phase, clusterSpin, Site, MCp, Hp, my_beta, vil);
+
+    for(int iz=0; iz<Lz; iz++){
+        for(int iy=0; iy<Ly; iy++){
+            for(int ix=0; ix<Lx; ix++){
+                i=ix+ Lx*(iy +iz*Ly);
+                if( clusterSpin[i]==1){count++;}
+            }
+        }
+    }
+
+//    std::cout<< "WOLFF size: "<< count<<std::endl;
+
+    return;
+}
+
 
 
 
