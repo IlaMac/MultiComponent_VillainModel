@@ -12,6 +12,7 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
         if((fin=fopen(hp_init_file.c_str(), "r"))) {
             fscanf(fin, "%lf" , &Hp.rho);
             fscanf(fin, "%lf" , &Hp.alpha);
+            fscanf(fin, "%lf" , &Hp.rho2);
             fscanf(fin, "%lf" , &Hp.eta1);
             fscanf(fin, "%lf" , &Hp.eta2);
             fscanf(fin, "%lf" , &Hp.e);
@@ -26,6 +27,8 @@ void initialize_Hparameters(struct H_parameters &Hp, const fs::path & directory_
     }else{
         Hp.rho=1;
         Hp.alpha=1;
+        /* To have finite amplitude gradients within the system*/
+        Hp.rho2=0;
         Hp.eta1=0;
         Hp.eta2=100;
         Hp.e=0;

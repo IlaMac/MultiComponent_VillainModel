@@ -28,6 +28,7 @@ struct H_parameters{
     /*These values are externally given by an input file*/
     double rho;
     double alpha; //anisotropy factor between the bare stiffness of the two components
+    double rho2; // to have finite amplitude gradients within the system*/
     double eta1;
     double eta2;
     double e;

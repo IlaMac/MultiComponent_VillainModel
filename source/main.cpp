@@ -237,6 +237,9 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     MPI_Scatter(PTroot.beta_m.data(), 1, MPI_DOUBLE, &beta_nm, 1, MPI_DOUBLE, PTp.root, MPI_COMM_WORLD);
     /*Initialization Villain potentials*/
     init_villain_potentials(my_beta, beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
+    if(Hp.rho2!=0){
+        init_villain_potentials_2(my_beta, beta_np, beta_nm, vil, Hp, MCp, directory_write_temp );
+    }
     std::cout<< "START I am rank "<< PTp.rank << " my beta is: "<< my_beta<< " my beta plus is: "<< beta_np << " my beta minus is: "<< beta_nm << std::endl;
 
     mis.reset();

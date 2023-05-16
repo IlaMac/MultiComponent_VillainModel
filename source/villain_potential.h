@@ -21,7 +21,20 @@ struct Villain{
     std::vector<double> d11_potential; /*Useful to compute efficiently the helicity modulus*/
     std::vector<double> d22_potential; /*Useful to compute efficiently the helicity modulus*/
     std::vector<double> d12_potential; /*Useful to compute efficiently the helicity modulus*/
+
+    std::vector<double> potential_2; /*Table of the Villain potential multiplied by beta for each value of \Delta_mu \theta_1(r),  \Delta_mu \theta_2(r) */
+    std::vector<double> potential_bplus_2; /*Table of the Villain potential multiplied by the right neighbouring beta for each value of \Delta_mu \theta_1(r),  \Delta_mu \theta_2(r) */
+    std::vector<double> potential_bminus_2; /*Table of the Villain potential multiplied by the right neighbouring beta for each value of \Delta_mu \theta_1(r),  \Delta_mu \theta_2(r) */
+    std::vector<double> upotential_2; /*Useful to compute efficiently the internal energy*/
+    std::vector<double> d1_potential_2; /*Useful to compute efficiently the helicity modulus*/
+    std::vector<double> d2_potential_2; /*Useful to compute efficiently the helicity modulus*/
+    std::vector<double> d11_potential_2; /*Useful to compute efficiently the helicity modulus*/
+    std::vector<double> d22_potential_2; /*Useful to compute efficiently the helicity modulus*/
+    std::vector<double> d12_potential_2; /*Useful to compute efficiently the helicity modulus*/
+
 };
 
 void init_villain_potentials(double my_beta, double beta_np, double beta_nm, struct Villain &vil, struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write);
+void init_villain_potentials_2(double my_beta, double beta_np, double beta_nm, struct Villain &vil, struct H_parameters &Hp, struct MC_parameters &MCp, const fs::path & directory_write);
+
 #endif //VILLAIN_2COMPONENT_VILLAIN_POTENTIAL_H
