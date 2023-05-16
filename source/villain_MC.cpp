@@ -294,11 +294,30 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
 
                 /*******************Phase updating phase componet 1*******************/
                 dE=0;
-                for (vec = 0; vec < DIM; vec++) {
-                   dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
-                         +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
-                         -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
-                         -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                if(Hp.rho2!=0){
+                    if(ix< ((int) Lx/2)){ /*First half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix>= ((int) Lx/2)){ /*secnd half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                }else{
+                    for (vec = 0; vec < DIM; vec++) {
+                       dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                             +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                    }
                 }
                 rand = rn::uniform_real_box(0, 1);
                 dE+=( (Hp.eta1*cos(dp*(new_int_phase[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(new_int_phase[0] - Site[i].Psi[1])) )
@@ -327,11 +346,30 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
 
                 /*******************Phase updating phase componet 2*******************/
                 dE=0;
-                for (vec = 0; vec < DIM; vec++) {
-                   dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
-                         +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
-                         -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
-                         -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                if(Hp.rho2!=0){
+                    if(ix< ((int) Lx/2)){ /*First half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix>= ((int) Lx/2)){ /*Second half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                }else{
+                    for (vec = 0; vec < DIM; vec++) {
+                       dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                             +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                             -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                    }
                 }
                 dE+=( (Hp.eta1*cos(dp*(new_int_phase[1] - Site[i].Psi[0])) + Hp.eta2*cos(2*dp*(new_int_phase[1] - Site[i].Psi[0])))
                         -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
@@ -382,16 +420,31 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                     }
                 }
                 dE=0;
-                for (vec = 0; vec < DIM; vec++) {
-                    dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
-                            +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
-                            -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
-                            -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                if(Hp.rho2!=0){
+                    if(ix< ((int) Lx/2)){ /*First half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix>= ((int) Lx/2)){ /*Second half*/
+                        for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                }else{
+                    for (vec = 0; vec < DIM; vec++) {
+                        dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                                +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                    }
                 }
-//                std::cout<<"dE prima: "<< dE<<std::endl;
-//                dE+=( (Hp.eta1*cos(dp*(new_int_phase[0] - new_int_phase[1])) + Hp.eta2*cos(2*dp*(new_int_phase[0] - new_int_phase[1])) )
-//                        -(Hp.eta1*cos(dp*(Site[i].Psi[0] - Site[i].Psi[1])) + Hp.eta2*cos(2*dp*(Site[i].Psi[0] - Site[i].Psi[1]))) );
-//                std::cout<<"dE dopo: "<< dE<<std::endl;
 
                 if(dE<0){
                     Site[i].Psi[0] = new_int_phase[0];
@@ -430,7 +483,19 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*NewA, MaxP);
                             arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*OldA, MaxP);
                         }
-                        dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec]) - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
+                        if(Hp.rho2!=0){
+                            if(ix< ((int)Lx/2) ){
+                                dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                        - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
+                            }
+                            if(ix>= ((int)Lx/2) ) {
+                                dE_A = vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec]) -
+                                       vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
+                            }
+                        }else{
+                            dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                    - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
+                        }
                         //curl A
                         curl2_A_new=0.;
                         curl2_A_old=0.;
