@@ -136,12 +136,28 @@ void helicity_modulus(struct Measures &mis, struct Villain &vil, const std::vect
 
                 int arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp* Hp.e * Site[i].A[0], MaxP);
                 int arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp* Hp.e * Site[i].A[0], MaxP);
-
-                d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                d11+= vil.d11_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                d22+= vil.d22_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                d12+= vil.d12_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                if(Hp.rho2!=0){
+                    if(ix< ((int) Lx/2)){ /*First half*/
+                        d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d11+= vil.d11_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d22+= vil.d22_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d12+= vil.d12_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    }
+                    if(ix>= ((int) Lx/2)) { /*second half*/
+                        d1+= vil.d1_potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d2+= vil.d2_potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d11+= vil.d11_potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d22+= vil.d22_potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        d12+= vil.d12_potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    }
+                }else{
+                    d1+= vil.d1_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    d2+= vil.d2_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    d11+= vil.d11_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    d22+= vil.d22_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    d12+= vil.d12_potential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                }
             }
         }
     }
