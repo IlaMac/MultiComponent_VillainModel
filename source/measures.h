@@ -25,6 +25,9 @@ struct Measures{
     double DH_Ddi[NC]={0}; //1st derivative in the twisted phase of the i component
     double D2H_Dd2i[NC]={0}; //2nd derivative in the twisted phase of the i component
     double D2H_Dd12=0.; //2nd mixed derivative in the twisted phases of the component 1 and 2
+    double B_x = 0.;
+    double B_y = 0.;
+    double B_z = 0.;
 
     int my_rank = 0;
     void reset(){
@@ -32,7 +35,7 @@ struct Measures{
     }
 };
 
-
+void magnetic_fields(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp);
 void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp);
 void josephson_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp);
 void energies(struct Measures &mis, struct Villain &vil, double &E_betanp, double &E_betanm, const std::vector<Node> &Site, struct H_parameters &Hp);

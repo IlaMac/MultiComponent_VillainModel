@@ -4,6 +4,45 @@
 
 #include "measures.h"
 
+void magnetic_fields(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp){
+
+    int n1_i, n3_i;
+    int vec1, vec2;
+
+    for(int iz=0;iz<Lz;iz++){
+        for(int iy=0;iy<Ly;iy++){
+            for(int ix=0; ix<Lx; ix++) {
+                int i = ix + Lx * (iy + iz * Ly);
+                /*Bx: plaquette in tht yz plane*/
+                n1_i=ix + Lx * (mod(iy+1,Ly) + iz * Ly);
+                n3_i=ix + Lx * (iy + mod(iz+1, Lz) * Ly);
+                vec1= 1;
+                vec2= 2;
+                mis.B_x+= Site[i].A[vec1] + Site[n1_i].A[vec2] - Site[n3_i].A[vec1] - Site[i].A[vec2];
+
+                /*By: plaquette in tht xz plane*/
+                n1_i=mod(ix+1, Lx) + Lx * (iy + iz * Ly);
+                n3_i=ix + Lx * (iy + mod(iz+1, Lz) * Ly);
+                vec1= 0;
+                vec2= 2;
+                mis.B_y+= Site[i].A[vec1] + Site[n1_i].A[vec2] - Site[n3_i].A[vec1] - Site[i].A[vec2];
+
+
+                /*Bz: plaquette in tht xy plane*/
+                n1_i=mod(ix+1, Lx) + Lx * (iy + iz * Ly);
+                n3_i=ix + Lx * (mod(iy+1, Ly) + iz * Ly);
+                vec1= 0;
+                vec2= 1;
+                mis.B_z+= Site[i].A[vec1] + Site[n1_i].A[vec2] - Site[n3_i].A[vec1] - Site[i].A[vec2];
+
+            }
+        }
+    }
+    mis.B_x/=N;
+    mis.B_y/=N;
+    mis.B_z/=N;
+}
+
 void gauge_potential(struct Measures &mis, const std::vector<Node> &Site, struct H_parameters &Hp){
     int vec, l;
     int nn_i, nn_il;

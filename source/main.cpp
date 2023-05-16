@@ -214,9 +214,10 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     std::cout << directory_write_temp << "\t" << NSTART << std::endl;
     // Enable compression
     file.setCompressionLevel(0);
-//    // Register the compound type
+    // Register the compound type
     std::vector<hsize_t> rho_dims = {NC};	
     h5pp::hid::h5t HDF5_RHO_TYPE = H5Tarray_create(H5T_NATIVE_DOUBLE,rho_dims.size(),rho_dims.data());
+
     h5pp::hid::h5t MY_HDF5_MEASURES_TYPE = H5Tcreate(H5T_COMPOUND, sizeof(Measures));
 
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "E", HOFFSET(Measures, E), H5T_NATIVE_DOUBLE);
@@ -229,6 +230,10 @@ void mainloop(const std::vector<Node> &Site, struct MC_parameters &MCp, struct H
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "DH_Ddi", HOFFSET(Measures, DH_Ddi), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd2i", HOFFSET(Measures, D2H_Dd2i), HDF5_RHO_TYPE);
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "D2H_Dd12", HOFFSET(Measures, D2H_Dd12), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "B_x", HOFFSET(Measures, B_x), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "B_y", HOFFSET(Measures, B_y), H5T_NATIVE_DOUBLE);
+    H5Tinsert(MY_HDF5_MEASURES_TYPE, "B_z", HOFFSET(Measures, B_z), H5T_NATIVE_DOUBLE);
+
     H5Tinsert(MY_HDF5_MEASURES_TYPE, "rank", HOFFSET(Measures, my_rank), H5T_NATIVE_INT);
 
     file.createTable(MY_HDF5_MEASURES_TYPE, "Measurements", "Measures");
