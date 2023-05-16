@@ -20,7 +20,7 @@
 struct Node{
     /*three spatial dimensions*/
     mutable std::array<double,DIM> A{};
-    /*three SC components*/
+    /*two SC components*/
     mutable std::array<int, NC> Psi{}; /*discretized values of the phase. To be multiplied by 2*M_PI/MaxP*/
 };
 
