@@ -80,10 +80,26 @@ void energies(struct Measures &mis, struct Villain &vil, double &E_betanp, doubl
 
                     int arg_1 = arg(Site[nn_i].Psi[0] - Site.at(i).Psi[0] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
                     int arg_2 = arg(Site[nn_i].Psi[1] - Site.at(i).Psi[1] - inv_dp*Hp.e * Site[i].A[vec], MaxP);
-                    mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                    mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
-                    E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
-                    E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    if(Hp.rho2!=0){
+                        if(ix< ((int) Lx/2)){ /*First half*/
+                            mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                            mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
+                            E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                            E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        }
+                        if(ix>= ((int) Lx/2)){ /*second half*/
+                            mis.U+= vil.upotential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                            mis.E+= vil.potential_2.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
+                            E_betanm_temp+= vil.potential_bminus_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                            E_betanp_temp+= vil.potential_bplus_2.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        }
+                    }else{
+                        mis.U+= vil.upotential.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        mis.E+= vil.potential.at(OFFSET_POT + arg_1 +MaxP*arg_2) ;
+                        E_betanm_temp+= vil.potential_bminus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                        E_betanp_temp+= vil.potential_bplus.at(OFFSET_POT + arg_1 +MaxP*arg_2);
+                    }
+
                 }
             }
         }
