@@ -295,7 +295,20 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 /*******************Phase updating phase componet 1*******************/
                 dE=0;
                 if(Hp.rho2!=0){
-                    if(ix< ((int) Lx/2)){ /*First half*/
+                    if(ix== 0){ /*External border: Backward along x requires rho2*/
+                        vec=0;
+                        dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                               +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if( (ix< ((int) Lx/2)) && (ix>0)){ /*First half*/
                         for (vec = 0; vec < DIM; vec++) {
                             dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
                                    +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
@@ -303,8 +316,21 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                    -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
                         }
                     }
-                    if(ix>= ((int) Lx/2)){ /*secnd half*/
+                    if(ix> ((int) Lx/2)){ /*second half*/
                         for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix== ((int) Lx/2) ){ /*Central border: Backward along x requires rho1*/
+                        vec=0;
+                        dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
+                               +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
                             dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_old[1][vec])
                                    +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_old[1][vec])
                                    -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
@@ -347,7 +373,20 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 /*******************Phase updating phase componet 2*******************/
                 dE=0;
                 if(Hp.rho2!=0){
-                    if(ix< ((int) Lx/2)){ /*First half*/
+                    if(ix== 0){ /*External border: Backward along x requires rho2*/
+                        vec=0;
+                        dE += (vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                               +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if( (ix< ((int) Lx/2)) && (ix>0)){ /*First half*/
                         for (vec = 0; vec < DIM; vec++) {
                             dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
                                    +vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
@@ -355,8 +394,21 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                    -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
                         }
                     }
-                    if(ix>= ((int) Lx/2)){ /*Second half*/
+                    if(ix> ((int) Lx/2)){ /*Second half*/
                         for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix== ((int) Lx/2) ){ /*Central border: Backward along x requires rho1*/
+                        vec=0;
+                        dE += (vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
+                               +vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
                             dE += (vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_new[1][vec])
                                    +vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_new[1][vec])
                                    -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
@@ -421,7 +473,20 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                 }
                 dE=0;
                 if(Hp.rho2!=0){
-                    if(ix< ((int) Lx/2)){ /*First half*/
+                    if(ix== 0){ /*External border: Backward along x requires rho2*/
+                        vec=0;
+                        dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                               +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
+                            dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if( (ix< ((int) Lx/2)) && (ix>0)){ /*First half*/
                         for (vec = 0; vec < DIM; vec++) {
                             dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
                                    +vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
@@ -429,8 +494,21 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                                    -vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
                         }
                     }
-                    if(ix>= ((int) Lx/2)){ /*Second half*/
+                    if(ix> ((int) Lx/2)){ /*Second half*/
                         for (vec = 0; vec < DIM; vec++) {
+                            dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                                   +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                                   -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        }
+                    }
+                    if(ix== ((int) Lx/2) ){ /*Central border: Backward along x requires rho1*/
+                        vec=0;
+                        dE += (vil.potential.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
+                               +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
+                               -vil.potential.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
+                               -vil.potential_2.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]));
+                        for (vec = 1; vec < DIM; vec++) {
                             dE += (vil.potential_2.at(OFFSET_POT + arg_B_new[0][vec] + MaxP * arg_B_new[1][vec])
                                    +vil.potential_2.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
                                    -vil.potential_2.at(OFFSET_POT + arg_B_old[0][vec] + MaxP * arg_B_old[1][vec])
@@ -483,7 +561,7 @@ void metropolis_villain(const std::vector<Node> &Site, struct MC_parameters &MCp
                             arg_F_new[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*NewA, MaxP);
                             arg_F_old[alpha][vec] = arg( (Site[ip].Psi[alpha] - Site[i].Psi[alpha]) - inv_dp*Hp.e*OldA, MaxP);
                         }
-                        if(Hp.rho2!=0){
+                        if(Hp.rho2!=0){ /*Here we only compute the forward phase difference so no need to be worried about the border*/
                             if(ix< ((int)Lx/2) ){
                                 dE_A= vil.potential.at(OFFSET_POT + arg_F_new[0][vec] + MaxP * arg_F_new[1][vec])
                                         - vil.potential.at(OFFSET_POT + arg_F_old[0][vec] + MaxP * arg_F_old[1][vec]);
