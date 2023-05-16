@@ -58,7 +58,30 @@ void growCluster(int i, int* clusterSpin, const std::vector<Node> &Site, struct 
                 arg_B_old[alpha] = arg( (old_Psi[alpha]  - Site[im].Psi[alpha]) - inv_dp*Hp.e*Site[im].A[vec], MaxP);
             }
             //with this sweep I am not touching the Josephson term.
-            dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+            if(Hp.rho2!=0){
+                if(ix== 0){ /*External border: Backward along x requires rho2*/
+                    if(vec==0){
+                        dE = (  vil.potential_2.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential_2.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                    }else if (vec>0){
+                        dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                    }
+                }
+                if( (ix< ((int) Lx/2)) && (ix>0)){ /*First half*/
+                    dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                }
+                if(ix> ((int) Lx/2)){ /*second half*/
+                    dE = (  vil.potential_2.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential_2.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                }
+                if(ix== ((int) Lx/2) ){ /*Central border: Backward along x requires rho1*/
+                    if(vec==0){
+                        dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                    }else if(vec>0){
+                        dE = (  vil.potential_2.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential_2.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+                    }
+                }
+            }else{
+                dE = (  vil.potential.at(OFFSET_POT + arg_B_new[0] + MaxP * arg_B_new[1]) -vil.potential.at(OFFSET_POT + arg_B_old[0] + MaxP * arg_B_old[1]));
+            }
             addProbability=1-exp(-my_beta*dE);
             rand= rn::uniform_real_box(0, 1);;
             if (rand < addProbability){
@@ -70,7 +93,19 @@ void growCluster(int i, int* clusterSpin, const std::vector<Node> &Site, struct 
                 arg_F_old[alpha] = arg( (Site[ip].Psi[alpha] - old_Psi[alpha]) - inv_dp*Hp.e*Site[i].A[vec], MaxP);
             }
             //with this sweep I am not touching the Josephson term.
-            dE = (  vil.potential.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) - vil.potential.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+            if(Hp.rho2!=0){
+                if(ix< ((int) Lx/2)){ /*First half*/
+                    dE = (vil.potential.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) -
+                          vil.potential.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+                }
+                if(ix>= ((int) Lx/2)){ /*second half*/
+                    dE = (vil.potential_2.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) -
+                          vil.potential_2.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+                }
+            }else {
+                dE = (vil.potential.at(OFFSET_POT + arg_F_new[0] + MaxP * arg_F_new[1]) -
+                      vil.potential.at(OFFSET_POT + arg_F_old[0] + MaxP * arg_F_old[1]));
+            }
             addProbability=1-exp(-my_beta*dE);
 
             rand= rn::uniform_real_box(0, 1);;
