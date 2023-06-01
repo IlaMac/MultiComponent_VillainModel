@@ -22,9 +22,10 @@ nu=float(sys.argv[7])
 eta1=(sys.argv[8])
 eta2=(sys.argv[9])
 rho=sys.argv[10]
-nMAX=sys.argv[11]
-H_init=sys.argv[12]
-flag_init=(sys.argv[13])
+alpha=sys.argv[11]
+nMAX=sys.argv[12]
+H_init=sys.argv[13]
+flag_init=(sys.argv[14])
 
 if( (nu).is_integer()): nu=int(nu)
 if( (e).is_integer()): e=int(e)
@@ -32,27 +33,34 @@ if( (e).is_integer()): e=int(e)
 
 
 L=[]
-for ind in range(14, len(sys.argv)):
+for ind in range(15, len(sys.argv)):
     L.append(int(sys.argv[ind]))
 
 beta=np.zeros((nbeta))
 
 color=iter(plt.cm.rainbow(np.linspace(0,1,len(L)+1)))
 
+def bootstrap_magn(M_data, nblocks, nrs):
+    Mboot = np.zeros(nrs)
+    Chiboot = np.zeros(nrs)
+    Uboot = np.zeros(nrs)
+    #bootstrap resampling extract Nblocks with replacement and form a new set of data from which compute Cv, E_err, Cv_err
+    for i in range(nrs):
+        inds = np.random.randint(nblocks, size=nblocks)
+        data = M_data[inds,:]
+        data = data.flatten()
+        Mboot[i] = np.mean(data)
+        Chiboot[i] = np.var(data)
+        Uboot[i]= np.mean(np.power(data,4))/(3*np.power(np.mean(np.power(data,2)),2))
+    M_err= np.std(Mboot, ddof=1)
+    Chi_err= np.std(Chiboot, ddof=1)
+    U_err= np.std(Uboot, ddof=1)
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-plt.rc('text.latex', preamble=r'\usepackage{bm}')
-fig, ax1 = plt.subplots(nrows=2, figsize=(4,8))
-ax1[0].set_title(r"$h=%s$; $e=%s$; $\nu=%s$" %(h, e, nu))
-ax1[0].set_xlabel(r"$\beta$")
-ax1[0].set_ylabel(r"$M$")
-ax1[1].set_xlabel(r"$\beta$")
-ax1[1].set_ylabel(r"$U$")
+    return M_err, Chi_err, U_err, Uboot
 
-N_dataset=100
+nrs=500
 
-U_resampling=np.zeros((N_dataset, nbeta))
+U_resampling=np.zeros((nrs, nbeta))
 
 for l in range(len(L)):
 
@@ -61,9 +69,7 @@ for l in range(len(L)):
     M_mean=np.zeros((nbeta))
     M_err=np.zeros((nbeta))
 
-    BASEDIR=("%s/L%d_rho%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
-
-    c_m=next(color)
+    BASEDIR=("%s/L%d_rho%s_alpha%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, alpha, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
     
     data_tau_max=np.loadtxt("%s/tau_max.txt" %BASEDIR, dtype=str)
     tau_max=np.amax(np.array(data_tau_max[1], dtype=float))
@@ -86,41 +92,41 @@ for l in range(len(L)):
         M=M[indices_rank]
         
         #split the N measurements in Nb blocks according to the autocorrelation time tau
-        Nblocks=100
-        block_size=int(len(M)/Nblocks)
-        while((block_size<(20*tau_max)) and (Nblocks>20) ):
-            Nblocks=int(Nblocks*0.5)
-            block_size=int(len(M)/Nblocks)
-        M_block=np.zeros((Nblocks, block_size))
-        for block in range(Nblocks):
-            M_block[block]=M[block*block_size: (block+1)*block_size]
+        block_size=int(100*tau_max)
+        nblocks=int(len(M)/block_size)
 
-        meanM_resampling=np.zeros((N_dataset))
-        #bootstrap resampling extract M blocks with replacement and form a new set of data from which compute Cv, E_err, Cv_err
-        for n in range(N_dataset):
-            resampling= np.random.choice(Nblocks,Nblocks)
-            M_resampling=M_block[resampling]
-            meanM_resampling[n]=np.mean(M_resampling)
-            U_resampling[n, b]=np.mean(np.power(M_resampling,4))/(3*np.power(np.mean(np.power(M_resampling,2)),2))
+        while((block_size<(100*tau_max)) and (nblocks>20) ):
+            nblocks=int(nblocks*0.5)
+            block_size=int(len(M)/nblocks)
 
-        M_mean[b]=np.mean(meanM_resampling)
-        M_err[b]=np.sqrt(N_dataset-1)*np.std(meanM_resampling)
-        U_mean[b]=np.mean(U_resampling[:,b])
-        U_err[b]=np.sqrt(N_dataset-1)*np.std(U_resampling[:,b])
+        M_data=np.zeros((nblocks, block_size))
+        for block in range(nblocks):
+            M_data[block]=M[block*block_size: (block+1)*block_size]
+
+        M_err, Chi_err, U_err,  U_resampling[:,b]= bootstrap_magn(M_data, nblocks, nrs)
+
+        # meanM_resampling=np.zeros((N_dataset))
+        # #bootstrap resampling extract M blocks with replacement and form a new set of data from which compute Cv, E_err, Cv_err
+        # for n in range(N_dataset):
+        #     resampling= np.random.choice(Nblocks,Nblocks)
+        #     M_resampling=M_block[resampling]
+        #     meanM_resampling[n]=np.mean(M_resampling)
+        #     U_resampling[n, b]=np.mean(np.power(M_resampling,4))/(3*np.power(np.mean(np.power(M_resampling,2)),2))
+
+        # M_mean[b]=np.mean(meanM_resampling)
+        M_mean[b]=np.mean(M)
+        M_err[b]= M_err
+        # M_err[b]=np.std(meanM_resampling)
+
+        # U_mean[b]=np.mean(U_resampling[:,b])
+        U_mean[b]=np.mean(np.power(M,4))/(3*np.power(np.mean(np.power(M,2)),2))
+        U_err[b]= U_err
+        # U_err[b]=np.std(U_resampling[:,b])
 
     np.savetxt("%s/Binder_alln.txt" %(BASEDIR), U_resampling)
 
     np.savetxt("%s/Magnetization.txt" %(BASEDIR), (beta, M_mean, M_err))
     np.savetxt("%s/Binder_cumulant.txt" %(BASEDIR), (beta, U_mean, U_err))
 
-    ax1[0].plot(beta, M_mean, '-', c=c_m)
-    ax1[0].errorbar(beta, M_mean, yerr=M_err, capsize=2, c=c_m,label="L=%s" %L[l])
-    ax1[1].plot(beta, U_mean, '-', c=c_m)
-    ax1[1].errorbar(beta, U_mean, yerr=U_err, c=c_m, capsize=2)
-
-ax1[0].legend(loc="best")
-plt.tight_layout()
-plt.savefig("%s/Magnetization_h%s_bmin%s_bmax%s.png" %(folder_out, h, beta_low, beta_high))
-#plt.show()
 
 

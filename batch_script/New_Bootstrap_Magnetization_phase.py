@@ -22,9 +22,10 @@ nu=float(sys.argv[7])
 eta1=(sys.argv[8])
 eta2=(sys.argv[9])
 rho=sys.argv[10]
-nMAX=sys.argv[11]
-H_init=sys.argv[12]
-flag_init=(sys.argv[13])
+alpha=sys.argv[11]
+nMAX=sys.argv[12]
+H_init=sys.argv[13]
+flag_init=(sys.argv[14])
 
 if( (nu).is_integer()): nu=int(nu)
 if( (e).is_integer()): e=int(e)
@@ -32,7 +33,7 @@ if( (e).is_integer()): e=int(e)
 
 
 L=[]
-for ind in range(14, len(sys.argv)):
+for ind in range(15, len(sys.argv)):
     L.append(int(sys.argv[ind]))
 
 beta=np.zeros((nbeta))
@@ -73,7 +74,7 @@ for l in range(len(L)):
     meanM2_resampling=np.zeros((N_dataset, nbeta))
     U2_resampling=np.zeros((N_dataset, nbeta))
     
-    BASEDIR=("%s/L%d_rho%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
+    BASEDIR=("%s/L%d_rho%s_alpha%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, alpha, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
 
     c_m=next(color)
     
@@ -121,14 +122,14 @@ for l in range(len(L)):
             U2_resampling[n,b]=2*(1- np.mean(np.power(M2_resampling,4))/(2*np.power(np.mean(np.power(M2_resampling,2)),2)))
 
         M_1_mean[b]=np.mean(meanM1_resampling[:, b])
-        M_1_err[b]=np.sqrt(N_dataset-1)*np.std(meanM1_resampling[:, b])
+        M_1_err[b]=np.std(meanM1_resampling[:, b])
         U_1_mean[b]=np.mean(U1_resampling[:, b])
-        U_1_err[b]=np.sqrt(N_dataset-1)*np.std(U1_resampling[:, b])
+        U_1_err[b]=np.std(U1_resampling[:, b])
 
         M_2_mean[b]=np.mean(meanM1_resampling[:, b])
-        M_2_err[b]=np.sqrt(N_dataset-1)*np.std(meanM1_resampling[:, b])
+        M_2_err[b]=np.std(meanM1_resampling[:, b])
         U_2_mean[b]=np.mean(U1_resampling[:, b])
-        U_2_err[b]=np.sqrt(N_dataset-1)*np.std(U1_resampling[:, b])
+        U_2_err[b]=np.std(U1_resampling[:, b])
 
 
     np.savetxt("%s/Magnetization_phase.txt" %(BASEDIR), (beta, M_1_mean, M_1_err,  M_1_mean, M_2_err))

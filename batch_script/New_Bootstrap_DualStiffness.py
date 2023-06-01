@@ -23,9 +23,10 @@ nu=float(sys.argv[7])
 eta1=(sys.argv[8])
 eta2=(sys.argv[9])
 rho=sys.argv[10]
-nMAX=sys.argv[11]
-H_init=sys.argv[12]
-flag_init=(sys.argv[13])
+alpha=sys.argv[11]
+nMAX=sys.argv[12]
+H_init=sys.argv[13]
+flag_init=(sys.argv[14])
 
 if( (nu).is_integer()): nu=int(nu)
 if( (e).is_integer()): e=int(e)
@@ -33,7 +34,7 @@ if( (e).is_integer()): e=int(e)
 
 
 L=[]
-for ind in range(14, len(sys.argv)):
+for ind in range(15, len(sys.argv)):
     L.append(int(sys.argv[ind]))
 
 beta=np.zeros((nbeta))
@@ -69,7 +70,7 @@ for l in range(len(L)):
 
     Ds_all=np.zeros((N_dataset, nbeta))
 
-    BASEDIR=("%s/L%d_rho%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
+    BASEDIR=("%s/L%d_rho%s_alpha%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, alpha, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
 
     data_tau_max=np.loadtxt("%s/tau_max.txt" %BASEDIR, dtype=str)
     tau_max=np.amax(np.array(data_tau_max[1], dtype=float))
@@ -113,7 +114,7 @@ for l in range(len(L)):
             Ds_all[n,b]=np.mean(Ds_resampling)
 
         Ds_mean[b]=np.mean(meanDs_resampling)
-        Ds_err[b]=np.sqrt(N_dataset-1)*np.std(meanDs_resampling)
+        Ds_err[b]=np.std(meanDs_resampling)
 
     np.savetxt("%s/DStiffness_alln.txt" %(BASEDIR), Ds_all)
     np.savetxt("%s/Dual_Stiffness.txt" %(BASEDIR), (beta, Ds_mean, Ds_err))

@@ -46,7 +46,6 @@ for name in range(len(Observables)):
 
         ######################################
         if((Observables[name]=="D2H_Dd2i") or (Observables[name]=="DH_Ddi") or (Observables[name]=="m_phase")):
-            #print(np.shape(Obs), Obs)
             Obs=Obs[:,0]
 
         ####ORDER ACCORDING TO THE RANK#########
@@ -57,8 +56,6 @@ for name in range(len(Observables)):
 
         A_Obs=acf(Obs, nlags=int(len(Obs)/10), fft=True)
 
-        #plt.plot(A_Obs)
-        #plt.show()
         temp_tau=[]
         time_int=10
         while(time_int<= len(A_Obs)):

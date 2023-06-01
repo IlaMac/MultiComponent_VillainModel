@@ -22,8 +22,8 @@ endif()
 #################################################################
 ### Make an "enum" for valid download methods                 ###
 #################################################################
-set(GL_VALID_PACKAGE_MANAGERS find cmake conan)
-set(GL_PACKAGE_MANAGER cmake CACHE STRING "Package manager for external dependencies")
+set(GL_VALID_PACKAGE_MANAGERS find cmake)
+set(GL_PACKAGE_MANAGER find CACHE STRING "Package manager for external dependencies")
 set_property(CACHE GL_PACKAGE_MANAGER  PROPERTY STRINGS ${GL_VALID_PACKAGE_MANAGERS})
 if(NOT GL_PACKAGE_MANAGER IN_LIST GL_VALID_PACKAGE_MANAGERS)
     message(FATAL_ERROR "GL_PACKAGE_MANAGER must be one of ${GL_VALID_PACKAGE_MANAGERS}")
@@ -59,7 +59,7 @@ include(cmake/CompilerFlags.cmake)
 ### Add all source files recursively
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 file(GLOB_RECURSE HEADERS "source/*.h")
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/main.cpp source/main.h source/villain_MC.cpp source/villain_MC.h source/pt.cpp source/pt.h source/measures.cpp source/measures.h source/initialization.cpp source/initialization.h source/rng.cpp)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} source/main.cpp source/main.h source/villain_MC.cpp source/villain_MC.h source/villain_potential.cpp source/villain_potential.h source/pt.cpp source/pt.h source/measures.cpp source/measures.h source/initialization.cpp source/initialization.h source/rng.cpp)
 
 
 

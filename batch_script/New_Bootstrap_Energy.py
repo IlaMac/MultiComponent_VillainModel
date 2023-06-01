@@ -22,9 +22,10 @@ nu=float(sys.argv[7])
 eta1=(sys.argv[8])
 eta2=(sys.argv[9])
 rho=sys.argv[10]
-nMAX=sys.argv[11]
-H_init=sys.argv[12]
-flag_init=(sys.argv[13])
+alpha=sys.argv[11]
+nMAX=sys.argv[12]
+H_init=sys.argv[13]
+flag_init=(sys.argv[14])
 
 if( (nu).is_integer()): nu=int(nu)
 if( (e).is_integer()): e=int(e)
@@ -32,7 +33,7 @@ if( (e).is_integer()): e=int(e)
 
 
 L=[]
-for ind in range(14, len(sys.argv)):
+for ind in range(15, len(sys.argv)):
     L.append(int(sys.argv[ind]))
 
 beta=np.zeros((nbeta))
@@ -40,18 +41,22 @@ beta=np.zeros((nbeta))
 print(sys.argv)
 
 
-# plt.rc('text', usetex=True)
-# plt.rc('font', family='serif')
-# plt.rc('text.latex', preamble=r'\usepackage{bm}')
-# fig, ax1 = plt.subplots(nrows=2, figsize=(4,8))
-# ax1[0].set_title(r"$h=%s$; $e=%s$; $\nu=%s$" %(h, e, nu))
-# ax1[0].set_xlabel(r"$\beta$")
-# ax1[0].set_ylabel(r"$E/V$")
-# ax1[1].set_xlabel(r"$\beta$")
-# ax1[1].set_ylabel(r"$C_{v}$")
+def bootstrap_energy(E_data, nblocks, nrs):
+    Eboot = np.zeros(nrs)
+    Cboot = np.zeros(nrs)
+    #bootstrap resampling extract Nblocks with replacement and form a new set of data from which compute Cv, E_err, Cv_err
+    for i in range(nrs):
+        inds = np.random.randint(nblocks, size=nblocks)
+        data = E_data[inds,:]
+        data = data.flatten()
+        Eboot[i] = np.mean(data)
+        Cboot[i] = np.var(data)
+    E_err= np.std(Eboot, ddof=1)
+    C_err= np.std(Cboot, ddof=1)
 
-# color=iter(plt.cm.rainbow(np.linspace(0,1,len(L)+1)))
+    return E_err, C_err
 
+nrs=500
 
 for l in range(len(L)):
 
@@ -60,14 +65,11 @@ for l in range(len(L)):
     E_mean=np.zeros((nbeta))
     E_err=np.zeros((nbeta))
 
-    # c_m=next(color)
 
-    N_dataset=100
-
-    BASEDIR=("%s/L%d_rho%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
+    BASEDIR=("%s/L%d_rho%s_alpha%s_eta1%s_eta2%s_e%s_h%s_nu%s_bmin%s_bmax%s_nMAX%s_init%s"  %(folder_out, L[l], rho, alpha, eta1, eta2, e,  h, nu, beta_low, beta_high, nMAX, H_init))
 
     data_tau_max=np.loadtxt("%s/tau_max.txt" %BASEDIR, dtype=str)
-    tau_max=np.amax(np.array(data_tau_max[1], dtype=float))
+    tau_max=(np.array(data_tau_max[1][0], dtype=float))
 
     data_transient_time=np.loadtxt("%s/transient_time.txt" %BASEDIR, dtype=str)
     transient_time=int(np.amax(np.array(data_transient_time[1], dtype=float)))
@@ -86,50 +88,31 @@ for l in range(len(L)):
         indices_rank= rank.argsort()
         E=E[indices_rank]
         #split the N measurements in Nblocks blocks according to the autocorrelation time tau
-     
-        Nblocks=100
-        block_size=int(len(E)/Nblocks)
-        while((block_size<(20*tau_max)) and (Nblocks>20) ):
-            Nblocks=int(Nblocks*0.5)
-            block_size=int(len(E)/Nblocks)
-        #block_size=int(20*tau_max)
 
-        E_block=np.zeros((Nblocks, block_size))
-        for block in range(Nblocks):
-            E_block[block]=E[block*block_size: (block+1)*block_size]
+        block_size=int(100*tau_max)
+        nblocks=int(len(E)/block_size)
+        while((block_size<(100*tau_max)) and (nblocks>20) ):
+            Nblocks=int(nblocks*0.5)
+            block_size=int(len(E)/nblocks)
+
+
+        E_data=np.zeros((nblocks, block_size))
+        for block in range(nblocks):
+            E_data[block]=E[block*block_size: (block+1)*block_size]
+
+        Eerr, Cerr = bootstrap_energy(E_data, nblocks, nrs)
+
+        E_mean[b]=np.mean(E)/(L**3)
+        E_err[b]=Eerr/(L**3)
        
-        meanE_resampling=np.zeros((N_dataset))
-        meanE2_resampling=np.zeros((N_dataset))
-        Cv_resampling=np.zeros((N_dataset))
-        #bootstrap resampling extract Nblocks with replacement and form a new set of data from which compute Cv, E_err, Cv_err
-        for n in range(N_dataset):
-            resampling= np.random.choice(Nblocks,Nblocks)
-            E_resampling=E_block[resampling]
-            meanE_resampling[n]=np.mean(E_resampling)
-            meanE2_resampling[n]=np.mean(E_resampling**2)
-            Cv_resampling[n]=(beta[b]*beta[b])/(L[l]**3) * (meanE2_resampling[n] - (meanE_resampling[n]**2))
+        Cv_mean[b]=np.var(E)*(beta[b]*beta[b])/(L**3) 
+        Cv_err[b]=Cerr*(beta[b]*beta[b])/(L**3) 
 
-        E_mean[b]=np.mean(meanE_resampling/(L[l]**3))
-        E_err[b]=np.sqrt(N_dataset-1)*np.std(meanE_resampling/(L[l]**3))
-        Cv_mean[b]=np.mean(Cv_resampling)
-        Cv_err[b]=np.sqrt(N_dataset-1)*np.std(Cv_resampling)
 
     data_energy=np.vstack((beta, E_mean, E_err))
     np.savetxt("%s/Energy.txt" %(BASEDIR), data_energy)
     np.savetxt("%s/Specific_Heat.txt" %(BASEDIR), (beta, Cv_mean, Cv_err))
 
-
-#     ax1[0].plot(beta, E_mean, '-', c=c_m)
-#     #for block in range(nblocks):
-#     #    ax1[0].plot(beta, meanE_resampling[block,:], '-')
-#     ax1[0].errorbar(beta, E_mean, yerr=E_err, capsize=2, c=c_m, label="L=%s" %L[l])
-#     ax1[1].plot(beta, Cv_mean, '-', c=c_m)
-#     ax1[1].errorbar(beta, Cv_mean, yerr=Cv_err, c=c_m, capsize=2)
-
-# ax1[0].legend(loc="best")
-# fig.tight_layout()
-# fig.savefig("%s/Energy_h%s_bmin%s_bmax%s.png" %(BASEDIR, h, beta_low, beta_high))
-# #plt.show()
 
 
 
